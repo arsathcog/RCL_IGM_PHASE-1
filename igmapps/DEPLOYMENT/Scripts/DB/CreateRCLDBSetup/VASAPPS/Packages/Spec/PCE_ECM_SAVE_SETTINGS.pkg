@@ -1,0 +1,12 @@
+CREATE OR REPLACE PACKAGE PCE_ECM_SAVE_SETTINGS AS
+
+ PROCEDURE PRE_GET_VIEW_INFO(  p_o_v_view_id       OUT      VARCHAR2
+                               ,p_o_v_view_name    OUT      VARCHAR2
+                               ,p_o_v_default_flag OUT      VARCHAR2
+                               ,p_o_v_view_type	   OUT      VARCHAR2
+                               ,p_i_v_view_id	     IN      VARCHAR2	
+							                 , p_o_v_error    OUT     VARCHAR2
+                              );
+END PCE_ECM_SAVE_SETTINGS; 
+
+/

@@ -1,0 +1,16 @@
+CREATE OR REPLACE PACKAGE PCE_ECM_ERRORMESSAGE AS
+
+PROCEDURE PRE_ECM_ERRORMESSAGE
+                (
+                    p_o_refErrorMessage              OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+                  , p_i_v_ll_dl_flag                 VARCHAR2
+                  , p_i_v_load_discharg_id           TOS_DL_OVERLANDED_CONTAINER.FK_DISCHARGE_LIST_ID%TYPE
+                  , p_i_v_ol_os_id                   TOS_DL_OVERLANDED_CONTAINER.PK_OVERLANDED_CONTAINER_ID%TYPE
+                  , p_o_v_tot_rec                    OUT VARCHAR2
+                  , p_o_v_error                      OUT VARCHAR2
+                );
+
+END PCE_ECM_ERRORMESSAGE;
+/* End of Package Specification */
+
+/

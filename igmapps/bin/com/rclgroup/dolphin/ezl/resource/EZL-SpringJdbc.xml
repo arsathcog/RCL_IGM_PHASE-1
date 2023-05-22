@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans.dtd"-->
+		  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+	
+    <!-- 
+        Simple local DataSource that works in any environment.
+        This uses the JDBC DriverManager to obtain connections, and does NOT perform connection
+        pooling. Connection pooling is essential to all real-world applications.
+        This definition is good for testing in local machine, as it introduces no dependencies beyond
+        the JDK, but DriverManagerDataSource is not intended for production usage.
+    -->
+
+
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="java:/VASJNDI"/>
+    </bean>
+     
+	<!--   
+        remove the below code before delevery. -->
+        
+        <!-- 
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+                        <property name="url" value="jdbc:oracle:thin:@//10.0.3.46:1534/SGDDOL15.rclgroup.com"/>
+        		<property name="username" value="VASAPPS"/>
+			<property name="password" value="VASDEVAPPS"/>
+		</bean>
+         -->
+	
+    <!-- 
+    Transaction manager for a Simple Local - JDBC DataSource (alternative to JTA) 
+    -->
+    <!--bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean-->
+    
+    <!-- 
+    Transaction manager for a JTA - JNDI DataSource (alternative to JDBC Data Source) 
+    -->
+    <!--<bean id="txManager" class="org.springframework.transaction.jta.OC4JJtaTransactionManager" />-->
+    
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+        
+    <!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+    <!-- Ioc to Create the DAO objects and set the datasource into that e.g. UserDAO-->
+    <!-- Common Module -->
+ 
+    <bean id="RiaGridCommonDao" class="com.niit.control.common.ria.grid.dao.GridCommonDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="masterLookupDAO" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmMasterLookupDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="dischargeListOverviewDAO" class="com.rclgroup.dolphin.ezl.web.edl.dao.EdlDischargeListOverviewDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+   
+   <bean id="commonDAO" class="com.niit.control.eut.dao.EutCommonDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="saveSettingsDAO" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmSaveSettingsDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="edlDischargeListMaintenanceDao" class="com.rclgroup.dolphin.ezl.web.edl.dao.EdlDischargeListMaintenanceDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>   
+    <bean id="errorMessageDAO" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmErrorMessageDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="excelDownloadDAO" class="com.rclgroup.dolphin.ezl.web.edl.dao.EdlExcelDownloadDaoImpl">
+        <property name="dataSource" ref="dataSource" /> 
+    </bean>
+    
+    <bean id="loadListOverviewDAO" class="com.rclgroup.dolphin.ezl.web.ell.dao.EllLoadListOverviewDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="tareWeightOverviewDao" class="com.rclgroup.dolphin.ezl.web.ell.dao.EllTareWeightOverviewDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    
+    <bean id="mailAlertCommonDAO" class="com.niit.control.common.mail.dao.MailCommonDaoImpl">
+        <property name="dataSource" ref="dataSource" /> 
+    </bean>
+
+    <bean id="excelUploadDAO" class="com.rclgroup.dolphin.ezl.web.edl.dao.EdlExcelUploadDaoImpl">
+        <property name="dataSource" ref="dataSource" /> 
+    </bean>
+
+    <bean id="ellLoadListMaintenanceDao" class="com.rclgroup.dolphin.ezl.web.ell.dao.EllLoadListMaintenanceDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>     
+    
+    <bean id="importGeneralManifestDao" class="com.rclgroup.dolphin.ezl.web.ell.dao.ImportGeneralManifestDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>     
+    
+    <bean id="bulkUpdateDAO" class="com.rclgroup.dolphin.ezl.web.edl.dao.EdlBulkUpdateDaoImpl">
+            <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="containerReplacementDAO" class="com.rclgroup.dolphin.ezl.web.edl.dao.EdlContainerReplacementDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="returnShipmentDAO" class="com.rclgroup.dolphin.ezl.web.edl.dao.EdlReturnShipmentDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="variableLookupDao" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmVariableLookupDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="ENoticeTemplateDao" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmENoticeTemplateDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="maintainMailAlertDao" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmMaintainMailAlertDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="enoticeCommonDAO" class="com.niit.control.common.enotice.dao.ENoticeCommonDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    
+    <bean id="addViewRecipientDao" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmAddViewRecipientDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <!-- =================================- CREATE ARRIVAL BAY PLAN =============================== -->
+    <bean id="CreateArrivalBayPlanDAO" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmCreateArrivalBayPlanDaoImpl">
+	<property name="dataSource" ref="dataSource"/>
+    </bean>    
+    
+    <bean id="declareDischargeListOutboundDAO" class="com.rclgroup.dolphin.ezl.web.ecm.dao.EcmDeclareDischargeListOutboundDaoImpl">
+       <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    
+    <!-- ========================= TRANSACTIONS MANAGEMENT ========================= -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED" rollback-for="Throwable"/>
+        </tx:attributes>
+    </tx:advice>
+    
+</beans>
+

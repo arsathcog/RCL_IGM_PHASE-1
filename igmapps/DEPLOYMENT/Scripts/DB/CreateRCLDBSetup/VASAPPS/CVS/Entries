@@ -1,0 +1,23 @@
+/01_vasapps_tables.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/02_vasapps_types.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/03_vasapps_synonyms.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/04_vasapps_sequences.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/05_vasapps_views.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/06_vasapps_functions.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/07_vasapps_pre_procedures.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/08_vasapps_packages_spec.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/09_vasapps_packages_body.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/10_vasapps_post_procedures.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+/11_vasapps_create_data.sql/1.1.1.1/Tue Jun  2 02:45:35 2020//
+D/Data////
+D/Functions////
+D/Index////
+D/Miscellaneous////
+D/Packages////
+D/Procedures////
+D/Schedules////
+D/Sequence////
+D/Tables////
+D/Triggers////
+D/Types////
+D/Views////

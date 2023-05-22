@@ -1,0 +1,178 @@
+create or replace
+PACKAGE           "PCE_ECM_SYNC_TOS_EZDL" AS
+
+    g_v_userId                            VARCHAR2(10)  := 'TOS';
+    g_v_sql_id                            VARCHAR2(10);
+    g_v_err_code                          VARCHAR2(50);
+    g_v_err_desc                          VARCHAR2(100);
+    g_v_opr_type                          TOS_SYNC_ERROR_LOG.OPEARTION_TYPE%TYPE := 'T';
+    BLANK                                 VARCHAR2(1)   := '';
+    g_v_prog_name                         VARCHAR2(100) := 'PCE_ECM_SYNC_TOS_EZDL';
+    g_v_err_handler_flg                   VARCHAR2(1)   :='N';
+    g_exception                           EXCEPTION;
+    g_exception_ll                        EXCEPTION;
+    g_error_msg_1                         VARCHAR2(100) := 'Container information not found in privious load list.';
+
+    PROCEDURE PRE_TOS_UPDATE_DISCH_STS (
+          p_i_v_new_disch_status          TOS_ONBOARD_LIST.DISCH_STATUS%TYPE
+        , p_i_v_old_disch_status          TOS_ONBOARD_LIST.DISCH_STATUS%TYPE
+        , p_i_v_booking                   TOS_ONBOARD_LIST.BOOKING_NO%TYPE
+        , p_i_v_equipment_no              TOS_ONBOARD_LIST.CONTAINER_NO%TYPE
+        , p_i_v_voyage_routing_dtl        TOS_DL_BOOKED_DISCHARGE.FK_BKG_VOYAGE_ROUTING_DTL%TYPE
+        , p_i_v_fk_bkg_equipm_dtl         TOS_DL_BOOKED_DISCHARGE.FK_BKG_EQUIPM_DTL%TYPE
+        , p_i_v_pod                       TOS_DL_DISCHARGE_LIST.DN_PORT%TYPE
+        , p_i_v_pod_trm                   TOS_DL_DISCHARGE_LIST.DN_TERMINAL%TYPE
+        , p_i_v_pol                       TOS_DL_BOOKED_DISCHARGE.DN_POL%TYPE
+        , p_i_v_pol_trm                   TOS_DL_BOOKED_DISCHARGE.DN_POL_TERMINAL%TYPE
+        , p_o_return_status               OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_TOS_GET_TOS_ONBORD (
+          p_i_v_weight                    TOS_ONBOARD_LIST.WEIGHT%TYPE
+        , p_i_v_rftemp                    TOS_ONBOARD_LIST.RFTEMP%TYPE
+        , p_i_v_unit                      TOS_ONBOARD_LIST.UNIT%TYPE
+        , p_i_v_imdg                      TOS_ONBOARD_LIST.IMDG%TYPE
+        , p_i_v_unno                      TOS_ONBOARD_LIST.UNNO%TYPE
+        , p_i_v_variant                   TOS_ONBOARD_LIST.VARIANT%TYPE
+        , p_i_v_flash_pt                  TOS_ONBOARD_LIST.FLASH_PT%TYPE
+        , p_i_v_flash_pt_unit             TOS_ONBOARD_LIST.FLASH_PT_UNIT%TYPE
+        , p_i_v_port_class                TOS_ONBOARD_LIST.PORT_CLASS%TYPE
+        , p_i_v_oog_oh                    TOS_ONBOARD_LIST.OOG_OH%TYPE
+        , p_i_v_oog_olf                   TOS_ONBOARD_LIST.OOG_OLF%TYPE
+        , p_i_v_oog_olb                   TOS_ONBOARD_LIST.OOG_OLB%TYPE
+        , p_i_v_oog_owr                   TOS_ONBOARD_LIST.OOG_OWR%TYPE
+        , p_i_v_oog_owl                   TOS_ONBOARD_LIST.OOG_OWL%TYPE
+        , p_i_v_stow_position             TOS_ONBOARD_LIST.STOW_POSITION%TYPE
+        , p_i_v_container_operator        TOS_ONBOARD_LIST.CONTAINER_OPERATOR%TYPE
+        , p_i_v_out_slot_operator         TOS_ONBOARD_LIST.OUT_SLOT_OPERATOR%TYPE
+        , p_i_v_han1                      TOS_ONBOARD_LIST.HAN1%TYPE
+        , p_i_v_han2                      TOS_ONBOARD_LIST.HAN2%TYPE
+        , p_i_v_han3                      TOS_ONBOARD_LIST.HAN3%TYPE
+        , p_i_v_clr1                      TOS_ONBOARD_LIST.CLR1%TYPE
+        , p_i_v_clr2                      TOS_ONBOARD_LIST.CLR2%TYPE
+        , p_i_v_connecting_vessel         TOS_ONBOARD_LIST.CONNECTING_VESSEL%TYPE
+        , p_i_v_connecting_voyage_no      TOS_ONBOARD_LIST.CONNECTING_VOYAGE_NO%TYPE
+        , p_i_v_next_pod1                 TOS_ONBOARD_LIST.NEXT_POD1%TYPE
+        , p_i_v_next_pod2                 TOS_ONBOARD_LIST.NEXT_POD2%TYPE
+        , p_i_v_next_pod3                 TOS_ONBOARD_LIST.NEXT_POD3%TYPE
+        , p_i_v_tight_conn_flag           TOS_ONBOARD_LIST.TIGHT_CONN_FLAG%TYPE
+        , p_i_v_void_slot                 TOS_ONBOARD_LIST.VOID_SLOT%TYPE
+        , p_i_v_list_status               TOS_ONBOARD_LIST.LIST_STATUS%TYPE
+        , p_i_v_soc_coc                   TOS_ONBOARD_LIST.SOC_COC%TYPE
+        , p_i_v_service                   TOS_ONBOARD_LIST.POL_SERVICE%TYPE
+        , p_i_v_vessel                    TOS_ONBOARD_LIST.POL_VESSEL%TYPE
+        , p_i_v_voyage                    TOS_ONBOARD_LIST.POL_VOYAGE%TYPE
+        , p_i_v_direction                 TOS_ONBOARD_LIST.POL_DIR%TYPE
+        , p_i_v_pod                       TOS_ONBOARD_LIST.POD%TYPE
+        , p_i_v_pod_trm                   TOS_ONBOARD_LIST.POD_TERMINAL%TYPE
+        , p_i_v_pol                       TOS_ONBOARD_LIST.POL%TYPE
+        , p_i_v_pol_trm                   TOS_ONBOARD_LIST.POL_TERMINAL%TYPE
+        , p_i_v_booking                   TOS_ONBOARD_LIST.BOOKING_NO%TYPE
+        , p_i_v_equipment_no              TOS_ONBOARD_LIST.CONTAINER_NO%TYPE
+        , p_i_v_pot                       TOS_ONBOARD_LIST.POT_PORT%TYPE
+        , p_i_v_eqsize                      TOS_ONBOARD_LIST.EQSIZE%TYPE
+        , p_i_v_eqtype                    TOS_ONBOARD_LIST.EQTYPE%TYPE
+        , p_i_v_full_mt                   TOS_ONBOARD_LIST.FULL_MT%TYPE
+        , p_i_v_slot_operator             TOS_ONBOARD_LIST.SLOT_OPERATOR%TYPE
+        , p_i_v_final_destination          TOS_ONBOARD_LIST.FINAL_DESTINATION%TYPE
+        , p_i_v_local_ts                  TOS_ONBOARD_LIST.LOCAL_TS%TYPE
+        , p_o_return_status               OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_NEW_EQUIPMENT_ADD(
+          p_i_v_prog_type                 TOS_SYNC_ERROR_LOG.PROG_TYPE%TYPE
+        , p_i_v_invoyageno                TOS_LL_LOAD_LIST.FK_VOYAGE%TYPE
+        , p_i_v_load_list_id              TOS_LL_BOOKED_LOADING.PK_BOOKED_LOADING_ID%TYPE
+        , p_i_v_flag                      VARCHAR2
+        , p_i_v_load_port                 BOOKING_VOYAGE_ROUTING_DTL.LOAD_PORT%TYPE
+        , p_i_v_act_service_code          BOOKING_VOYAGE_ROUTING_DTL.ACT_SERVICE_CODE%TYPE
+        , p_i_v_act_vessel_code           BOOKING_VOYAGE_ROUTING_DTL.ACT_VESSEL_CODE%TYPE
+        , p_i_v_act_voyage_number         BOOKING_VOYAGE_ROUTING_DTL.ACT_VOYAGE_NUMBER%TYPE
+        , p_i_v_act_port_direction        BOOKING_VOYAGE_ROUTING_DTL.ACT_PORT_DIRECTION%TYPE
+        , p_i_v_from_terminal             BOOKING_VOYAGE_ROUTING_DTL.FROM_TERMINAL%TYPE
+        , p_i_v_discharge_port            BOOKING_VOYAGE_ROUTING_DTL.DISCHARGE_PORT%TYPE
+        , p_i_v_to_terminal               BOOKING_VOYAGE_ROUTING_DTL.TO_TERMINAL%TYPE
+        , p_i_v_weight                    TOS_ONBOARD_LIST.WEIGHT%TYPE
+        , p_i_v_rftemp                    TOS_ONBOARD_LIST.RFTEMP%TYPE
+        , p_i_v_unit                      TOS_ONBOARD_LIST.UNIT%TYPE
+        , p_i_v_imdg                      TOS_ONBOARD_LIST.IMDG%TYPE
+        , p_i_v_unno                      TOS_ONBOARD_LIST.UNNO%TYPE
+        , p_i_v_variant                   TOS_ONBOARD_LIST.VARIANT%TYPE
+        , p_i_v_flash_pt                  TOS_ONBOARD_LIST.FLASH_PT%TYPE
+        , p_i_v_flash_pt_unit             TOS_ONBOARD_LIST.FLASH_PT_UNIT%TYPE
+        , p_i_v_port_class                TOS_ONBOARD_LIST.PORT_CLASS%TYPE
+        , p_i_v_oog_oh                    TOS_ONBOARD_LIST.OOG_OH%TYPE
+        , p_i_v_oog_olf                   TOS_ONBOARD_LIST.OOG_OLF%TYPE
+        , p_i_v_oog_olb                   TOS_ONBOARD_LIST.OOG_OLB%TYPE
+        , p_i_v_oog_owr                   TOS_ONBOARD_LIST.OOG_OWR%TYPE
+        , p_i_v_oog_owl                   TOS_ONBOARD_LIST.OOG_OWL%TYPE
+        , p_i_v_stow_position             TOS_ONBOARD_LIST.STOW_POSITION%TYPE
+        , p_i_v_container_operator        TOS_ONBOARD_LIST.CONTAINER_OPERATOR%TYPE
+        , p_i_v_out_slot_operator         TOS_ONBOARD_LIST.OUT_SLOT_OPERATOR%TYPE
+        , p_i_v_han1                      TOS_ONBOARD_LIST.HAN1%TYPE
+        , p_i_v_han2                      TOS_ONBOARD_LIST.HAN2%TYPE
+        , p_i_v_han3                      TOS_ONBOARD_LIST.HAN3%TYPE
+        , p_i_v_clr1                      TOS_ONBOARD_LIST.CLR1%TYPE
+        , p_i_v_clr2                      TOS_ONBOARD_LIST.CLR2%TYPE
+        , p_i_v_connecting_vessel         TOS_ONBOARD_LIST.CONNECTING_VESSEL%TYPE
+        , p_i_v_connecting_voyage_no      TOS_ONBOARD_LIST.CONNECTING_VOYAGE_NO%TYPE
+        , p_i_v_next_pod1                 TOS_ONBOARD_LIST.NEXT_POD1%TYPE
+        , p_i_v_next_pod2                 TOS_ONBOARD_LIST.NEXT_POD2%TYPE
+        , p_i_v_next_pod3                 TOS_ONBOARD_LIST.NEXT_POD3%TYPE
+        , p_i_v_tight_conn_flag           TOS_ONBOARD_LIST.TIGHT_CONN_FLAG%TYPE
+        , p_i_v_void_slot                 TOS_ONBOARD_LIST.VOID_SLOT%TYPE
+        , p_i_v_list_status               TOS_ONBOARD_LIST.LIST_STATUS%TYPE
+        , p_i_v_soc_coc                   TOS_ONBOARD_LIST.SOC_COC%TYPE
+        , p_i_v_service                   TOS_ONBOARD_LIST.POL_SERVICE%TYPE
+        , p_i_v_vessel                    TOS_ONBOARD_LIST.POL_VESSEL%TYPE
+        , p_i_v_voyage                    TOS_ONBOARD_LIST.POL_VOYAGE%TYPE
+        , p_i_v_direction                 TOS_ONBOARD_LIST.POL_DIR%TYPE
+        , p_i_v_pod                       TOS_ONBOARD_LIST.POD%TYPE
+        , p_i_v_pod_trm                   TOS_ONBOARD_LIST.POD_TERMINAL%TYPE
+        , p_i_v_pol                       TOS_ONBOARD_LIST.POL%TYPE
+        , p_i_v_pol_trm                   TOS_ONBOARD_LIST.POL_TERMINAL%TYPE
+        , p_i_v_booking                   TOS_ONBOARD_LIST.BOOKING_NO%TYPE
+        , p_i_v_equipment_no              TOS_ONBOARD_LIST.CONTAINER_NO%TYPE
+        , p_i_v_pot                       TOS_ONBOARD_LIST.POT_PORT%TYPE
+        , p_i_v_eqsize                    TOS_ONBOARD_LIST.EQSIZE%TYPE
+        , p_i_v_eqtype                    TOS_ONBOARD_LIST.EQTYPE%TYPE
+        , p_i_v_full_mt                   TOS_ONBOARD_LIST.FULL_MT%TYPE
+        , p_i_v_slot_operator             TOS_ONBOARD_LIST.SLOT_OPERATOR%TYPE
+        , p_i_v_final_destination         TOS_ONBOARD_LIST.FINAL_DESTINATION%TYPE
+        , p_i_v_local_ts                  TOS_ONBOARD_LIST.LOCAL_TS%TYPE
+        , p_i_v_voyage_seqno              BOOKING_VOYAGE_ROUTING_DTL.VOYAGE_SEQNO%TYPE
+        , p_i_v_equipment_seq_no          sealiner.BKP009.BISEQN%TYPE
+        , p_i_v_supplier_seq_no           sealiner.BKP009.SUPPLIER_SQNO%TYPE
+        , p_i_v_fk_port_sequence_no       TOS_DL_DISCHARGE_LIST.FK_PORT_SEQUENCE_NO%TYPE
+        , p_i_v_vvvoyn                    ITP063.VVVOYN%TYPE                         /* Added by vikas on 18.10.2011, for afs service */
+        , p_o_return_status               OUT VARCHAR2
+    );
+
+    /* Start Commented by vikas as k'chatgamol suggested, 11.11.2011 *
+    PROCEDURE PRE_EDL_PREV_LOAD_LIST_ID (
+          p_i_v_vessel                     VARCHAR2
+        , p_i_v_equip_seq_no               VARCHAR2
+        , p_i_v_booking_no                 VARCHAR2
+        , p_i_port_code                    VARCHAR2
+        , p_i_v_port_seq                   VARCHAR2
+        , p_o_v_pk_loading_id          OUT VARCHAR2
+        , p_o_v_flag                   OUT VARCHAR2
+        , p_o_v_err_cd                 OUT VARCHAR2
+    );
+    * End Commented by vikas as k'chatgamol suggested, 11.11.2011 */
+
+    /* Start added by vikas as k'chatgamol suggested, 11.11.2011 */
+    PROCEDURE PRE_EDL_PREV_LOAD_LIST_ID (
+          p_i_v_service                VARCHAR2
+        , p_i_v_vessel                 VARCHAR2
+        , p_i_v_voyage                 VARCHAR2
+        , p_i_v_pol                    VARCHAR2
+        , p_i_v_booking                VARCHAR2
+        , p_i_v_equipment_no           VARCHAR2
+        , p_o_v_pk_loading_id          OUT VARCHAR2
+        , p_o_v_err_cd                 OUT VARCHAR2
+    );
+    /* End added by vikas as k'chatgamol suggested, 11.11.2011 */
+
+
+END PCE_ECM_SYNC_TOS_EZDL;

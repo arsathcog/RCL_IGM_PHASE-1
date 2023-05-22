@@ -1,0 +1,21 @@
+CREATE OR REPLACE PACKAGE VASAPPS."PCE_EDL_CONTAINERREPLACMT" AS
+    PROCEDURE PRE_EDL_CONTAINERREPLACMTSAVE (
+              p_i_v_booking_id             VARCHAR2
+            , p_i_v_booking_no             VARCHAR2
+            , p_i_v_terminal               VARCHAR2
+            , p_i_v_old_container_no       VARCHAR2
+            , p_i_v_old_shippers_seal      VARCHAR2
+            , p_i_v_new_container_no       VARCHAR2
+            , p_i_v_new_shippers_seal      VARCHAR2
+            , p_i_v_reason                 VARCHAR2
+            , p_i_v_user                   VARCHAR2
+            , p_i_v_new_activity_dt        VARCHAR2
+            , p_i_v_time                   VARCHAR2
+            , p_i_v_port                   VARCHAR2
+            , p_i_v_etd_date               VARCHAR2
+            , p_i_v_etd_time               VARCHAR2
+            , p_o_v_error                  OUT VARCHAR2
+         )  ;
+
+END PCE_EDL_CONTAINERREPLACMT;
+/

@@ -1,0 +1,115 @@
+.ideo-ndg-table{
+	background: #efefeb;
+}
+
+/* Headers style */
+
+.ideo-ndg-table .ideo-ndg-head {
+	background: #B4B4B4 url(../images/datagrid/header.png) repeat-x scroll left bottom;
+}
+
+.ideo-ndg-table .ideo-ndg-header {
+	background: none;
+	border-bottom:1px solid #6A7896;
+	border-right:1px solid #F3F3EF; 
+	text-align:left; 
+	font-weight:normal;
+	color:#003399;
+	text-align:center;
+	valign:center;
+	background-color:#E9E7D7;
+}
+
+/* Remove Pencil Image from Header */
+.ideo-ndg-table .ideo-ndg-headerEditable{
+	background : url("") transparent top right no-repeat ;
+}
+
+/* Body of the grid style */
+.ideo-ndg-table .ideo-ndg-divBody{
+	background-color : #efefeb;
+	 overflow-x: auto;	
+	 overflow-y: auto;	
+}
+
+/* Style for odd rows */
+.ideo-ndg-table .ideo-ndg-oddRow{
+	background-color : #FFFFFF;
+}
+
+.ideo-ndg-table .ideo-ndg-oddRow input {
+	border: 1px solid #000000;
+}
+
+/* Style for even rows */
+.ideo-ndg-table .ideo-ndg-parRow{
+	background-color : #FFFFFF;
+}
+
+.ideo-ndg-table .ideo-ndg-cell {
+	color:#000;
+	border-bottom:1px solid #efefeb;
+	border-right:1px solid #efefeb; 	
+}
+
+.ideo-ndg-table .ideo-ndg-parRow input {
+	border: 1px solid #000000;
+}
+
+/* Style for odd rows - when sorted ascending */
+.ideo-ndg-table .ideo-ndg-sortCell-asc-odd{
+	background-color:#FFFFFF;	
+}
+
+/* Style for even rows - when sorted ascending */
+.ideo-ndg-table .ideo-ndg-sortCell-asc-par{
+	background-color:#FFFFFF;	
+}
+
+/* Style for even rows - when sorted descending */
+.ideo-ndg-table .ideo-ndg-sortCell-desc-odd{
+	background-color:#FFFFFF;	
+}
+
+/* Style for even rows - when sorted descending */
+.ideo-ndg-table .ideo-ndg-sortCell-desc-par{
+	background-color:#FFFFFF;	
+}
+
+/* Selected row style */
+.ideo-ndg-table .ideo-ndg-selection{
+	background-color : #ADC3E7;
+}
+
+
+DIV.ideo-schedule-tooltip {
+	position: absolute;
+	background-color: #000000;
+	border: 1px solid black;
+	font-size: x-small;
+	overflow: hidden;
+}
+
+DIV.ideo-schedule-event-tooltip {
+	position: absolute;
+	background-color: blank;
+	border: 1px black solid;
+}
+
+.clsNoScroll {
+	 overflow-x: hidden;
+	 overflow-y: hidden;
+	 border-style: none;
+}
+
+.clsHorizontalScroll {
+	 overflow-x: scroll;
+	 overflow-y: hidden;
+	 border-style: none;
+}
+
+.clsVerticalScroll {
+	 overflow-x: hidden;
+	 overflow-y: scroll;
+	 border-style: none;
+}

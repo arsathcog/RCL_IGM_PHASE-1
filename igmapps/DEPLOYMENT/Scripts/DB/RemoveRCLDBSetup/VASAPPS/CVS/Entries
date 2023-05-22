@@ -1,0 +1,10 @@
+/01_vasapps_drop_tables.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+/02_vasapps_drop_types.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+/03_vasapps_drop_synonym.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+/04_vasapps_drop_sequences.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+/05_vasapps_drop_views.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+/06_vasapps_drop_functions.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+/07_vasapps_drop_procedures.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+/08_vasapps_drop_packages.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+/09_vasapps_delete_data.sql/1.1.1.1/Tue Jun  2 02:45:41 2020//
+D/DROP_DATA////

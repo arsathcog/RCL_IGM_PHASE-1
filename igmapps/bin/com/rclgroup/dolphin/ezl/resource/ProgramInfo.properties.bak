@@ -1,0 +1,17 @@
+################################################################
+# Mapping of Program Group Code of Dolphin Menu Master to
+# VAS Program ID.
+# Child screens will have prog group=prog code of parent Screen
+################################################################
+#Discharge List Overview
+SEDL001=EDL001
+#Discharge List Maintainence
+SEDL002=EDL001
+#Error Message
+SECM001=EDL001
+#Upload Excel
+SEDL009=EDL001
+#Download Excel
+SEDL011=EDL001
+#Load List Overview
+SELL001=ELL001

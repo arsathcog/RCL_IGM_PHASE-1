@@ -1,0 +1,7 @@
+--20120201                              
+UPDATE VCM_CONFIG_MST
+SET CONFIG_VALUE = '20150101'          
+WHERE CONFIG_TYP = 'TABLE_FILTER'
+    AND CONFIG_CD = 'VVARDT';
+
+COMMIT;    

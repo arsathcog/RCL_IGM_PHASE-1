@@ -1,0 +1,26 @@
+create or replace
+PACKAGE           "PCE_RETURN_SHIPMENT" AS
+
+PROCEDURE VALID_BOOKING_NUMBER (
+	p_i_v_bkg_number       IN  VARCHAR2,
+    p_o_v_return_status    OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE VALID_BILL_NUMBER(
+	p_i_v_bkg_list        IN VARCHAR2,
+    p_o_v_return_status   OUT NOCOPY  VARCHAR2
+) ;
+
+PROCEDURE PRE_BKG_RETURN_CONT
+( p_i_v_usr_id              IN   VARCHAR2
+, p_i_v_bkg_number          IN   VARCHAR2
+, p_i_v_bkg_list            IN   VARCHAR2
+, p_i_v_rcrd_status         IN   VARCHAR2
+, p_i_v_resn_kind           IN   VARCHAR2
+, p_i_v_resn_desc           IN   VARCHAR2
+, p_o_v_error       OUT NOCOPY  VARCHAR2
+);
+
+END PCE_RETURN_SHIPMENT;
+ 
+/

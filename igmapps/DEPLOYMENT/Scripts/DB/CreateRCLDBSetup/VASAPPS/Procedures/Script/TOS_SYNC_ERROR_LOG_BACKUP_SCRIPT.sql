@@ -1,0 +1,48 @@
+DECLARE
+    LAST_MONTH_COUNT        NUMBER := -2;
+BEGIN
+    INSERT INTO TOS_SYNC_ERROR_LOG_BACKUP
+      (
+        PK_SYNC_ERR_LOG_ID,
+        PARAMETER_STRING  ,
+        PROG_TYPE         ,
+        OPEARTION_TYPE    ,
+        ERROR_MSG         ,
+        RERUN_STATUS      ,
+        RECORD_STATUS     ,
+        RECORD_ADD_USER   ,
+        RECORD_ADD_DATE   ,
+        RECORD_CHANGE_USER,
+        RECORD_CHANGE_DATE,
+        RECORD_FILTER     ,
+        RECORD_TABLE
+      )
+     SELECT PK_SYNC_ERR_LOG_ID,
+      PARAMETER_STRING        ,
+      PROG_TYPE               ,
+      OPEARTION_TYPE          ,
+      ERROR_MSG               ,
+      RERUN_STATUS            ,
+      RECORD_STATUS           ,
+      RECORD_ADD_USER         ,
+      RECORD_ADD_DATE         ,
+      RECORD_CHANGE_USER      ,
+      RECORD_CHANGE_DATE      ,
+      RECORD_FILTER           ,
+      RECORD_TABLE
+       FROM TOS_SYNC_ERROR_LOG
+      WHERE TRUNC(RECORD_ADD_DATE) <= TRUNC(LAST_DAY(ADD_MONTHS(SYSDATE, LAST_MONTH_COUNT)))
+    ORDER BY RECORD_ADD_DATE DESC;
+
+    DELETE
+       FROM TOS_SYNC_ERROR_LOG
+      WHERE TRUNC(RECORD_ADD_DATE) <= TRUNC(LAST_DAY(ADD_MONTHS(SYSDATE, LAST_MONTH_COUNT)));
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Data Successfuly purged');
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE(SQLERRM);
+END;
+
+/

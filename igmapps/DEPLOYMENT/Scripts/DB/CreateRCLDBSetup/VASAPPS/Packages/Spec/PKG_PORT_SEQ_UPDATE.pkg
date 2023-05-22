@@ -1,0 +1,93 @@
+CREATE OR REPLACE PACKAGE PKG_PORT_SEQ_UPDATE AS
+    /********************************************************************************
+    * Name           : PKG_PORT_SEQ_UPDATE.PRE_UPDATE_PORT_SEQ_EZLL                 *
+    * Module         : EZLL                                                         *
+    * Purpose        : Procedure to check the bookings in EZLL whoes port seq
+                       is not synch with vessel schedule master, and update the
+                       correct port sequence in the ezll/ezdl.
+    * Calls          : PRE_GET_POD_PCSQ                                             *
+    *                  PRE_UPDATE_PORT_SEQ_IN_BOOKING                               *
+    *                  PRE_UPDATE_BVRD_BL_INFO                                      *
+    *                  PRE_FIRST_SEA_LEG                                            *
+    *                  PRE_GET_BL_NUMBER                                            *
+    * Returns        : NONE                                                         *
+    * Steps Involved :                                                              *
+    * History        : None                                                         *
+    * Author           Date          What                                           *
+    * ---------------  ----------    ----                                           *
+    * Vikas Verma     02/10/2012     1.0                                            *
+    *********************************************************************************/
+
+    
+    C_TRUE VARCHAR2(5) DEFAULT 'true';
+    C_FALSE VARCHAR2(5) DEFAULT 'false';
+    C_OPEN NUMBER DEFAULT 0;
+    C_RAIL VARCHAR2(1) DEFAULT 'R';
+    C_TRUCK VARCHAR2(1) DEFAULT 'T';
+    C_PORT_SEQ_UPD VARCHAR2(20) DEFAULT 'PORT_SEQ_UPD';
+    C_USER CONSTANT VASAPPS.TOS_LL_LOAD_LIST.RECORD_CHANGE_USER%TYPE DEFAULT 'EZLL_TRG';
+    C_LOAD_LIST VARCHAR2(1) DEFAULT 'L';
+    C_DISCHARGE_LIST VARCHAR2(1) DEFAULT 'D';
+    POD_PCSQ_NOT_FOUND_EXCEP EXCEPTION;
+    PORT_SEQ_UPDATE VARCHAR2(15) DEFAULT 'PORT_SEQ_UPDATE';
+    NO_OF_DAYS VARCHAR2(15) DEFAULT 'NO_OF_DAYS';
+    NO_OF_UPD_ROW NUMBER DEFAULT 0;
+    G_V_SQL_ID VARCHAR2(10) DEFAULT 'SQL000';
+    SEP VARCHAR2(1) DEFAULT '~';
+    ACTIVE VARCHAR2(1) DEFAULT 'A';
+    C_SEA_LEG CONSTANT VARCHAR2(1) DEFAULT 'S';
+    
+    PROCEDURE PRE_UPDATE_PORT_SEQ_EZLL ;
+
+    /* * LOGIC TO GET POD_PCSQ * */
+    PROCEDURE PRE_GET_POD_PCSQ(
+        P_I_V_BOOKING             VARCHAR2,
+        P_I_V_VOYAGE_SEQ          VARCHAR2,
+        P_I_V_OUTVOYAGE           VARCHAR2,
+        P_I_V_ACT_PORT_SEQ        VARCHAR2,
+        P_O_V_POD_PORT_SEQ        OUT VARCHAR2
+    );
+
+    /*
+        This procedure is used to udpate port sequence for in bookings
+        for discharge list *
+    */
+    PROCEDURE PRE_UPDATE_PORT_SEQ_IN_BOOKING (
+        P_I_V_BOOKING_NO     VASAPPS.TOS_DL_BOOKED_DISCHARGE.FK_BOOKING_NO%TYPE,
+        P_I_V_DISCHARGE_PORT VASAPPS.TOS_DL_DISCHARGE_LIST.DN_PORT%TYPE,
+        P_I_V_VOY_SEQ_NO     VASAPPS.TOS_DL_BOOKED_DISCHARGE.FK_BOOKING_NO%TYPE,
+        P_I_V_PORT_SEQ       VASAPPS.TOS_DL_DISCHARGE_LIST.FK_PORT_SEQUENCE_NO%TYPE
+    );
+    PROCEDURE PRE_UPDATE_BVRD_BL_INFO (
+        P_I_V_U_DIRECTION          VARCHAR2,
+        P_I_V_U_PORT_SEQ           VARCHAR2,
+        P_I_V_U_OUT_PORT_SEQ       VARCHAR2,
+        P_I_V_U_DATE               VARCHAR2,
+        P_I_V_U_TIME               VARCHAR2,
+        P_I_V_BOOKING_NO           VARCHAR2,
+        P_I_V_SERVICE              VARCHAR2,
+        P_I_V_VESSEL               VARCHAR2,
+        P_I_V_VOYAGE               VARCHAR2,
+        P_I_V_PORT                 VARCHAR2,
+        P_I_V_TERMINAL             VARCHAR2,
+        P_I_V_POL                  VARCHAR2,
+        P_I_V_POL_TERMINAL         VARCHAR2,
+        P_I_V_EQUIPMENT_NO         VARCHAR2,
+        P_I_V_VOYAGE_SEQ           VARCHAR2
+    );
+    
+    /* get first sea leg for the booking * */
+    PROCEDURE PRE_FIRST_SEA_LEG(
+        P_I_V_BOOKING_NO           VARCHAR2,
+        P_O_V_VOYAGE_SEQNO         OUT VARCHAR2
+    );
+    
+    /* get BL number from the IDP002 table * */
+    PROCEDURE PRE_GET_BL_NUMBER (
+        P_I_V_BOOKING_NO        VARCHAR2,
+        P_I_V_EQUIPMENT_NO      VARCHAR2,
+        P_O_V_BL_NUMBER         OUT VARCHAR2
+    );
+    
+END PKG_PORT_SEQ_UPDATE;
+/

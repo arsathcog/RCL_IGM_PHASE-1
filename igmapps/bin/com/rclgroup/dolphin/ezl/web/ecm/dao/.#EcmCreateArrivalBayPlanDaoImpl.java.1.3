@@ -1,0 +1,518 @@
+ /* -----------------------------------------------------------------------------
+System  : RCL-EZL
+Module  : Common
+Prog ID : ECM011 - CtrateArrivalBayPlanDaoImpl.java
+Name    : Ctrate Arrival Bay Plan
+Purpose : DAO Class for CtrateArrivalBayPlanDao Interface
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author          Date            What
+--------------- --------------- ------------------------------------------------
+NTL)Poonam         19/01/2011      <Initial version>
+--Change Log--------------------------------------------------------------------
+## DD/MM/YY –User- -Task/CR No- -Short Description-
+*1 11/04/2012   vikas, pass LL/DL flag to DB, to igonre generating bayplan for the
+                bookings load/discharge from the current port.
+----------------------------------------------------------------------------- */
+package com.rclgroup.dolphin.ezl.web.ecm.dao;
+
+import com.niit.control.common.GlobalConstants;
+import com.niit.control.common.POIReportGenerator;
+import com.niit.control.common.exception.BusinessException;
+import com.niit.control.common.exception.ExceptionFactory;
+import com.niit.control.dao.AncestorJdbcDao;
+import com.niit.control.dao.JdbcStoredProcedure;
+import com.niit.control.common.POIReportGenerator;
+import com.niit.control.common.ReportTagConstant;
+import com.niit.control.dao.JdbcRowMapper;
+
+import com.rclgroup.dolphin.ezl.web.ecm.vo.EcmCreateArrivalBayPlanMod;
+import com.rclgroup.dolphin.ezl.web.edl.dao.EdlDischargeListOverviewDaoImpl;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import org.springframework.dao.DataAccessException;
+
+/**
+ * Class for DAO
+ * @class EcmCreateArrivalBayPlanDaoImpl
+ * @author NTL) Poonam
+ * @version v1.00 2011/01/19
+ * @see
+ */
+
+public class EcmCreateArrivalBayPlanDaoImpl extends AncestorJdbcDao implements EcmCreateArrivalBayPlanDao{
+
+    /* SQL for Updating fields */
+    private static final String SQL_UPDATE = "PCE_TOS_BAYPLAN.PRE_TOS_CREATE_BAYPLAN";
+    private static final String SQL_GET_NEXT_PORT = "PCE_TOS_BAYPLAN.PRV_EDL_GET_NEXT_PORT_VAL";
+    private static final String SQL_GET_MSG_RCPT_SET = "PCE_TOS_BAYPLAN.PRV_EDL_GET_MSG_RCPNT_SET_VAL";
+    private static final String SQL_ARRIVAL_BAYPLAN_EXCEL = "PCE_TOS_BAYPLAN.PRE_EDL_BayplanReport";
+
+    public static final String TEMPLATE           = "Template";
+    private static final String YES               = "Y";
+    private static final String NO                = "N";
+    private static final String DISCHARGELISTID   = "1";
+    private static final String LOADLISTID        = "4";
+
+
+    public EcmCreateArrivalBayPlanDaoImpl() {
+    }
+
+    public Map onGenerate(Map amapParam) throws BusinessException, DataAccessException {
+
+        /* Stores return error code from SP */
+        String strRetError  = null;
+        /* stored procedure object */
+        JdbcStoredProcedure objSP = null;
+        /* Return Result from SP execute */
+        Map mapResult       = null;
+        /*
+         * Prepare 2D Array of Parameters to be passed to SP
+         * 1. Param Name
+         * 2. Oracle Data Type
+         * 3. Param Type(In/Out/InOut)
+         * 4. Param Value(for In/InOut types)
+        */
+
+
+        String[][] arrParam =
+            {
+                {KEY_PORT                  ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_PORT)},
+                 {KEY_SERVICE               ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_SERVICE)},
+                 {KEY_VESSEL                ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_VESSEL)},
+                 {KEY_TERMINAL              ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_TERMINAL)},
+                 {KEY_VOYAGE                ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_VOYAGE)},
+                 {KEY_DIRECTION             ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_DIRECTION)},
+                 {KEY_OMC                   ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_OMC)},
+                 {KEY_EME_UID               ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_EME_UID)},
+                 {KEY_DL_ETA                ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_DL_ETA)},
+                 {KEY_LL_ETD                ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_LL_ETD)},
+                 {KEY_EXCLUDE_ROB           ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_EXCLUDE_ROB)},
+                 {KEY_CONT_OPER_FLAG        ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_CONT_OPER_FLAG)},
+                 {KEY_SLOT_OPER_FLAG        ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_SLOT_OPER_FLAG)},
+                 {KEY_CONT_OPER             ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_CONT_OPER)},
+                 {KEY_SLOT_OPER             ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_SLOT_OPER)},
+                 {KEY_LL_DL_FLAG            ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_LL_DL_FLAG)}, // *1
+                 {KEY_ERROR_DATA            ,BLANK+ORACLE_VARCHAR,PARAM_OUT, BLANK}
+            };
+
+        /* Create JDBC Stored Procedure Object */
+        objSP = new JdbcStoredProcedure(getDataSource(),
+                                        SQL_UPDATE,
+                                        arrParam);
+        /* Execute the SP & Get the Return Output values as Map*/
+        mapResult = objSP.execute();
+        /* Read the Return code from SP */
+        strRetError = (String)mapResult.get(KEY_ERROR_DATA);
+        /* If return error code is Failure, throw Business Exception */
+        if(isErrorCode(strRetError)){
+            /*if(strRetError.equals("0")){
+                strRetError="Operation Successful";
+            }else{
+                strRetError="Error Occured";
+            }*/
+            throw ExceptionFactory.createApplicationException(strRetError);
+        }
+
+        return mapResult;
+    }
+
+
+    public Map onOpenedFromLoadList(Map amapParam) throws BusinessException, DataAccessException {
+
+        /* Stores return error code from SP */
+        String strRetError  = null;
+        /* stored procedure object */
+        JdbcStoredProcedure objSP = null;
+        /* Return Result from SP execute */
+        Map mapResult       = null;
+        /*
+         * Prepare 2D Array of Parameters to be passed to SP
+         * 1. Param Name
+         * 2. Oracle Data Type
+         * 3. Param Type(In/Out/InOut)
+         * 4. Param Value(for In/InOut types)
+        */
+        String[][] arrParam =
+            {
+                {KEY_VOYAGE                         ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_VOYAGE)},
+                {KEY_VESSEL                         ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_VESSEL)},
+                {KEY_LL_SEQ                         ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_LL_SEQ)},
+                {KEY_ETD                            ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_ETD)},
+                {KEY_NEXT_SERVICE                   ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                {KEY_NEXT_VESSEL                    ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                {KEY_NEXT_ETD                       ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                {KEY_NEXT_PORT                      ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                {KEY_NEXT_VOYAGE_NO                 ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                {KEY_NEXT_PORT_SEQ                  ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                {KEY_NEXT_TERMINAL                  ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                {KEY_ERROR_DATA                     ,BLANK+ORACLE_VARCHAR,PARAM_OUT, BLANK}
+            };
+
+        /* Create JDBC Stored Procedure Object */
+        objSP = new JdbcStoredProcedure(getDataSource(),
+                                        SQL_GET_NEXT_PORT,
+                                        arrParam);
+        /* Execute the SP & Get the Return Output values as Map*/
+        mapResult = objSP.execute();
+
+        /* Read the Return code from SP */
+        strRetError = (String)mapResult.get(KEY_ERROR_DATA);
+        /* If return error code is Failure, throw Business Exception */
+        if(isErrorCode(strRetError)){
+            throw ExceptionFactory.createApplicationException(strRetError);
+        }
+
+        return mapResult;
+    }
+
+    public Map GetMessageRecpSet(Map amapParam) throws BusinessException, DataAccessException {
+
+        /* Stores return error code from SP */
+        String strRetError  = null;
+        /* stored procedure object */
+        JdbcStoredProcedure objSP = null;
+        /* Return Result from SP execute */
+        Map mapResult       = null;
+        /*
+         * Prepare 2D Array of Parameters to be passed to SP
+         * 1. Param Name
+         * 2. Oracle Data Type
+         * 3. Param Type(In/Out/InOut)
+         * 4. Param Value(for In/InOut types)
+        */
+         String[][] arrParam_1 =
+             {
+                 {KEY_TERMINAL                       ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_TERMINAL)},
+                 {KEY_MSG_RECP                       ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                 {KEY_MSG_SET                        ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                 {KEY_OUT_EME_UID                    ,BLANK+ORACLE_VARCHAR,PARAM_OUT,BLANK},
+                 {KEY_ERROR_DATA                     ,BLANK+ORACLE_VARCHAR,PARAM_OUT, BLANK}
+             };
+
+
+
+        /* Create JDBC Stored Procedure Object */
+        objSP = new JdbcStoredProcedure(getDataSource(),
+                                        SQL_GET_MSG_RCPT_SET,
+                                        arrParam_1);
+        /* Execute the SP & Get the Return Output values as Map*/
+         mapResult = objSP.execute();
+
+        /* Read the Return code from SP */
+        strRetError = (String)mapResult.get(KEY_ERROR_DATA);
+
+        /* If return error code is Failure, throw Business Exception */
+        if(isErrorCode(strRetError)){
+            throw ExceptionFactory.createApplicationException(strRetError);
+        }
+
+        return mapResult;
+    }
+
+    /** onGenerateExcel: Generate the Excel for Discharge list
+     * @param Map
+     * @return Map
+     * @throws BusinessException
+     * @throws DataAccessException
+     */
+    public Map onGenerateExcel(Map amapParam) throws BusinessException
+                                                   , DataAccessException
+                                                   , Exception{
+
+        POIReportGenerator   objPOIReportGenerator  = null;
+
+        //String lstrTemplatePath  = (String)amapParam.get(KEY_EXCEL_TEMPLATE_PATH); //D:\
+        String lstrTemplatePath  = "D:\\";
+        String lstrTemplateName  = (String)amapParam.get(KEY_TEMPLATE_NAME);
+        //String lstrNewPath       = (String)amapParam.get(KEY_DOWNLOAD_FILE_PATH); //D:\
+        String lstrNewPath       = "D:\\";
+        String lstrUserID        = (String)amapParam.get(KEY_USER_ID);
+        String lstrSysdate       = (String)amapParam.get(KEY_DATE_TM);//YYYYMMDDHH24MISS
+        String lstrReportDate    = (String)amapParam.get(KEY_REPORT_DATE);//DD/YY/MM HH24:MI
+
+        int totDataCol            = 30;
+        int lintCounter           = 0;
+        String lstrFinalFileName  = null;
+        String lstrScreenParameter = null;
+        /* Stores return error code from SP */
+        String strRetError = null;
+        /* stored procedure object */
+        JdbcStoredProcedure objSP = null;
+
+        /* Return Result from SP execute */
+        Map mapResult             = null;
+
+        Map mapFields             = null;
+        int lintTableDataSize = 0;
+
+        /*
+         * Prepare 2D Array of Parameters to be passed to SP
+         * 1. Param Name
+         * 2. Oracle Data Type
+         * 3. Param Type(In/Out/InOut)
+         * 4. Param Value(for In/InOut types)
+         */
+
+        String[][] arrParam =
+            {
+                {KEY_REF_ARRIVAL_LIST   ,BLANK+ORACLE_CURSOR,PARAM_OUT,BLANK},
+                {KEY_PORT               ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_PORT)},
+                {KEY_SERVICE            ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_SERVICE)},
+                {KEY_VESSEL             ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_VESSEL)},
+                {KEY_TERMINAL           ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_TERMINAL)},
+                {KEY_VOYAGE             ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_VOYAGE)},
+                {KEY_DIRECTION          ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_DIRECTION)},
+                {KEY_DL_ETA             ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_DL_ETA)},
+                {KEY_LL_ETD             ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_LL_ETD)},
+                {KEY_EXCLUDE_ROB        ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_EXCLUDE_ROB)},
+                {KEY_CONT_OPER_FLAG     ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_CONT_OPER_FLAG)},
+                {KEY_SLOT_OPER_FLAG     ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_SLOT_OPER_FLAG)},
+                {KEY_CONT_OPER          ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_CONT_OPER)},
+                {KEY_SLOT_OPER          ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_SLOT_OPER)},
+                {KEY_LL_DL_FLAG         ,BLANK+ORACLE_VARCHAR,PARAM_IN,(String)amapParam.get(KEY_LL_DL_FLAG)}, // *1
+                {KEY_ERROR_DATA         ,BLANK+ORACLE_VARCHAR,PARAM_OUT, BLANK}
+            };
+
+        lstrScreenParameter = (String)amapParam.get(KEY_SCREEN_ID);
+
+        /* Create JDBC Stored Procedure Object */
+        objSP = new JdbcStoredProcedure(getDataSource(),
+                                        SQL_ARRIVAL_BAYPLAN_EXCEL,
+                                        new ArrivalListRowMapper(),
+                                        arrParam);
+
+        /* Execute the SP & Get the Return Output values as Map*/
+        mapResult = objSP.execute();
+
+       objPOIReportGenerator   = new POIReportGenerator();
+
+       objPOIReportGenerator.openWorkBook(lstrTemplatePath, lstrTemplateName);
+
+        /* Sample code for find place-holders and replace with values*/
+        mapFields = new HashMap();
+        // put all place holders (as Key) & thier values in map
+        mapFields.put(ReportTagConstant.KEY_REPORT_ID        ,KEY_REPORT_ID);
+        mapFields.put(ReportTagConstant.KEY_TEMPLATE_SHEET   ,TEMPLATE);
+
+        mapFields.put(ReportTagConstant.KEY_TOT_DATA_COL     ,totDataCol);
+        mapFields.put(ReportTagConstant.KEY_TABLE_FIRST_ROW_POS ,1);//index of first data row
+        mapFields.put(ReportTagConstant.KEY_TABLE_FIRST_COL_POS ,1);//index of first data col
+        mapFields.put(ReportTagConstant.KEY_TABLE_LAST_COL_POS  ,30);//index of last data col
+
+        List data = (List)mapResult.get(KEY_REF_ARRIVAL_LIST);
+
+        if (data !=null) {
+            lintTableDataSize = data.size();
+        }
+
+        mapResult.put(EcmCreateArrivalBayPlanDao.KEY_DATA_FOUND,NO);
+
+        if(lintTableDataSize > 0){
+            mapResult.put(EcmCreateArrivalBayPlanDao.KEY_DATA_FOUND,YES);
+            String [][]larrDtlData = new String[data.size()][totDataCol];
+            Iterator itr = data.iterator();
+            while(itr.hasNext()){
+                EcmCreateArrivalBayPlanMod objMod = (EcmCreateArrivalBayPlanMod)itr.next();
+
+                larrDtlData[lintCounter][0] = objMod.getService();
+                larrDtlData[lintCounter][1] = objMod.getVessel();
+                larrDtlData[lintCounter][2] = objMod.getInVoyage();
+                larrDtlData[lintCounter][3] = objMod.getDirection();
+                larrDtlData[lintCounter][4] = objMod.getBookingNo();
+                larrDtlData[lintCounter][5] = objMod.getPortOfLoading();
+                larrDtlData[lintCounter][6] = objMod.getPortOfDischarge();
+                larrDtlData[lintCounter][7] = objMod.getEquipmentNo();
+                larrDtlData[lintCounter][8] = objMod.getEquipmentSize();
+                larrDtlData[lintCounter][9] = objMod.getEquipmentType();
+                larrDtlData[lintCounter][10] = objMod.getGrossWeight();
+                larrDtlData[lintCounter][11] = objMod.getGrossWeightUom();
+                larrDtlData[lintCounter][12] = objMod.getOverlengthTfront();
+                larrDtlData[lintCounter][13] = objMod.getOverlengthBack();
+                larrDtlData[lintCounter][14] = objMod.getDocOverheight();
+                larrDtlData[lintCounter][15] = objMod.getOverwidthLeft();
+                larrDtlData[lintCounter][16] = objMod.getOverwidthRight();
+                larrDtlData[lintCounter][17] = objMod.getTemperature();
+                larrDtlData[lintCounter][18] = objMod.getTemperatureUom();
+                larrDtlData[lintCounter][19] = objMod.getHumidity();
+                larrDtlData[lintCounter][20] = objMod.getHazadousFlag();
+                larrDtlData[lintCounter][21] = objMod.getUnno();
+                larrDtlData[lintCounter][22] = objMod.getImdg();
+                larrDtlData[lintCounter][23] = objMod.getPortClass();
+                larrDtlData[lintCounter][24] = objMod.getPackageType();
+                larrDtlData[lintCounter][25] = objMod.getCommodityCd();
+                larrDtlData[lintCounter][26] = objMod.getDescription();
+                larrDtlData[lintCounter][27] = objMod.getCommGrossWeight();
+                larrDtlData[lintCounter][28] = objMod.getCommGrossWeightUom();
+                larrDtlData[lintCounter][29] = objMod.getStowagePosition();
+
+                lintCounter++;
+            }
+
+            mapFields.put(ReportTagConstant.KEY_DETAIL_DATA,larrDtlData);
+
+            int lintDtlColTagInfo[][]           = new int [totDataCol][2];
+
+            //First Data Col Information SERVICE
+            lintDtlColTagInfo[0][ReportTagConstant.IDX_COL_NUM]   = 0;
+            lintDtlColTagInfo[0][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Second Data Col Information VESSEL_CODE
+            lintDtlColTagInfo[1][ReportTagConstant.IDX_COL_NUM]   = 1;
+            lintDtlColTagInfo[1][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Third Data Col Information VOYAGE_NO
+            lintDtlColTagInfo[2][ReportTagConstant.IDX_COL_NUM]   = 2;
+            lintDtlColTagInfo[2][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Fourth Data Col Information DIRECTION
+            lintDtlColTagInfo[3][ReportTagConstant.IDX_COL_NUM]   = 3;
+            lintDtlColTagInfo[3][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Fifth Data Col Information BOOKING_NO
+            lintDtlColTagInfo[4][ReportTagConstant.IDX_COL_NUM]   = 4;
+            lintDtlColTagInfo[4][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Sixth Data Col Information PORT OF LOADING ------- ?
+            lintDtlColTagInfo[5][ReportTagConstant.IDX_COL_NUM]   = 5;
+            lintDtlColTagInfo[5][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Seventh Data Col Information PORT OF DISCHARGE
+            lintDtlColTagInfo[6][ReportTagConstant.IDX_COL_NUM]   = 6;
+            lintDtlColTagInfo[6][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Eight Data Col Information EQUIPMENT_NO
+            lintDtlColTagInfo[7][ReportTagConstant.IDX_COL_NUM]   = 7;
+            lintDtlColTagInfo[7][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Ninth Data Col Information EQUIPMENT_SIZE
+            lintDtlColTagInfo[8][ReportTagConstant.IDX_COL_NUM]   = 8;
+            lintDtlColTagInfo[8][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_INT;
+            //Tenth Data Col Information EQUIPMENT_TYPE
+            lintDtlColTagInfo[9][ReportTagConstant.IDX_COL_NUM]   = 9;
+            lintDtlColTagInfo[9][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Eleventh Data Col Information GROSS_WEIGHT----------?
+            lintDtlColTagInfo[10][ReportTagConstant.IDX_COL_NUM]   = 10;
+            lintDtlColTagInfo[10][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Twelth Data Col Information GROSS_WEIGHT_UOM---------?
+            lintDtlColTagInfo[11][ReportTagConstant.IDX_COL_NUM]   = 11;
+            lintDtlColTagInfo[11][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Thirteenth Data Col Information OVERLENGTH_TFRONT
+            lintDtlColTagInfo[12][ReportTagConstant.IDX_COL_NUM]   = 12;
+            lintDtlColTagInfo[12][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_INT;
+            //Fourteenth Data Col Information OVERLENGTH_BACK
+            lintDtlColTagInfo[13][ReportTagConstant.IDX_COL_NUM]   = 13;
+            lintDtlColTagInfo[13][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_INT;
+            //Fifteenth Data Col Information OVERHEIGHT
+            lintDtlColTagInfo[14][ReportTagConstant.IDX_COL_NUM]   = 14;
+            lintDtlColTagInfo[14][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_INT;
+            //Sixteenth Data Col Information OVERWIDTH_LEFT
+            lintDtlColTagInfo[15][ReportTagConstant.IDX_COL_NUM]   = 15;
+            lintDtlColTagInfo[15][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_INT;
+            //Seventeenth Data Col Information OVERWIDTH_RIGHT
+            lintDtlColTagInfo[16][ReportTagConstant.IDX_COL_NUM]   = 16;
+            lintDtlColTagInfo[16][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_INT;
+            //Eighteenth Data Col Information TEMPERATURE
+            lintDtlColTagInfo[17][ReportTagConstant.IDX_COL_NUM]   = 17;
+            lintDtlColTagInfo[17][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_INT;
+            //Ninteeth Data Col Information TEMPERATURE_UOM
+            lintDtlColTagInfo[18][ReportTagConstant.IDX_COL_NUM]   = 18;
+            lintDtlColTagInfo[18][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Twenteeth Data Col Information HUMIDITY
+            lintDtlColTagInfo[19][ReportTagConstant.IDX_COL_NUM]   = 19;
+            lintDtlColTagInfo[19][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_INT;
+            //TwentyFirst Data Col Information HAZADOUS_FLAG-------?
+            lintDtlColTagInfo[20][ReportTagConstant.IDX_COL_NUM]   = 20;
+            lintDtlColTagInfo[20][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //TwentySecond Col Information UNNO
+            lintDtlColTagInfo[21][ReportTagConstant.IDX_COL_NUM]   = 21;
+            lintDtlColTagInfo[21][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //TwentyThird Data Col Information IMDG
+            lintDtlColTagInfo[22][ReportTagConstant.IDX_COL_NUM]   = 22;
+            lintDtlColTagInfo[22][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //TwentyFourth Data Col Information PORT_CLASS
+            lintDtlColTagInfo[23][ReportTagConstant.IDX_COL_NUM]   = 23;
+            lintDtlColTagInfo[23][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //TwentyFifth Data Col Information PACKAGE_TYPE-------
+            lintDtlColTagInfo[24][ReportTagConstant.IDX_COL_NUM]   = 24;
+            lintDtlColTagInfo[24][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //TwentySixth Data Col Information COMMODITY_CD--------
+            lintDtlColTagInfo[25][ReportTagConstant.IDX_COL_NUM]   = 25;
+            lintDtlColTagInfo[25][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //TwentySeventh Data Col Information DESCRIPTION---------
+            lintDtlColTagInfo[26][ReportTagConstant.IDX_COL_NUM]   = 26;
+            lintDtlColTagInfo[26][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //TwentyEight Data Col Information COMM_GROSS_WEIGHT-----
+            lintDtlColTagInfo[27][ReportTagConstant.IDX_COL_NUM]   = 27;
+            lintDtlColTagInfo[27][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //TwentyNinth Data Col Information COMM_GROSS_WEIGHT_UOM---------
+            lintDtlColTagInfo[28][ReportTagConstant.IDX_COL_NUM]   = 28;
+            lintDtlColTagInfo[28][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+            //Thirty Data Col Information STOWAGE POSITION
+            lintDtlColTagInfo[29][ReportTagConstant.IDX_COL_NUM]   = 29;
+            lintDtlColTagInfo[29][ReportTagConstant.IDX_CELL_TYPE] = ReportTagConstant.CELL_TYPE_STRING;
+
+            objPOIReportGenerator.setTableDataColInfo(lintDtlColTagInfo);
+
+            objPOIReportGenerator.generateReport(mapFields);
+            lstrFinalFileName = objPOIReportGenerator.saveWorkBook(lstrNewPath
+                                                                    , lstrTemplateName
+                                                                    , lstrUserID
+                                                                    , lstrSysdate);
+
+            mapResult.put(FILE_NAME, lstrFinalFileName);
+            mapResult.put(FILE_PATH, lstrNewPath);
+
+        }   else {
+            mapResult.put(EcmCreateArrivalBayPlanDao.KEY_DATA_FOUND,NO);
+        }
+        return mapResult;
+    }//generateExcel
+
+    /* Inner Row Mapper Class for DAO
+    * @class DischargeListRowMapper
+    */
+    private class ArrivalListRowMapper extends JdbcRowMapper {
+        /** mapRow : Will be called for each row of result set by spring
+        * @param ResultSet
+        * @param int - Current Row Number
+        * @return Object
+        * @throws SQLException
+        */
+       public Object mapRow(ResultSet rs, int row) throws SQLException {
+           EcmCreateArrivalBayPlanMod objContract = null;
+           objContract = new EcmCreateArrivalBayPlanMod();
+           objContract.setSrlNo(row+1);
+           objContract.setService(rs.getString("SERVICE"));
+           objContract.setVessel(rs.getString("VESSEL"));
+           objContract.setInVoyage(rs.getString("VOYAGE"));
+           objContract.setDirection(rs.getString("DIRECTION"));
+           objContract.setBookingNo(rs.getString("BOOKING_NO"));
+           objContract.setPortOfLoading(rs.getString("POL"));
+           objContract.setPortOfDischarge(rs.getString("POD"));
+           objContract.setEquipmentNo(rs.getString("EQUIP_NO"));
+           objContract.setEquipmentSize(rs.getString("EQUIP_SIZE"));
+           objContract.setEquipmentType(rs.getString("EQUIP_TYPE"));
+           objContract.setGrossWeight(rs.getString("GROSS_WT"));
+           objContract.setGrossWeightUom(rs.getString("GROSS_WT_UOM"));
+           objContract.setOverlengthTfront(rs.getString("OVERLENGTH_FRONT"));
+           objContract.setOverlengthBack(rs.getString("OVERLENGTH_BACK"));
+           objContract.setDocOverheight(rs.getString("OVERHEIGHT"));
+           objContract.setOverwidthLeft(rs.getString("OVERWIDTH_LEFT"));
+           objContract.setOverwidthRight(rs.getString("OVERWIDTH_RIGHT"));
+           objContract.setTemperature(rs.getString("TEMPERATURE"));
+           objContract.setTemperatureUom(rs.getString("TEMP_UOM"));
+           objContract.setHumidity(rs.getString("HUMIDITY"));
+           objContract.setHazadousFlag(rs.getString("HAZADOUS_FLAG"));
+           objContract.setUnno(rs.getString("UNNO"));
+           objContract.setImdg(rs.getString("IMDG"));
+           objContract.setPortClass(rs.getString("PORT_CLASS"));
+           objContract.setPackageType(rs.getString("PACKAGE_TYPE"));
+           objContract.setCommodityCd(rs.getString("COMMODITY_CD"));
+           objContract.setDescription(rs.getString("DESCRIPTION"));
+           objContract.setCommGrossWeight(rs.getString("COMM_GROSS_WT"));
+           objContract.setCommGrossWeightUom(rs.getString("COMM_GROSS_WT_UOM"));
+           objContract.setStowagePosition(rs.getString("STOWAGE_POSITION"));
+           return objContract;
+       }//mapRow
+   }//End of Inner Class ContractRowMapper
+}

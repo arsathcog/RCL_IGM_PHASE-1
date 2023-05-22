@@ -1,0 +1,42 @@
+CREATE OR REPLACE PACKAGE PCE_ECM_REF_CUR AS
+/* -----------------------------------------------------------------------------
+System  : RCL-VAS
+Module  : Common
+Prog ID : PCE_ECM_REF_CUR.sql
+Name    : Common RefCursor Package
+Purpose : Common Package to declare ref cursors OF ECM Module
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author		Date		What
+---------------	---------------	------------------------------------------------
+NTL)AKS	  	30/10/2009	<Initial version>
+--Change Log--------------------------------------------------------------------
+DD/MM/YY     User-Task/CR No -Short Description-
+----------------------------------------------------------------------------- */
+
+
+/* Ref Cursor for Common Module */
+TYPE ECM_REF_CUR  IS REF CURSOR ;
+
+/* Record Structure For FSC Address */
+TYPE FSC_REC IS RECORD(
+    FSC_NAME    ITP188.CRCONM%TYPE,
+		FSC_ADD1    ITP188.CRADD1%TYPE,
+    FSC_ADD2    ITP188.CRADD2%TYPE,
+    FSC_ADD3    ITP188.CRADD3%TYPE,
+    FSC_ADD4    ITP188.CRADD4%TYPE,
+    FSC_CITY    ITP188.CRCITY%TYPE,
+    FSC_ZIP     ITP188.CRZIP%TYPE,
+    FSC_TEL     ITP188.CRPHON%TYPE,
+    FSC_FAX     ITP188.CRFAXN%TYPE,
+    FSC_EMAIL   ITP188.CREMAL%TYPE
+);
+TYPE  FSC_REF_CUR IS REF CURSOR RETURN FSC_REC;
+
+
+/* Table Structure For String to Array */
+TYPE TAB_STR_2_ARR IS TABLE OF VARCHAR2(20);
+
+END PCE_ECM_REF_CUR;
+/

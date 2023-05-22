@@ -1,0 +1,71 @@
+CREATE OR REPLACE PACKAGE PCE_ECM_EMS AS
+   g_v_user            VARCHAR2(10) := 'EZLL';
+   g_v_sql_id          VARCHAR2(10);
+   g_v_err_code        VARCHAR2(50);
+   g_v_err_desc        VARCHAR2(100);
+   g_v_dummy           VARCHAR2(10) :='DUMMY';
+    /*
+        *5: Modified by vikas, populate ems only for non-edi locations, as k'chatgamol, 30.07.2012
+    */
+
+   PROCEDURE PRE_UPDATE_EMS_BKG
+   (
+        p_i_v_booking_no        VARCHAR2
+      , p_i_v_container_no      ECP030.MQEQN%TYPE
+      , p_o_v_return_status     OUT NOCOPY  VARCHAR2
+   );
+   PROCEDURE PRE_INSERT_EMS_LL_DL
+   (
+        p_i_v_act_type         VARCHAR2
+      , p_i_n_ll_id            TOS_LL_BOOKED_LOADING.FK_LOAD_LIST_ID%TYPE
+      , p_i_n_dl_id            TOS_DL_BOOKED_DISCHARGE.FK_DISCHARGE_LIST_ID%TYPE
+      , p_o_v_return_status    OUT NOCOPY  VARCHAR2
+   );
+   PROCEDURE PRE_EMS_CONTAINER_REPLACEMENT
+    (
+        p_i_n_discharge_id       TOS_DL_BOOKED_DISCHARGE.PK_BOOKED_DISCHARGE_ID%TYPE
+      , p_i_v_old_cont_no        TOS_DL_BOOKED_DISCHARGE.DN_EQUIPMENT_NO%TYPE
+      , p_i_v_new_cont_no        TOS_DL_BOOKED_DISCHARGE.DN_EQUIPMENT_NO%TYPE
+      , p_i_d_act_date           TOS_DL_BOOKED_DISCHARGE.ACTIVITY_DATE_TIME%TYPE
+      , p_o_v_return_status      OUT NOCOPY VARCHAR2
+    );
+
+   FUNCTION FE_GMT_DATE_TIME
+   (
+        p_i_n_dt_value     NUMBER
+      , p_i_n_tm_value     NUMBER
+      , p_i_n_tm_value_gmt NUMBER
+   ) RETURN DATE;
+
+    /******************************************************************************
+     *  Name           :  PRE_DUPLICATE_EMS_CHECK                                 *
+     *  Module         :  VASAPPS                                                 *
+     *  Purpose        :  To check the duplicate EMS activity exists or not.      *
+     *  Calls          :                                                          *
+     *  Returns        :  TRUE: found duplicate                                   *
+     *                    FALSE: no duplicate exists                              *
+     *                                                                            *
+     *  Author          Date               What                                   *
+     *  ------          ----               ----                                   *
+     *  vikas         26/04/2012           INITIAL VERSION                        *
+    *******************************************************************************/
+
+    PROCEDURE PRE_DUPLICATE_EMS_CHECK(
+        P_I_V_EQUIPMENT_NO                  TOS_DL_BOOKED_DISCHARGE.DN_EQUIPMENT_NO%TYPE
+        , P_I_V_BOOKING_NO                  TOS_DL_BOOKED_DISCHARGE.FK_BOOKING_NO%TYPE
+        , P_I_V_VESSEL                      TOS_DL_DISCHARGE_LIST.FK_VESSEL%TYPE
+        , P_I_V_VOYAGE                      TOS_DL_DISCHARGE_LIST.FK_VOYAGE%TYPE
+        , P_I_V_PORT                        TOS_DL_DISCHARGE_LIST.DN_PORT%TYPE
+        , P_I_V_TERMINAL                    TOS_DL_DISCHARGE_LIST.DN_TERMINAL%TYPE
+        , P_I_V_ACT_CODE                    VARCHAR2
+        , P_O_DUPLICATE                     OUT VARCHAR2
+    );
+
+    /* * *5 start * */
+    PROCEDURE PRE_CHECK_EDI_LOCATION(
+        P_I_TERMINAL       VARCHAR2,
+        P_O_TERMINAL_FOUND OUT VARCHAR2
+    );
+    /* * *5 end * */
+END PCE_ECM_EMS;
+/

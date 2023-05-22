@@ -1,0 +1,19 @@
+CREATE OR REPLACE PACKAGE VASAPPS.PCE_TARE_WEIGHT_OVERVIEW AS
+/* -----------------------------------------------------------------------------
+System  : RCL-VAS
+Module  : Tare Weight
+Prog ID : PCE_ETW_MAINTENANCE.sql
+Name    : Common Utility Package
+Purpose : Show tare Weight by equipment no.
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author       Date                  What
+Saisuda.     16.06.2016        Get equipment no. ,size , type and tare weight by equipment no.
+----------------------------------------------------------------------------- */
+PROCEDURE PRE_TARE_WEIGHT_OVERVIEW ( p_o_ref_tw_overview     OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+                                                                     ,p_i_v_eq_number                 VARCHAR2
+                                                                      ,p_o_v_error                           OUT VARCHAR2
+                                                                   );
+END PCE_TARE_WEIGHT_OVERVIEW;
+/

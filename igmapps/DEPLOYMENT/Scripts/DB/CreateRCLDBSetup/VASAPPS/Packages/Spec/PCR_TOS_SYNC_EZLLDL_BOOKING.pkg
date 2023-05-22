@@ -1,0 +1,73 @@
+CREATE OR REPLACE package VASAPPS.PCR_TOS_SYNC_EZLLDL_BOOKING is
+
+  -- Author  : Saisuda SK
+  -- Created : 07/07/2016 
+  -- Purpose : To flow data (vgm, category) from booking to ezll/ezdl
+  
+
+PROCEDURE PRR_TOS_UPD_EZLLDL_BOOKING;
+ PROCEDURE PRE_UPDATE_EZLL_VGM (  P_I_BOOKING_NO TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE,
+                                                         P_I_DN_EQUIPMENT_NO  TOS_LL_BOOKED_LOADING.DN_EQUIPMENT_NO%TYPE,
+                                                         P_I_FK_BKG_EQUIPM_DTL TOS_LL_BOOKED_LOADING.FK_BKG_EQUIPM_DTL%TYPE,     
+                                                         P_I_CATECORY TOS_LL_BOOKED_LOADING.CATEGORY_CODE%TYPE,
+                                                         P_I_VGM    TOS_LL_BOOKED_LOADING.CONTAINER_GROSS_WEIGHT%TYPE,
+                                                         P_I_V_USER VARCHAR2,                                         
+                                                         P_O_V_MSG OUT VARCHAR2,
+                                                         P_O_V_RETURN_STATUS           OUT  NOCOPY     VARCHAR2 
+                                                        );
+PROCEDURE PRE_UPDATE_EZDL_VGM( 
+--                                                          p_i_v_user_upd VARCHAR2,
+--                                                          p_i_v_booking_no VARCHAR2,
+--                                                           P_O_V_MSG OUT VARCHAR2,
+--                                                          p_o_v_return_status           OUT  NOCOPY     VARCHAR2 
+                                                        P_I_BOOKING_NO TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE,
+                                                         P_I_DN_EQUIPMENT_NO  TOS_LL_BOOKED_LOADING.DN_EQUIPMENT_NO%TYPE,
+                                                         P_I_FK_BKG_EQUIPM_DTL TOS_LL_BOOKED_LOADING.FK_BKG_EQUIPM_DTL%TYPE,     
+                                                         P_I_CATECORY TOS_LL_BOOKED_LOADING.CATEGORY_CODE%TYPE,
+                                                         P_I_VGM    TOS_LL_BOOKED_LOADING.CONTAINER_GROSS_WEIGHT%TYPE,
+                                                         P_I_V_USER VARCHAR2,                                         
+                                                         P_O_V_MSG OUT VARCHAR2,
+                                                         P_O_V_RETURN_STATUS           OUT  NOCOPY     VARCHAR2 
+                                                          
+                                                          ) ;
+PROCEDURE PRE_UPDATE_STATUS_TEMP(p_i_v_user_ins VARCHAR2,
+                                                              p_i_v_booking_no VARCHAR2,
+                                                               p_i_ll_dl_seq INTEGER,
+                                                               p_i_v_return_status VARCHAR2,
+                                                              p_i_v_return_msg VARCHAR2
+                                                              );
+
+PROCEDURE PRE_UPDATE_FLAG_EZLL( P_I_FK_PORT TOS_LL_LOAD_LIST.DN_PORT%TYPE,
+                                                         P_I_FK_SERVICE TOS_LL_LOAD_LIST.FK_SERVICE%TYPE,
+                                                         P_I_FK_VESSEL TOS_LL_LOAD_LIST.FK_VESSEL%TYPE,
+                                                         P_I_FK_VOYAGE TOS_LL_LOAD_LIST.FK_VOYAGE%TYPE,
+                                                         P_I_FK_DIRECTION TOS_LL_LOAD_LIST.FK_DIRECTION%TYPE,
+                                                         P_I_FK_PORT_SEQUENCE_NO TOS_LL_LOAD_LIST.FK_PORT_SEQUENCE_NO%TYPE,
+                                                         P_I_BOOKING_NO TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE,
+                                                         P_I_DN_EQUIPMENT_NO  TOS_LL_BOOKED_LOADING.DN_EQUIPMENT_NO%TYPE,
+                                                         P_I_FK_BKG_EQUIPM_DTL TOS_LL_BOOKED_LOADING.FK_BKG_EQUIPM_DTL%TYPE,               
+                                                         P_I_V_USER VARCHAR2,                                         
+                                                         P_O_V_MSG OUT VARCHAR2,
+                                                         P_O_V_RETURN_STATUS           OUT  NOCOPY     VARCHAR2 
+                                                         );      
+PROCEDURE PRE_CHECK_EXISTING_DATA_BKP001( P_I_FK_PORT TOS_LL_LOAD_LIST.DN_PORT%TYPE,
+                                                                 P_I_FK_SERVICE TOS_LL_LOAD_LIST.FK_SERVICE%TYPE,
+                                                                 P_I_FK_VESSEL TOS_LL_LOAD_LIST.FK_VESSEL%TYPE,
+                                                                 P_I_FK_VOYAGE TOS_LL_LOAD_LIST.FK_VOYAGE%TYPE,
+                                                                 P_I_FK_DIRECTION TOS_LL_LOAD_LIST.FK_DIRECTION%TYPE,
+                                                                 P_I_FK_PORT_SEQUENCE_NO TOS_LL_LOAD_LIST.FK_PORT_SEQUENCE_NO%TYPE,
+                                                                 P_I_BOOKING_NO TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE,
+                                                                P_O_CNT_ROW  OUT INTEGER
+                                                             );
+PROCEDURE  PRE_CHECK_EXISTING_DATA_EZLL( P_I_BOOKING_NO TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE,
+                                                                            P_I_DN_EQUIPMENT_NO  TOS_LL_BOOKED_LOADING.DN_EQUIPMENT_NO%TYPE,
+                                                                             P_I_FK_BKG_EQUIPM_DTL TOS_LL_BOOKED_LOADING.FK_BKG_EQUIPM_DTL%TYPE,
+                                                                             P_O_CNT_ROW  OUT INTEGER
+                                                                         );    
+PROCEDURE  PRE_CHECK_EXISTING_DATA_EZDL( P_I_BOOKING_NO TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE,
+                                                                            P_I_DN_EQUIPMENT_NO  TOS_LL_BOOKED_LOADING.DN_EQUIPMENT_NO%TYPE,
+                                                                             P_I_FK_BKG_EQUIPM_DTL TOS_LL_BOOKED_LOADING.FK_BKG_EQUIPM_DTL%TYPE,
+                                                                             P_O_CNT_ROW  OUT INTEGER
+                                                                         );                                                                                                                                                                                      
+end PCR_TOS_SYNC_EZLLDL_BOOKING;
+/

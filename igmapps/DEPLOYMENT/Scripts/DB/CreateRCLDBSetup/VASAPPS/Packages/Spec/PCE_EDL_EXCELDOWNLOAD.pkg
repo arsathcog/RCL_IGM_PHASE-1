@@ -1,0 +1,377 @@
+CREATE OR REPLACE PACKAGE VASAPPS."PCE_EDL_EXCELDOWNLOAD" AS 
+
+/* -----------------------------------------------------------------------------
+System  : RCL-EZLL
+Module  : Excel Download
+Prog ID : EDL011 - PCE_EDL_EXCELDOWNLOAD.sql
+Name    : Excel Download
+Purpose : Allows to download excel
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author                Date                      What
+--------------- --------------- ------------------------------------------------
+NTL)Richa     16/02/2011        <Initial version>
+--Change Log--------------------------------------------------------------------
+DD/MM/YY     User-Task/CR No -Short Description-
+----------------------------------------------------------------------------- */
+
+/**
+ * @ PRE_EDL_DISCHARGELIST_BOOKED
+ * Purpose : To data from Dischargelist Booked main table
+ * @param  : p_o_refDischargelistBooked     OutPut
+ * @param  : p_i_v_find1
+ * @param  : p_i_v_in1
+ * @param  : p_i_v_find2
+ * @param  : p_i_v_in2
+ * @param  : p_i_v_order1
+ * @param  : p_i_v_order1order
+ * @param  : p_i_v_order2
+ * @param  : p_i_v_order2order
+ * @param  : p_i_v_discharge_list_id
+ * @param  : p_o_v_error                    OutPut
+ * @return : The list of data in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+    PROCEDURE PRE_EDL_DISCHARGELIST_BOOKED(
+          p_o_refDischargelistBooked   OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_find1			       IN  VARCHAR2
+        , p_i_v_in1         		   IN  VARCHAR2
+        , p_i_v_find2        		   IN  VARCHAR2
+        , p_i_v_in2					   IN  VARCHAR2
+        , p_i_v_order1				   IN  VARCHAR2
+        , p_i_v_order1order      	   IN  VARCHAR2
+        , p_i_v_order2				   IN  VARCHAR2
+        , p_i_v_order2order      	   IN  VARCHAR2
+        , p_i_v_discharge_list_id      IN  VARCHAR2
+        , p_o_v_error                  OUT VARCHAR2
+    );
+
+/**
+ * @ PRE_EDL_DL_BOOKED_FORMAT
+ * Purpose : To data from Dischargelist Booked main table
+ * @param  : p_o_refDischargelistBooked     OutPut
+ * @param  : p_i_v_find1
+ * @param  : p_i_v_in1
+ * @param  : p_i_v_find2
+ * @param  : p_i_v_in2
+ * @param  : p_i_v_order1
+ * @param  : p_i_v_order1order
+ * @param  : p_i_v_order2
+ * @param  : p_i_v_order2order
+ * @param  : p_i_v_discharge_list_id
+ * @param  : p_o_v_error                    OutPut
+ * @return : The list of data in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+    PROCEDURE PRE_EDL_DL_BOOKED_FORMAT(
+          p_o_refDischargelistBooked   OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_find1			       IN  VARCHAR2
+        , p_i_v_in1         		   IN  VARCHAR2
+        , p_i_v_find2        		   IN  VARCHAR2
+        , p_i_v_in2					   IN  VARCHAR2
+        , p_i_v_order1				   IN  VARCHAR2
+        , p_i_v_order1order      	   IN  VARCHAR2
+        , p_i_v_order2				   IN  VARCHAR2
+        , p_i_v_order2order      	   IN  VARCHAR2
+        , p_i_v_discharge_list_id      IN  VARCHAR2
+        , p_o_v_error                  OUT VARCHAR2
+    );
+
+/**
+ * @ ADDITION_WHERE_CONDTIONS_DL
+ * Purpose : To add 'where' conditions in the Dischargelist sql
+ * @param  : p_i_v_in
+ * @param  : p_i_v_find
+ * @param  : p_i_v_tab
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+    PROCEDURE ADDITION_WHERE_CONDTIONS_DL(
+          p_i_v_in      IN  VARCHAR2
+        , p_i_v_find    IN  VARCHAR2
+        , p_i_v_tab 	  IN  VARCHAR2
+
+	  );
+
+/**
+ * @ PRE_EDL_DL_OVERLANDED
+ * Purpose : To data from Dischargelist Overlanded main table
+ * @param  : p_o_refDischargelistOverlanded     OutPut
+ * @param  : p_i_v_find1
+ * @param  : p_i_v_in1
+ * @param  : p_i_v_find2
+ * @param  : p_i_v_in2
+ * @param  : p_i_v_order1
+ * @param  : p_i_v_order1order
+ * @param  : p_i_v_order2
+ * @param  : p_i_v_order2order
+ * @param  : p_i_v_discharge_list_id
+ * @param  : p_o_v_error                    OutPut
+ * @return : The list of data in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+     PROCEDURE PRE_EDL_DL_OVERLANDED (
+          p_o_refDischargelistOverlanded   OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_find1			       	   IN  VARCHAR2
+        , p_i_v_in1         			   IN  VARCHAR2
+        , p_i_v_find2        			   IN  VARCHAR2
+        , p_i_v_in2					       IN  VARCHAR2
+        , p_i_v_order1				       IN  VARCHAR2
+        , p_i_v_order1order      		   IN  VARCHAR2
+        , p_i_v_order2				       IN  VARCHAR2
+        , p_i_v_order2order      	   	   IN  VARCHAR2
+        , p_i_v_discharge_list_id          IN  VARCHAR2
+        , p_o_v_error                	   OUT VARCHAR2
+    );
+
+/**
+ * @ PRE_EDL_DL_RESTOWED
+ * Purpose : To data from Dischargelist Restowed main table
+ * @param  : p_o_refDischargelistRestowed     OutPut
+ * @param  : p_i_v_find1
+ * @param  : p_i_v_in1
+ * @param  : p_i_v_find2
+ * @param  : p_i_v_in2
+ * @param  : p_i_v_order1
+ * @param  : p_i_v_order1order
+ * @param  : p_i_v_order2
+ * @param  : p_i_v_order2order
+ * @param  : p_i_v_discharge_list_id
+ * @param  : p_o_v_error                    OutPut
+ * @return : The list of data in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+    PROCEDURE PRE_EDL_DL_RESTOWED  (
+          p_o_refDischargelistRestowed	OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_find1			       	IN  VARCHAR2
+        , p_i_v_in1         			IN  VARCHAR2
+        , p_i_v_find2        			IN  VARCHAR2
+        , p_i_v_in2					    IN  VARCHAR2
+        , p_i_v_order1				    IN  VARCHAR2
+        , p_i_v_order1order      		IN  VARCHAR2
+        , p_i_v_order2				    IN  VARCHAR2
+        , p_i_v_order2order      	   	IN  VARCHAR2
+        , p_i_v_discharge_list_id       IN  VARCHAR2
+        , p_o_v_error                	OUT VARCHAR2
+    ) ;
+
+/**
+ * @ PRE_ELL_LL_BOOKED
+ * Purpose : To data from Loadlist Booked main table
+ * @param  : p_o_refLoadlistBooked     OutPut
+ * @param  : p_i_v_find1
+ * @param  : p_i_v_in1
+ * @param  : p_i_v_find2
+ * @param  : p_i_v_in2
+ * @param  : p_i_v_order1
+ * @param  : p_i_v_order1order
+ * @param  : p_i_v_order2
+ * @param  : p_i_v_order2order
+ * @param  : p_i_v_load_list_id
+ * @param  : p_o_v_error                    OutPut
+ * @return : The list of data in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+     PROCEDURE PRE_ELL_LL_BOOKED(
+          p_o_refLoadlistBooked        OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_find1			       IN  VARCHAR2
+        , p_i_v_in1         	       IN  VARCHAR2
+        , p_i_v_find2        	       IN  VARCHAR2
+        , p_i_v_in2				       IN  VARCHAR2
+        , p_i_v_order1			       IN  VARCHAR2
+        , p_i_v_order1order            IN  VARCHAR2
+        , p_i_v_order2			       IN  VARCHAR2
+        , p_i_v_order2order            IN  VARCHAR2
+        , p_i_v_load_list_id           IN  VARCHAR2
+        , p_o_v_error                  OUT VARCHAR2
+    );
+
+/**
+ * @ ADDITION_WHERE_CONDTIONS_LL
+ * Purpose : To add 'where' conditions in the Loadlist sql
+ * @param  : p_i_v_in
+ * @param  : p_i_v_find
+ * @param  : p_i_v_tab
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+     PROCEDURE ADDITION_WHERE_CONDTIONS_LL(
+          p_i_v_in      IN  VARCHAR2
+        , p_i_v_find    IN  VARCHAR2
+        , p_i_v_tab 	IN  VARCHAR2
+    );
+
+/**
+ * @ PRE_ELL_LL_OVERSHIPPED
+ * Purpose : To data from Loadlist Overshipped main table
+ * @param  : p_o_refLoadlistOverShipped     OutPut
+ * @param  : p_i_v_find1
+ * @param  : p_i_v_in1
+ * @param  : p_i_v_find2
+ * @param  : p_i_v_in2
+ * @param  : p_i_v_order1
+ * @param  : p_i_v_order1order
+ * @param  : p_i_v_order2
+ * @param  : p_i_v_order2order
+ * @param  : p_i_v_load_list_id
+ * @param  : p_o_v_error                    OutPut
+ * @return : The list of data in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+    PROCEDURE PRE_ELL_LL_OVERSHIPPED (
+          p_o_refLoadlistOverShipped    OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_find1			        IN  VARCHAR2
+        , p_i_v_in1         		    IN  VARCHAR2
+        , p_i_v_find2        		    IN  VARCHAR2
+        , p_i_v_in2					    IN  VARCHAR2
+        , p_i_v_order1				    IN  VARCHAR2
+        , p_i_v_order1order      	    IN  VARCHAR2
+        , p_i_v_order2				    IN  VARCHAR2
+        , p_i_v_order2order      	    IN  VARCHAR2
+        , p_i_v_load_list_id            IN  VARCHAR2
+        , p_o_v_error                   OUT VARCHAR2
+    );
+
+/**
+ * @ PRE_ELL_LL_RESTOWED
+ * Purpose : To data from Loadlist Restowed main table
+ * @param  : p_o_refLoadlistRestowed     OutPut
+ * @param  : p_i_v_find1
+ * @param  : p_i_v_in1
+ * @param  : p_i_v_find2
+ * @param  : p_i_v_in2
+ * @param  : p_i_v_order1
+ * @param  : p_i_v_order1order
+ * @param  : p_i_v_order2
+ * @param  : p_i_v_order2order
+ * @param  : p_i_v_load_list_id
+ * @param  : p_o_v_error                    OutPut
+ * @return : The list of data in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+    PROCEDURE PRE_ELL_LL_RESTOWED (
+          p_o_refLoadlistRestowed		          OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_find1			    	  	      IN  VARCHAR2
+        , p_i_v_in1         				      IN  VARCHAR2
+        , p_i_v_find2        			      	  IN  VARCHAR2
+        , p_i_v_in2					              IN  VARCHAR2
+        , p_i_v_order1				              IN  VARCHAR2
+        , p_i_v_order1order      		    	  IN  VARCHAR2
+        , p_i_v_order2				              IN  VARCHAR2
+        , p_i_v_order2order      	  	          IN  VARCHAR2
+        , p_i_v_load_list_id                      IN  VARCHAR2
+        , p_o_v_error               	          OUT VARCHAR2
+    ) ;
+
+	/* Funciton to get Config description */
+	FUNCTION FN_GET_CONFIG_DESC (
+		  p_i_v_type        VARCHAR2
+		, p_i_v_cd          VARCHAR2
+	)
+	RETURN VARCHAR2;
+
+    /* Funciton to get Config description for reefer temprature unit*/
+    FUNCTION FN_REFEER_TEMP_GET_CONFIG_DESC (
+        p_i_v_cd          VARCHAR2
+    )
+    RETURN VARCHAR2;
+
+
+/**
+ * @ PRE_ELL_LL_BOOKED_FORMAT
+ * Purpose : To data from Loadlist Booked main table
+ * @param  : p_o_refLoadlistBooked     OutPut
+ * @param  : p_i_v_find1
+ * @param  : p_i_v_in1
+ * @param  : p_i_v_find2
+ * @param  : p_i_v_in2
+ * @param  : p_i_v_order1
+ * @param  : p_i_v_order1order
+ * @param  : p_i_v_order2
+ * @param  : p_i_v_order2order
+ * @param  : p_i_v_load_list_id
+ * @param  : p_o_v_error                    OutPut
+ * @return : The list of data in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+  PROCEDURE PRE_ELL_LL_BOOKED_FORMAT(
+          p_o_refLoadlistBooked	    OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_find1			    IN  VARCHAR2
+        , p_i_v_in1         	    IN  VARCHAR2
+        , p_i_v_find2        	    IN  VARCHAR2
+        , p_i_v_in2				    IN  VARCHAR2
+        , p_i_v_order1			    IN  VARCHAR2
+        , p_i_v_order1order         IN  VARCHAR2
+        , p_i_v_order2			    IN  VARCHAR2
+        , p_i_v_order2order         IN  VARCHAR2
+        , p_i_v_load_list_id        IN  VARCHAR2
+        , p_o_v_error               OUT VARCHAR2
+    ) ;
+
+END PCE_EDL_EXCELDOWNLOAD;
+/

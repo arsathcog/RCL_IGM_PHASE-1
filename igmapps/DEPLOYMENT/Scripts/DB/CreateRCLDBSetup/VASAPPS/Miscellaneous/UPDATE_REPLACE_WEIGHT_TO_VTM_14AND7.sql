@@ -1,0 +1,27 @@
+-- update for grid in EZLL
+     MERGE INTO ZCV_SCREEN_COLUMN TAB
+     USING (
+      SELECT  ZSC.PK_SCREEN_COLUMN_ID
+        FROM  ZCV_SCREEN_COLUMN ZSC,
+              ZCV_VIEW_COLUMN   ZVC
+        WHERE ZSC.PK_SCREEN_COLUMN_ID = ZVC.FK_SCREEN_COLUMN_ID
+        AND   ZVC.FK_VIEW_ID          = 14
+        AND   ZVC.RECORD_STATUS       = 'A'  -- Active
+        and  ZSC.COLUMN_ID = 'weight' ) SRC
+        ON (TAB.PK_SCREEN_COLUMN_ID = SRC.PK_SCREEN_COLUMN_ID)
+        WHEN MATCHED THEN 
+        UPDATE SET TAB.COLUMN_DESC = 'VGM';
+        
+-- update for grid in EZDL
+     MERGE INTO ZCV_SCREEN_COLUMN TAB
+     USING (
+      SELECT  ZSC.PK_SCREEN_COLUMN_ID
+        FROM  ZCV_SCREEN_COLUMN ZSC,
+              ZCV_VIEW_COLUMN   ZVC
+        WHERE ZSC.PK_SCREEN_COLUMN_ID = ZVC.FK_SCREEN_COLUMN_ID
+        AND   ZVC.FK_VIEW_ID          = 3
+        AND   ZVC.RECORD_STATUS       = 'A'  -- Active
+        and  ZSC.COLUMN_ID = 'weight' ) SRC
+        ON (TAB.PK_SCREEN_COLUMN_ID = SRC.PK_SCREEN_COLUMN_ID)
+        WHEN MATCHED THEN 
+        UPDATE SET TAB.COLUMN_DESC = 'VGM';        

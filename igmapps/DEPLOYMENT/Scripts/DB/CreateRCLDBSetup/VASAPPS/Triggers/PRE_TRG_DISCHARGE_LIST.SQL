@@ -1,0 +1,54 @@
+/* * trigger to log last list status for dishcarge list.
+	it fires for SGSIN port only * */
+CREATE OR REPLACE TRIGGER VASAPPS.PRE_TRG_DISCHARGE_LIST
+AFTER UPDATE
+    ON VASAPPS.TOS_DL_DISCHARGE_LIST
+    FOR EACH ROW
+    WHEN ((NEW.DISCHARGE_LIST_STATUS <> OLD.DISCHARGE_LIST_STATUS) AND
+        (OLD.DN_PORT = 'SGSIN'))
+
+DECLARE
+    SEP CONSTANT VARCHAR2(1) DEFAULT '~';
+
+    PRAGMA AUTONOMOUS_TRANSACTION; -- Added to commit changes
+
+BEGIN -- beg1
+
+    INSERT INTO
+        VASAPPS.TOS_DL_LOG_LIST_STATUS
+    (
+          DISCAHRGE_LIST_ID
+        , FK_SERVICE
+        , FK_VESSEL
+        , FK_VOYAGE
+        , OLD_DISCHARGE_LIST_STATUS
+        , NEW_DISCHARGE_LIST_STATUS
+        , NEW_RECORD_CHANGE_USER
+        , NEW_RECORD_CHANGE_DATE
+        , RECORD_ADD_DATE
+    )
+    VALUES
+    (
+          :NEW.PK_DISCHARGE_LIST_ID
+        , :OLD.FK_SERVICE
+        , :OLD.FK_VESSEL
+        , :OLD.FK_VOYAGE
+        , :OLD.DISCHARGE_LIST_STATUS
+        , :NEW.DISCHARGE_LIST_STATUS
+        , :NEW.RECORD_CHANGE_USER
+        , :NEW.RECORD_CHANGE_DATE
+        , SYSDATE
+    );
+
+    /* * commit changes * */
+
+    COMMIT;
+
+EXCEPTION -- beg1
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE (SQLCODE||SEP||SQLERRM);
+
+END PRE_TRG_DISCHARGE_LIST; -- beg1
+/* end of the trigger * */
+/

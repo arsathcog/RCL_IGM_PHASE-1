@@ -1,0 +1,1 @@
+@&&ROOT_FOLDER_PATH\VASAPPS\Functions\FE_TRANS_DATA.sql;

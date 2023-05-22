@@ -1,0 +1,675 @@
+create or replace
+PACKAGE           "PCE_ELL_LLMAINTENANCE" AS
+/* -----------------------------------------------------------------------------
+System  : RCL-EZLL
+Module  : Load List
+Prog ID : ELL002 - PCE_ELL_LLMAINTENANCE.sql
+Name    : Load List Maintenance
+Purpose : Allows to maintain Load List
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author                Date                      What
+--------------- --------------- ------------------------------------------------
+NTL)Vikas Verma    25/02/2011        <Initial version>
+--Change Log--------------------------------------------------------------------
+DD/MM/YY     User-Task/CR No -Short Description-
+*8: Added by vikas, to get cran value in booked tab, as k'chatamol, 27.03.2012
+*17: Modified by vikas, When load list status changed from open to load complete
+	(10 or more then 10) than, update load list status in discharge list booked table.
+	 and update Copy DG, OOG, REEFER details from load list to discharge list detail tablelist,
+	 as k'chatgamol, 08.10.2012
+*18: Modified by vikas, When changing list status from open to load complete or higher,
+	 check duplicate cell location, as k'chatgamol, 27.12.2012
+*23: Modified by vikas, modify logic to get next discharge list, as k'chatgamol,
+	 11.06.2013
+
+ ----------------------------------------------------------------------------- */
+
+    g_exp_upd_another_usr       EXCEPTION;
+
+    PROCEDURE PRV_ELL_SET_BOOKING_TO_TEMP (
+         p_i_v_session_id       IN  VARCHAR2
+        ,p_i_v_load_list_id     IN  VARCHAR2
+        ,p_i_v_user_id          IN  VARCHAR2
+        ,p_o_v_err_cd           OUT VARCHAR2
+    );
+
+    PROCEDURE PRV_ELL_SET_OVERSHIP_TO_TEMP (
+         p_i_v_session_id       IN  VARCHAR2
+        ,p_i_v_load_list_id     IN  VARCHAR2
+        ,p_i_v_user_id          IN  VARCHAR2
+        ,p_o_v_err_cd           OUT VARCHAR2
+    );
+
+    PROCEDURE PRV_ELL_SET_RESTOW_TO_TEMP (
+        p_i_v_session_id       IN  VARCHAR2
+        ,p_i_v_load_list_id     IN  VARCHAR2
+        ,p_i_v_user_id          IN  VARCHAR2
+        ,p_o_v_err_cd           OUT VARCHAR2
+    );
+
+    PROCEDURE PRV_ELL_CLR_TMP(
+        p_i_v_session_id        IN  VARCHAR2
+        , p_i_v_user_id         IN  VARCHAR2
+        , p_o_v_err_cd          OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_BOOKED_TAB_FIND(
+        p_o_refBookedTabFind    OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_session_id      IN  VARCHAR2
+        , p_i_v_find1           IN  VARCHAR2
+        , p_i_v_in1             IN  VARCHAR2
+        , p_i_v_find2           IN  VARCHAR2
+        , p_i_v_in2             IN  VARCHAR2
+        , p_i_v_order1          IN  VARCHAR2
+        , p_i_v_order1order     IN  VARCHAR2
+        , p_i_v_order2          IN  VARCHAR2
+        , p_i_v_order2order     IN  VARCHAR2
+        , p_i_v_load_list_id    IN  VARCHAR2
+        , p_o_v_tot_rec         OUT VARCHAR2
+        , p_o_v_error           OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_OVERSHIPPED_TAB_FIND (
+        p_o_refOvershippedTabFind   OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_session_id          IN  VARCHAR2
+        , p_i_v_find1               IN  VARCHAR2
+        , p_i_v_in1                 IN  VARCHAR2
+        , p_i_v_find2               IN  VARCHAR2
+        , p_i_v_in2                 IN  VARCHAR2
+        , p_i_v_order1              IN  VARCHAR2
+        , p_i_v_order1order         IN  VARCHAR2
+        , p_i_v_order2              IN  VARCHAR2
+        , p_i_v_order2order         IN  VARCHAR2
+        , p_i_v_load_list_id        IN  VARCHAR2
+        , p_o_v_tot_rec             OUT VARCHAR2
+        , p_o_v_error               OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_RESTOWED_TAB_FIND  (
+        p_o_refRestowedTabFind      OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_session_id          IN  VARCHAR2
+        , p_i_v_find1               IN  VARCHAR2
+        , p_i_v_in1                 IN  VARCHAR2
+        , p_i_v_find2               IN  VARCHAR2
+        , p_i_v_in2                 IN  VARCHAR2
+        , p_i_v_order1              IN  VARCHAR2
+        , p_i_v_order1order         IN  VARCHAR2
+        , p_i_v_order2              IN  VARCHAR2
+        , p_i_v_order2order         IN  VARCHAR2
+        , p_i_v_load_list_id        IN  VARCHAR2
+        , p_o_v_tot_rec             OUT VARCHAR2
+        , p_o_v_error               OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_SUMMARY_TAB_FIND (
+        p_o_refSummaryTabFind        OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_load_list_id         VARCHAR2
+        , p_o_v_tot_rec              OUT VARCHAR2
+        , p_o_v_error                OUT VARCHAR2
+    );
+
+    PROCEDURE ADDITION_WHERE_CONDTIONS(
+        p_i_v_in                    IN  VARCHAR2
+        , p_i_v_find                IN  VARCHAR2
+        , p_i_v_tab                 IN  VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_SAVE_BOOKED_TAB_DATA(
+          p_i_v_session_id                     VARCHAR2
+        , p_i_v_seq_no                         VARCHAR2
+        , p_i_v_load_list_id                   VARCHAR2
+        , p_i_v_dn_equipment_no                VARCHAR2
+        , p_i_v_local_terminal_status          VARCHAR2
+        , p_i_v_midstream_handling_code        VARCHAR2
+        , p_i_v_load_condition                 VARCHAR2
+        , p_i_v_loading_status                 VARCHAR2
+        , p_i_v_stowage_position               VARCHAR2
+        , p_i_v_activity_date_time             VARCHAR2
+        , p_i_v_container_gross_weight         VARCHAR2
+        , p_i_v_damaged                        VARCHAR2
+        , p_i_v_fk_container_operator          VARCHAR2
+        , p_i_v_slot_operator                  VARCHAR2
+        , p_i_v_seal_no                        VARCHAR2
+        , p_i_v_mlo_vessel                     VARCHAR2
+        , p_i_v_mlo_voyage                     VARCHAR2
+        , p_i_v_mlo_vessel_eta                 VARCHAR2
+        , p_i_v_mlo_pod1                       VARCHAR2
+        , p_i_v_mlo_pod2                       VARCHAR2
+        , p_i_v_mlo_pod3                       VARCHAR2
+        , p_i_v_mlo_del                        VARCHAR2
+        , p_i_v_humidity                       VARCHAR2
+        , p_i_v_handling_inst1                 VARCHAR2
+        , p_i_v_handling_inst2                 VARCHAR2
+        , p_i_v_handling_inst3                 VARCHAR2
+        , p_i_v_container_loading_rem_1        VARCHAR2
+        , p_i_v_container_loading_rem_2        VARCHAR2
+        , p_i_v_tight_connection_flag1         VARCHAR2
+        , p_i_v_tight_connection_flag2         VARCHAR2
+        , p_i_v_tight_connection_flag3         VARCHAR2
+        , p_i_v_fk_imdg                        VARCHAR2
+        , p_i_v_fk_unno                        VARCHAR2
+        , p_i_v_fk_un_var                      VARCHAR2
+        , p_i_v_fk_port_class                  VARCHAR2
+        , p_i_v_fk_port_class_typ              VARCHAR2
+        , p_i_v_flash_unit                     VARCHAR2
+        , p_i_v_flash_point                    VARCHAR2
+        , p_i_v_fumigation_only                VARCHAR2
+        , p_i_v_overheight_cm                  VARCHAR2
+        , p_i_v_overwidth_left_cm              VARCHAR2
+        , p_i_v_overwidth_right_cm             VARCHAR2
+        , p_i_v_overlength_front_cm            VARCHAR2
+        , p_i_v_overlength_rear_cm             VARCHAR2
+        , p_i_v_reefer_temperature             VARCHAR2
+        , p_i_v_reefer_tmp_unit                VARCHAR2
+        , p_i_v_public_remark                  VARCHAR2
+        , p_i_v_out_slot_operator              VARCHAR2
+        , p_i_v_user_id                        VARCHAR2
+        , p_i_v_opn_sts                        VARCHAR2
+        , p_i_v_local_status                   VARCHAR2
+        , p_i_v_ex_mlo_vessel                  VARCHAR2
+        , p_i_v_ex_mlo_vessel_eta              VARCHAR2
+        , p_i_v_ex_mlo_voyage                  VARCHAR2
+        , p_i_v_ventilation                    VARCHAR2
+        , p_i_v_residue_only_flag              VARCHAR2
+        , p_i_v_cran_description               VARCHAR2 -- *8
+        , p_o_v_error                          OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_SAVE_OVERSHIP_TAB_DATA(
+        p_i_v_session_id                      VARCHAR2
+        , p_i_v_seq_no                        IN  OUT VARCHAR2
+        , p_i_v_overshipped_container_id      VARCHAR2
+        , p_i_v_load_list_id                  VARCHAR2
+        , p_i_v_booking_no                    VARCHAR2
+        , p_i_v_equipment_no                  VARCHAR2
+        , p_i_v_eq_size                       VARCHAR2
+        , p_i_v_eq_type                       VARCHAR2
+        , p_i_v_full_mt                       VARCHAR2
+        , p_i_v_bkg_typ                       VARCHAR2
+        , p_i_v_flag_soc_coc                  VARCHAR2
+        , p_i_v_shipment_term                 VARCHAR2
+        , p_i_v_shipment_typ                  VARCHAR2
+        , p_i_v_local_status                  VARCHAR2
+        , p_i_v_local_terminal_status         VARCHAR2
+        , p_i_v_midstream_handling_code       VARCHAR2
+        , p_i_v_load_condition                VARCHAR2
+        , p_i_v_stowage_position              VARCHAR2
+        , p_i_v_activity_date_time            VARCHAR2
+        , p_i_v_container_gross_weight        VARCHAR2
+        , p_i_v_damaged                       VARCHAR2
+        , p_i_v_slot_operator                 VARCHAR2
+        , p_i_v_container_operator            VARCHAR2
+        , p_i_v_out_slot_operator             VARCHAR2
+        , p_i_v_special_handling              VARCHAR2
+        , p_i_v_seal_no                       VARCHAR2
+        , p_i_v_pod                           VARCHAR2
+        , p_i_v_pod_terminal                  VARCHAR2
+        , p_i_v_nxt_srv                       VARCHAR2
+        , p_i_v_nxt_vessel                    VARCHAR2
+        , p_i_v_nxt_voyage                    VARCHAR2
+        , p_i_v_nxt_dir                       VARCHAR2
+        , p_i_v_mlo_vessel                    VARCHAR2
+        , p_i_v_mlo_voyage                    VARCHAR2
+        , p_i_v_mlo_vessel_eta                VARCHAR2
+        , p_i_v_mlo_pod1                      VARCHAR2
+        , p_i_v_mlo_pod2                      VARCHAR2
+        , p_i_v_mlo_pod3                      VARCHAR2
+        , p_i_v_mlo_del                       VARCHAR2
+        , p_i_v_handling_instruction_1        VARCHAR2
+        , p_i_v_handling_instruction_2        VARCHAR2
+        , p_i_v_handling_instruction_3        VARCHAR2
+        , p_i_v_container_loading_rem_1       VARCHAR2
+        , p_i_v_container_loading_rem_2       VARCHAR2
+        , p_i_v_special_cargo                 VARCHAR2
+        , p_i_v_imdg_class                    VARCHAR2
+        , p_i_v_un_number                     VARCHAR2
+        , p_i_v_un_var                        VARCHAR2
+        , p_i_v_port_class                    VARCHAR2
+        , p_i_v_port_class_typ                VARCHAR2
+        , p_i_v_flashpoint_unit               VARCHAR2
+        , p_i_v_flashpoint                    VARCHAR2
+        , p_i_v_fumigation_only               VARCHAR2
+        , p_i_v_residue_only_flag             VARCHAR2
+        , p_i_v_overheight_cm                 VARCHAR2
+        , p_i_v_overwidth_left_cm             VARCHAR2
+        , p_i_v_overwidth_right_cm            VARCHAR2
+        , p_i_v_overlength_front_cm           VARCHAR2
+        , p_i_v_overlength_rear_cm            VARCHAR2
+        , p_i_v_reefer_temperature            VARCHAR2
+        , p_i_v_reefer_tmp_unit               VARCHAR2
+        , p_i_v_humidity                      VARCHAR2
+        , p_i_v_ventilation                   VARCHAR2
+        , p_i_v_loading_status                VARCHAR2
+        , p_i_v_user_id                       VARCHAR2
+        , p_i_v_opn_sts                       VARCHAR2
+        , p_i_v_void_slot                     VARCHAR2
+        , p_i_v_ex_mlo_vessel                 VARCHAR2
+        , p_i_v_ex_mlo_vessel_eta             VARCHAR2
+        , p_i_v_ex_mlo_voyage                 VARCHAR2
+        , p_o_v_error                         OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_DEL_OVERSHIPPED_DATA (
+        p_i_v_session_id                     IN VARCHAR2
+        , p_i_v_seq_no                       IN VARCHAR2
+        , p_i_v_opn_sts                      IN VARCHAR2
+        , p_i_v_user_id                      IN VARCHAR2
+        , p_o_v_err_cd                       OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_SAVE_RESTOW_TAB_DATA (
+        p_i_v_session_id                IN      VARCHAR2
+        , p_i_v_seq_no                  IN OUT  VARCHAR2
+        , p_i_v_pk_restow_id            IN      VARCHAR2
+        , p_i_v_equipment_no            IN      VARCHAR2
+        , p_i_v_midstream               IN      VARCHAR2
+        , p_i_v_load_condition          IN      VARCHAR2
+        , p_i_v_restow_status           IN      VARCHAR2
+        , p_i_v_stowage_position        IN      VARCHAR2
+        , p_i_v_activity_date_time      IN      VARCHAR2
+        , p_i_v_public_remark           IN      VARCHAR2
+        , p_i_v_user_id                 IN      VARCHAR2
+        , p_i_v_load_list_id            IN      VARCHAR2
+        , p_i_v_opn_sts                 IN      VARCHAR2
+        , p_i_v_container_gross_weight  IN      VARCHAR2
+        , p_i_v_damaged                 IN      VARCHAR2
+        , p_i_v_seal_no                 IN      VARCHAR2
+        , p_o_v_error                   OUT     VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_DEL_RESTOWED_TAB_DATA (
+        p_i_v_session_id                 IN VARCHAR2
+        , p_i_v_seq_no                   IN  VARCHAR2
+        , p_i_v_opn_sts                  IN VARCHAR2
+        , p_i_v_user_id                  IN VARCHAR2
+        , p_o_v_err_cd                   OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_SAVE_TEMP_TO_MAIN(
+        p_i_v_session_id          IN VARCHAR2
+        , p_i_v_user_id           IN VARCHAR2
+        , p_i_v_load_list_status  IN VARCHAR2
+        , p_i_v_load_list_id      IN VARCHAR2
+        , p_i_v_eta               IN VARCHAR2
+        , p_i_v_vessel            IN VARCHAR2
+        , p_i_v_hdr_eta_tm        IN VARCHAR2
+        , p_i_v_hdr_port          IN VARCHAR2
+        , p_i_v_load_etd          IN VARCHAR2
+        , p_i_v_hdr_etd_tm        IN VARCHAR2
+        , p_o_v_err_cd            OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_SAVE_BOOKED_TAB_MAIN(
+        p_i_v_session_id      IN VARCHAR2
+        , p_i_v_user_id       IN VARCHAR2
+        , p_i_v_port_code     IN VARCHAR2
+        , p_i_v_load_etd      IN VARCHAR2
+        , p_i_v_hdr_etd_tm    IN VARCHAR2
+        , p_i_v_vessel        IN VARCHAR2
+        , p_i_v_date          IN VARCHAR2
+        , p_o_v_err_cd        OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_BOOKED_VALIDATION(
+        p_i_v_session_id                     VARCHAR2
+        , p_i_row_num                       NUMBER
+        , p_i_v_load_list_id                VARCHAR2
+        , p_i_v_equipment_no                VARCHAR2
+        , p_i_v_pk_load_list                VARCHAR2
+        , p_i_v_clr_code1                   VARCHAR2
+        , p_i_v_clr_code2                   VARCHAR2
+        , p_i_v_oper_cd                     VARCHAR2
+        , p_i_v_unno                        VARCHAR2
+        , p_i_v_port_code                   VARCHAR2
+        , p_i_v_variant                     VARCHAR2
+        , p_i_v_imdg                        VARCHAR2
+        , p_i_v_shi_code1                   VARCHAR2
+        , p_i_v_shi_code2                   VARCHAR2
+        , p_i_v_shi_code3                   VARCHAR2
+        , p_i_v_port_class                  VARCHAR2
+        , p_i_v_port_class_type             VARCHAR2
+        , p_i_v_SLOT_OPERATOR               VARCHAR2
+        , p_i_v_OUT_SLOT_OPERATOR           VARCHAR2
+        , p_i_v_DN_SOC_COC                  VARCHAR2
+        , p_i_v_load_etd                    VARCHAR2
+        , p_i_v_hdr_etd_tm                  VARCHAR2
+        , p_o_v_err_cd                      OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_SAVE_OVERSHIP_TAB_MAIN(
+        p_i_v_session_id                       IN VARCHAR2
+        , p_i_v_user_id                        IN VARCHAR2
+        , p_i_v_vessel                         IN VARCHAR2
+        , p_i_v_eta                            IN VARCHAR2
+        , p_i_v_hdr_eta_tm                     IN VARCHAR2
+        , p_i_v_port_code                      IN VARCHAR2
+        , p_i_v_date                           IN VARCHAR2
+        , p_i_v_load_etd                       IN VARCHAR2
+        , p_i_v_hdr_etd_tm                     IN VARCHAR2
+        , p_o_v_err_cd                         OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_OVERSHIPPED_VALIDATION (
+        p_i_v_session_id                       VARCHAR2
+        , p_i_row_num                          VARCHAR2
+        , p_i_v_load_list_id                   VARCHAR2
+        , p_i_v_equipment_no                   VARCHAR2
+        , p_i_v_pk_cont_id                     VARCHAR2
+        , p_i_v_clr_code1                      VARCHAR2
+        , p_i_v_clr_code2                      VARCHAR2
+        , p_i_v_oper_cd                        VARCHAR2
+        , p_i_v_shi_code1                      VARCHAR2
+        , p_i_v_shi_code2                      VARCHAR2
+        , p_i_v_shi_code3                      VARCHAR2
+        , p_i_v_unno                           VARCHAR2
+        , p_i_v_variant                        VARCHAR2
+        , p_i_v_imdg                           VARCHAR2
+        , p_i_v_port_code                      VARCHAR2
+        , p_i_v_port_class                     VARCHAR2
+        , p_i_v_port_class_type                VARCHAR2
+        , p_i_v_out_slot_operator              VARCHAR2
+        , p_i_v_slot_operator                  VARCHAR2
+        , p_i_v_shipmnt_cd                     VARCHAR2
+        , p_i_v_SOC_COC                        VARCHAR2
+        , p_i_v_load_etd                       VARCHAR2
+        , p_i_v_hdr_etd_tm                     VARCHAR2
+        , p_i_v_equip_type                     VARCHAR2
+        , p_i_v_pod_code                       VARCHAR2
+        , p_i_v_pod_terminal_code              VARCHAR2
+        , p_o_v_err_cd                         OUT VARCHAR2
+    )  ;
+
+    PROCEDURE PRE_ELL_SAVE_RESTOW_TAB_MAIN (
+        p_i_v_session_id                 VARCHAR2
+        , p_i_v_user_id                  VARCHAR2
+        , p_i_v_vessel                   VARCHAR2
+        , p_i_v_eta                      VARCHAR2
+        , p_i_v_hdr_eta_tm               VARCHAR2
+        , p_i_v_load_etd                 VARCHAR2
+        , p_i_v_hdr_etd_tm               VARCHAR2
+        , p_i_v_hdr_port                 VARCHAR2
+        , p_i_v_date                     VARCHAR2
+        , p_o_v_err_cd                   OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_RESTOW_VALIDATION (
+        p_i_v_session_id            VARCHAR2
+        ,p_i_row_num                NUMBER
+        ,p_i_v_load_list_id        VARCHAR2
+        ,p_i_v_equipment_no        VARCHAR2
+        ,p_i_v_restow_id           VARCHAR2
+        ,p_i_v_soc_coc             VARCHAR2
+        ,p_i_v_hdr_port            VARCHAR2
+        ,p_i_v_discharge_etd       VARCHAR2
+        ,p_i_v_hdr_etd_tm          VARCHAR2
+        ,p_o_v_err_cd          OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PCV_ELL_RECORD_LOCK(
+    p_i_v_id              VARCHAR2
+    , p_i_v_rec_dt        VARCHAR2
+    , p_i_v_tab_name      VARCHAR2
+    , p_o_v_err_cd        OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_SYNCH_BOOKING(
+         p_i_v_pk_booked_id                       VARCHAR2
+        , p_i_v_container_seq_no                  VARCHAR2
+        , p_i_v_dn_equipment_no                   VARCHAR2
+        , p_i_v_fk_booking_no                     VARCHAR2
+        , p_i_v_overwidth_left_cm                 VARCHAR2
+        , p_i_v_overheight_cm                     VARCHAR2
+        , p_i_v_overwidth_right_cm                VARCHAR2
+        , p_i_v_overlength_front_cm               VARCHAR2
+        , p_i_v_overlength_rear_cm                VARCHAR2
+        , p_i_v_fk_imdg                           VARCHAR2
+        , p_i_v_fk_unno                           VARCHAR2
+        , p_i_v_fk_un_var                         VARCHAR2
+        , p_i_v_flash_point                       VARCHAR2
+        , p_i_v_flash_unit                        VARCHAR2
+        , p_i_v_reefer_tmp_unit                   VARCHAR2
+        , p_i_v_temperature                       VARCHAR2
+        , p_i_v_dn_humidity                       VARCHAR2
+        , p_i_v_weight                            VARCHAR2
+        , p_i_v_dn_ventilation                    VARCHAR2
+        , p_o_v_err_cd                            OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_LL_STATUS_VALIDATION(
+        p_i_v_load_list_id                         VARCHAR2
+        , p_i_v_load_list_status                   VARCHAR2
+        , p_o_v_err_cd                             OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_SAVE_LL_STATUS (
+          p_i_v_load_list_id                VARCHAR2
+        , p_i_v_load_list_status            VARCHAR2
+        , p_i_v_user_id                     VARCHAR2
+        , p_i_v_session_id                  VARCHAR2 -- *18
+        , p_i_v_date                        VARCHAR2
+        , p_o_v_err_cd                  OUT VARCHAR2
+    );
+    PROCEDURE GET_VESSEL_OWNER_DTL(
+        p_i_v_hdr_vessel               VARCHAR2
+        , p_i_v_owner_dtl              OUT VARCHAR2
+        , p_i_v_vessel_nm              OUT VARCHAR2
+        , p_o_v_err_cd                 OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_OL_VAL_PORT_CLASS(
+        p_i_v_port_code             VARCHAR2
+        , p_i_v_unno                VARCHAR2
+        , p_i_v_variant             VARCHAR2
+        , p_i_v_imdg_class          VARCHAR2
+        , p_i_v_port_class          VARCHAR2
+        , p_i_v_port_class_type     VARCHAR2
+        , p_i_v_equipment_no        VARCHAR2
+        , p_o_v_err_cd              OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_OL_VAL_IMDG(
+        p_i_v_unno                  IN  VARCHAR2
+        , p_i_v_variant             IN  VARCHAR2
+        , p_i_v_imdg                IN  VARCHAR2
+        , p_i_v_equipment_no        IN  VARCHAR2
+        , p_o_v_err_cd              OUT  VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_OL_VAL_HAND_CODE(
+        p_i_v_shi_code              IN  VARCHAR2
+        , p_i_v_equipment_no        IN  VARCHAR2
+        , p_o_v_err_cd              OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_OL_VAL_OPERATOR_CODE(
+        p_i_v_oper_cd              IN VARCHAR2
+        , p_i_v_equipment_no       IN VARCHAR2
+        , p_o_v_err_cd             OUT VARCHAR2
+    );
+    PROCEDURE PRE_ELL_OL_VAL_CLR_CODE(
+        p_i_v_clr_code             IN  VARCHAR2
+        , p_i_v_equipment_no       IN  VARCHAR2
+        , p_o_v_err_cd             OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_ELL_VAL_EQUIPMENT_TYPE(
+        p_i_v_oper_cd            IN VARCHAR2
+        , p_i_v_equipment_no     IN VARCHAR2
+        , p_o_v_err_cd           OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_VAL_PORT_CODE(
+        p_i_v_oper_cd           IN VARCHAR2
+        , p_i_v_equipment_no    IN VARCHAR2
+        , p_o_v_err_cd          OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_VAL_PORT_TERMINAL_CODE(
+        p_i_v_oper_cd          IN VARCHAR2
+        , p_i_v_equipment_no   IN VARCHAR2
+        , p_o_v_err_cd         OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_OL_VAL_UNNO(
+        p_i_v_unno             IN  VARCHAR2
+        , p_i_v_variant        IN  VARCHAR2
+        , p_i_v_equipment_no   IN  VARCHAR2
+        , p_o_v_err_cd         OUT VARCHAR2
+    );
+
+    /*    Check for the shipment term */
+    PROCEDURE PRE_SHIPMENT_TERM_OL_CODE(
+        p_i_v_shipmnt_cd      VARCHAR2
+        , p_i_v_equipment_no  VARCHAR2
+        , p_o_v_err_cd        OUT VARCHAR2
+    ) ;
+
+    PROCEDURE PRE_LL_SPLIT
+    (
+        p_i_v_booked_loading_id           NUMBER
+        , p_o_v_err_cd                    OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_LL_COMMON_MATCHING
+    (
+        p_i_v_match_type                    VARCHAR2
+        , p_i_v_load_list_id                NUMBER
+        , p_i_v_dl_container_seq            NUMBER
+        , p_i_v_overshipped_container_id    NUMBER
+        , p_i_v_equipment_no                VARCHAR2
+        , p_o_v_err_cd                      OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_MOVE_TO_OVERSHIPPED (
+        p_i_n_booked_loading_id    IN NUMBER
+        , p_o_v_return_status      OUT  NOCOPY VARCHAR2
+    );
+
+    FUNCTION FN_ELL_CONVERTDATE (
+        p_i_v_date        VARCHAR2
+        , p_i_v_time      VARCHAR2
+        , p_i_v_port      VARCHAR2
+    )
+    RETURN DATE;
+
+    /* Start commented by vikas, this logic is already available in
+    pce_edl_dlmaintenance package, 22.11.2011*
+    PROCEDURE PRE_ELL_PREV_LOAD_LIST_ID (
+        p_i_v_vessel                     VARCHAR2
+        , p_i_v_equip_no                   VARCHAR2
+        , p_i_v_booking_no              VARCHAR2
+        , p_i_v_eta_date                   VARCHAR2
+        , p_i_v_eta_tm                     VARCHAR2
+        , p_i_port_code                    VARCHAR2
+        , p_o_v_pk_loading_id          OUT VARCHAR2
+        , p_o_v_flag                   OUT VARCHAR2
+        , p_o_v_err_cd                 OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_ELL_NEXT_DISCHARGE_LIST_ID (
+        p_i_v_vessel                     VARCHAR2
+        , p_i_v_equip_no                   VARCHAR2
+        , p_i_v_booking_no              VARCHAR2
+        , p_i_v_etd_date                   VARCHAR2
+        , p_i_v_etd_tm                     VARCHAR2
+        , p_i_port_code                    VARCHAR2
+        , p_o_v_pk_discharge_id     OUT VARCHAR2
+        , p_o_v_flag                   OUT VARCHAR2
+        , p_o_v_err_cd                 OUT VARCHAR2
+    );
+    *  End commented by vikas, this logic is already available in
+    pce_edl_dlmaintenance package, 22.11.2011 */
+
+    PROCEDURE PRE_ELL_PREV_LOADED_EQUIP_ID (
+          p_i_v_equip_no                   VARCHAR2
+        , p_i_v_eta_date                   VARCHAR2
+        , p_i_v_eta_tm                     VARCHAR2
+        , p_o_v_pk_loading_id          OUT VARCHAR2
+        , p_o_v_flag                   OUT VARCHAR2
+        , p_o_v_err_cd                 OUT VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_REMOVE_ERROR(
+          p_i_v_da_error                       VARCHAR2
+        , p_i_v_ll_dl_flag                     VARCHAR2
+        , p_i_v_size                           VARCHAR2
+        , p_i_v_clr1                           VARCHAR2
+        , p_i_v_clr2                           VARCHAR2
+        , p_i_v_equipment_no                   VARCHAR2
+        , p_i_v_fk_overshipped_id              VARCHAR2
+        , p_i_v_fk_load_list_id                VARCHAR2
+        , p_o_v_err_cd              OUT        VARCHAR2
+    );
+
+    PROCEDURE PRE_EDL_POD_UPDATE(
+          p_i_v_pk_booked_id                  TOS_LL_BOOKED_LOADING.PK_BOOKED_LOADING_ID%TYPE
+        , p_i_v_fk_booking_no                 TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE
+        , p_i_v_lldl_flag                     VARCHAR2
+        , p_i_v_fk_bkg_voyage_rout_dtl        TOS_LL_BOOKED_LOADING.FK_BKG_VOYAGE_ROUTING_DTL%TYPE
+        , p_i_v_load_condition                TOS_LL_BOOKED_LOADING.LOAD_CONDITION%TYPE
+        , p_i_v_container_gross_weight        TOS_LL_BOOKED_LOADING.CONTAINER_GROSS_WEIGHT%TYPE
+        , p_i_v_damaged                       TOS_LL_BOOKED_LOADING.DAMAGED%TYPE
+        , p_i_v_fk_container_operator         TOS_LL_BOOKED_LOADING.FK_CONTAINER_OPERATOR%TYPE
+        , p_i_v_out_slot_operator             TOS_LL_BOOKED_LOADING.OUT_SLOT_OPERATOR%TYPE
+        , p_i_v_seal_no                       TOS_LL_BOOKED_LOADING.SEAL_NO%TYPE
+        , p_i_v_mlo_vessel                    TOS_LL_BOOKED_LOADING.MLO_VESSEL%TYPE
+        , p_i_v_mlo_voyage                    TOS_LL_BOOKED_LOADING.MLO_VOYAGE%TYPE
+        , p_i_v_mlo_vessel_eta                date
+        , p_i_v_mlo_pod1                      TOS_LL_BOOKED_LOADING.MLO_POD1%TYPE
+        , p_i_v_mlo_pod2                      TOS_LL_BOOKED_LOADING.MLO_POD2%TYPE
+        , p_i_v_mlo_pod3                      TOS_LL_BOOKED_LOADING.MLO_POD3%TYPE
+        , p_i_v_mlo_del                       TOS_LL_BOOKED_LOADING.MLO_DEL%TYPE
+        , p_i_v_fk_handl_instruction_1        TOS_LL_BOOKED_LOADING.FK_HANDLING_INSTRUCTION_1%TYPE
+        , p_i_v_fk_handl_instruction_2        TOS_LL_BOOKED_LOADING.FK_HANDLING_INSTRUCTION_2%TYPE
+        , p_i_v_fk_handl_instruction_3        TOS_LL_BOOKED_LOADING.FK_HANDLING_INSTRUCTION_3%TYPE
+        , p_i_v_container_loading_rem_1       TOS_LL_BOOKED_LOADING.CONTAINER_LOADING_REM_1%TYPE
+        , p_i_v_container_loading_rem_2       TOS_LL_BOOKED_LOADING.CONTAINER_LOADING_REM_2%TYPE
+        , p_i_v_tight_connection_flag1        TOS_LL_BOOKED_LOADING.TIGHT_CONNECTION_FLAG1%TYPE
+        , p_i_v_tight_connection_flag2        TOS_LL_BOOKED_LOADING.TIGHT_CONNECTION_FLAG2%TYPE
+        , p_i_v_tight_connection_flag3        TOS_LL_BOOKED_LOADING.TIGHT_CONNECTION_FLAG3%TYPE
+        , p_i_v_fumigation_only               TOS_LL_BOOKED_LOADING.FUMIGATION_ONLY%TYPE
+        , p_i_v_residue_only_flag             TOS_LL_BOOKED_LOADING.RESIDUE_ONLY_FLAG%TYPE
+        , p_i_v_fk_bkg_size_type_dtl          TOS_LL_BOOKED_LOADING.FK_BKG_SIZE_TYPE_DTL%TYPE
+        , p_i_v_fk_bkg_supplier               TOS_LL_BOOKED_LOADING.FK_BKG_SUPPLIER%TYPE
+        , p_i_v_fk_bkg_equipm_dtl             TOS_LL_BOOKED_LOADING.FK_BKG_EQUIPM_DTL%TYPE
+        , p_o_v_err_cd                        OUT VARCHAR2
+    );
+    /* *17 start * */
+    PROCEDURE PRE_UPD_MLO_DETAIL (
+        P_I_V_LIST_ID VARCHAR2,
+        P_I_V_USER_ID VARCHAR2,
+        P_I_V_DATE    VARCHAR2 /* format YYYYMMDDHH24MISS */
+    );
+    /* *17 end * */
+	/* *23 start * */
+     PROCEDURE PRE_FIND_DISCHARGE_LIST (
+        P_I_V_BOOKING             VARCHAR2,
+        P_I_V_VESSEL              VARCHAR2,
+        P_I_V_EQUIPMENT           VARCHAR2,
+        P_O_V_FLAG                OUT NOCOPY VARCHAR2,
+        P_O_V_BOOKED_DIS_ID       OUT NOCOPY VARCHAR2,
+        P_O_V_ERR_CD              OUT NOCOPY VARCHAR2);
+		
+	/* *23 end * */
+  
+      /* *24 end * */
+      PROCEDURE PRE_ELL_OL_VAL_PORT_CLASS_TYPE( 
+         P_I_V_PORT_CODE        VARCHAR2,
+         P_I_V_PORT_CLASS_TYPE  VARCHAR2,   
+         P_I_V_EQUIPMENT_NO     VARCHAR2,
+         P_O_V_ERR_CD           OUT varchar2);
+      /* *24 end * */
+      
+      /* *26, *27 start * */
+      PROCEDURE PRE_LOG_PORTCLASS_CHANGE(
+        P_I_V_BOOKED_LL_DL_ID 		NUMBER
+        ,P_I_V_PORT_CLASS			    VARCHAR
+        ,P_I_V_IMDG					    VARCHAR
+        ,P_I_V_UNNO					    VARCHAR
+        ,P_I_V_UN_VAR				    VARCHAR
+        ,P_I_V_LOAD_DISCHARGE_FLAG 	    VARCHAR
+        ,P_I_V_USER_ID 				    VARCHAR);
+      /* *26 end * */
+END PCE_ELL_LLMAINTENANCE;

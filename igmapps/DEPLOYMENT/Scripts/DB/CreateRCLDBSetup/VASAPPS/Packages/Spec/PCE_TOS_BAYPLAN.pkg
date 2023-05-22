@@ -1,0 +1,88 @@
+CREATE OR REPLACE PACKAGE PCE_TOS_BAYPLAN AS
+    /********************************************************************************
+    * Name           : PRE_TOS_CREATE_BAYPLAN                                       *
+    * Module         : EZLL                                                         *
+    * Purpose        : This  Stored  Procedure is for BayPlan                       *
+    * Calls          : None                                                         *
+    * Returns        : NONE                                                         *
+    * Steps Involved :                                                              *
+    * History        : None                                                         *
+    * Author           Date          What                                           *
+    * ---------------  ----------    ----                                           *
+    * Arijeet          01/03/2011     1.0                                           *
+    * *1 Vikas         10/04/2012     Bookings for the current port should not be   *
+	*							      included in bay plan.                         *
+    *********************************************************************************/
+
+   g_v_user            VARCHAR2(10) := 'EZLL';
+   g_v_sql_id          VARCHAR2(10);
+   g_v_err_code        VARCHAR2(50);
+   g_v_err_desc        VARCHAR2(100);
+   g_v_err_handler_flg VARCHAR2(1):='N';
+
+   PROCEDURE PRE_TOS_CREATE_BAYPLAN
+   (
+          p_i_v_port                    IN           VARCHAR2
+        , p_i_v_service                 IN           VARCHAR2
+        , p_i_v_vessel                  IN           VARCHAR2
+        , p_i_v_terminal                IN           VARCHAR2
+        , p_i_v_voyage                  IN           VARCHAR2
+        , p_i_v_direction               IN           VARCHAR2
+        , p_i_v_function_cd             IN           VARCHAR2
+        , p_i_v_eme_uid                 IN           NUMBER
+        , p_i_dt_dl_eta                 IN           VARCHAR2
+        , p_i_dt_ll_etd                 IN           VARCHAR2
+        , p_i_v_rob                     IN           VARCHAR2
+        , p_i_v_cont_op_flag            IN           VARCHAR2
+        , p_i_v_slot_op_flag            IN           VARCHAR2
+        , p_i_v_cont_op                 IN           VARCHAR2
+        , p_i_v_slot_op                 IN           VARCHAR2
+		, p_i_v_ll_dl_flag              IN           VARCHAR2  -- *1
+        , p_o_v_err_cd                  OUT          VARCHAR2
+    );
+
+    PROCEDURE PRV_EDL_GET_NEXT_PORT_VAL(
+          p_i_v_voyage                  IN          VARCHAR2
+        , p_i_v_vessel                  IN          VARCHAR2
+        , p_i_v_seq                     IN          VARCHAR2
+        , p_i_v_etd                     IN          VARCHAR2
+        , p_o_v_service                 OUT         VARCHAR2
+        , p_o_v_vessel                  OUT         VARCHAR2
+        , p_o_v_etd                     OUT         VARCHAR2
+        , p_o_v_port                    OUT         VARCHAR2
+        , p_o_v_voyage_no               OUT         VARCHAR2
+        , p_o_v_port_seq                OUT         VARCHAR2
+        , p_o_v_terminal                OUT         VARCHAR2
+        , p_o_v_err_cd                  OUT         VARCHAR2
+    );
+
+    PROCEDURE PRV_EDL_GET_MSG_RCPNT_SET_VAL(
+        p_i_v_terminal                 IN          VARCHAR2
+      , p_o_v_msg_recp                 OUT         VARCHAR2
+      , p_o_v_msg_set                  OUT         VARCHAR2
+      , p_o_v_eme_uid                  OUT         VARCHAR2
+      , p_o_v_err_cd                   OUT         VARCHAR2
+    );
+
+    PROCEDURE PRE_EDL_BAYPLANREPORT(
+          p_o_refCreateArrivalBayPlan   OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_port                    IN           VARCHAR2
+        , p_i_v_service                 IN           VARCHAR2
+        , p_i_v_vessel                  IN           VARCHAR2
+        , p_i_v_terminal                IN           VARCHAR2
+        , p_i_v_voyage                  IN           VARCHAR2
+        , p_i_v_direction               IN           VARCHAR2
+        , p_i_dt_dl_eta                 IN           VARCHAR2
+        , p_i_dt_ll_etd                 IN           VARCHAR2
+        , p_i_v_rob                     IN           VARCHAR2
+        , p_i_v_cont_op_flag            IN           VARCHAR2
+        , p_i_v_slot_op_flag            IN           VARCHAR2
+        , p_i_v_cont_op                 IN           VARCHAR2
+        , p_i_v_slot_op                 IN           VARCHAR2
+        , p_i_v_ll_dl_flag              IN           VARCHAR2  -- *1		
+        , p_o_v_err_cd                  OUT NOCOPY   VARCHAR2
+    );
+
+/* End of Package Specification */
+END PCE_TOS_BAYPLAN;
+/

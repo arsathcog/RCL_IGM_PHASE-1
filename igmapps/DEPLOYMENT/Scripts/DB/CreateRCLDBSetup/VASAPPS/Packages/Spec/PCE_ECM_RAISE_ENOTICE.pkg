@@ -1,0 +1,173 @@
+CREATE OR REPLACE PACKAGE PCE_ECM_RAISE_ENOTICE AS
+
+    /* *3: Added by vikas, new enotice type for BL-SURRENDER, as k'chatgamol, 03.01.2012 * */
+	/* *10: modified by vikas, extend size of exception variable, as k'myo, 26.02.2013 */
+
+    g_v_success                     VARCHAR2(6) := '000000';
+
+    g_n_bussiness_key_ll_maintain   ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 1;
+    g_n_bussiness_key_dl_maintain   ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 2;
+    g_n_bussiness_key_dl_edi        ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 3;
+
+    g_n_notice_type_dg_change       ZND_E_NOTICE_TYPE.PK_E_NOTICE_TYPE_ID%TYPE := 1;
+    g_n_notice_type_oog_change      ZND_E_NOTICE_TYPE.PK_E_NOTICE_TYPE_ID%TYPE := 2;
+    g_n_notice_type_rfr_change      ZND_E_NOTICE_TYPE.PK_E_NOTICE_TYPE_ID%TYPE := 3;
+
+    g_n_notice_type_cont_chng       ZND_E_NOTICE_TYPE.PK_E_NOTICE_TYPE_ID%TYPE := 7;
+    g_n_notice_type_ob_dtl_change   ZND_E_NOTICE_TYPE.PK_E_NOTICE_TYPE_ID%TYPE := 8;
+    g_n_notice_type_dl_wrk_start    ZND_E_NOTICE_TYPE.PK_E_NOTICE_TYPE_ID%TYPE := 9;
+        G_N_NOTICE_TYPE_BL_SURRENDER ZND_E_NOTICE_TYPE.PK_E_NOTICE_TYPE_ID%TYPE := 11; --*3
+
+    g_v_sql_id                      ZND_DISPATCH_ERROR.USER_ERR_CD%TYPE; -- Which SQL is executing
+    g_v_usr_err_cd                  ZND_DISPATCH_ERROR.USER_ERR_CD%TYPE;
+    g_v_usr_err_msg                 ZND_DISPATCH_ERROR.USER_ERR_MSG%TYPE;
+    /* g_v_ora_err_cd                  ZND_DISPATCH_ERROR.ORA_ERR_CD%TYPE; */  -- *10
+    g_v_ora_err_cd                  VARCHAR2(1000); -- *10
+    g_v_ora_err_msg                 ZND_DISPATCH_ERROR.ORA_ERR_MSG%TYPE;
+
+    TYPE ENOTICE_VARIABLES_TYPE IS RECORD
+    (
+          VARIABLE_DESC             VARCHAR2(50)
+        , MULTIPLE_VALUES_FLAG      VARCHAR2(1)
+        , MAP_CODE                  VARCHAR2(30)
+    );
+
+    TYPE ENOTICE_VARIABLES_TAB IS TABLE OF ENOTICE_VARIABLES_TYPE INDEX BY BINARY_INTEGER;
+
+    PROCEDURE PRE_GET_ENOTICE_VARIABLES (
+          p_i_v_notice_type_id                  VARCHAR2
+        , p_tab_enotice_variables    OUT        ENOTICE_VARIABLES_TAB
+    );
+
+    PROCEDURE PRE_GEN_INPUT_DATA (
+          p_tab_enotice_variables               ENOTICE_VARIABLES_TAB
+        , p_array_map_codes                     STRING_ARRAY
+        , p_array_map_code_value                STRING_ARRAY
+        , p_array_data_key_header    OUT        STRING_ARRAY
+        , p_array_data_value_header  OUT        STRING_ARRAY
+        , p_array_data_key_detail    OUT        STRING_ARRAY
+        , p_array_data_value_detail  OUT        STRING_ARRAY
+    );
+
+    PROCEDURE PRE_GET_VARIABLE_INFO (
+          p_tab_enotice_variables               ENOTICE_VARIABLES_TAB
+        , p_i_v_map_code                        VARCHAR2
+        , p_o_v_variable_desc        OUT NOCOPY VARCHAR2
+        , p_o_v_multiple_values_flag OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_RAISE_ENOTICE_DL_LL_MNTN (
+          p_i_v_load_dischage_list_flag         VARCHAR2
+        , p_i_v_session_id                      VARCHAR2
+        , p_i_v_add_user                        VARCHAR2
+        , p_i_v_add_date                        VARCHAR2
+        , p_o_v_error               OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_GEN_ENOTICE_DG_OOG_REF_CNG (
+          p_i_v_load_dischage_list_flag         VARCHAR2
+        , p_i_v_session_id                      VARCHAR2
+        , p_i_v_booked_id                       VARCHAR2
+        , p_i_v_osol_id                         VARCHAR2
+        , p_i_v_called_from                     VARCHAR2
+        , p_i_v_add_user                        VARCHAR2
+        , p_i_v_add_date                        VARCHAR2
+        , p_o_v_error               OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_RAISE_ENOTICE_OB_DTL_CHNG (
+          p_i_v_session_id                      VARCHAR2
+        , p_i_v_add_user                        VARCHAR2
+        , p_i_v_add_date                        VARCHAR2
+        , p_o_v_error               OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_DL_WRK_SRT_SYNC (
+          p_i_v_discharge_list_id               VARCHAR2
+        , p_i_v_equipment_seq_no                VARCHAR2
+        , p_i_v_booking_id                      VARCHAR2
+        , p_i_n_bussiness_key                   VARCHAR2
+        , p_i_v_add_user                        VARCHAR2
+        , p_i_v_add_date                        VARCHAR2
+        , p_o_v_error               OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_RAISE_ENOTICE_DL_WRK_SRT (
+          p_i_v_called_from                     VARCHAR2
+        , p_i_v_session_id                      VARCHAR2
+        , p_i_n_bussiness_key                   VARCHAR2
+        , p_i_v_discharge_list_id               VARCHAR2
+        , p_i_v_equipment_seq_no                VARCHAR2
+        , p_i_v_booking_id                      VARCHAR2
+        , p_i_v_add_user                        VARCHAR2
+        , p_i_v_add_date                        VARCHAR2
+        , p_o_v_error               OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_CONT_CHNG_SYNC (
+          p_i_v_discharge_list_id               VARCHAR2
+        , p_i_v_equipment_seq_no                VARCHAR2
+        , p_i_v_booking_id                      VARCHAR2
+        , p_i_n_bussiness_key                   VARCHAR2
+        , p_i_v_old_equipment_no                VARCHAR2
+        , p_i_v_new_equipment_no                VARCHAR2
+        , p_i_v_cont_action_flag                VARCHAR2
+        , p_i_v_add_user                        VARCHAR2
+        , p_i_v_add_date                        VARCHAR2
+        , p_o_v_error               OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_RAISE_ENOTICE_EDI (
+          p_i_v_load_dischage_list_flag         VARCHAR2
+        , p_i_v_booked_id                       VARCHAR2
+        , p_i_v_osol_id                         VARCHAR2   -- Overshipped / Overlanded Id
+        , p_i_v_add_user                        VARCHAR2
+        , p_i_v_add_date                        VARCHAR2
+        , p_o_v_error               OUT NOCOPY  VARCHAR2
+    );
+    /* *3 start * */
+    PROCEDURE PRE_ENOTICE_BL_SURRENDER (
+          P_I_V_BL_NUMBER        VARCHAR2
+        , P_I_V_CHANGE_USER      VARCHAR2
+        , P_I_V_BL_SURRENDER_FSC VARCHAR2
+        , P_I_V_CHANGE_DATE      VARCHAR2
+        , P_O_V_ERROR            OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_GET_BL_MAIL_DETAILS(
+        P_I_V_BL_NUMBER          VARCHAR2,
+        P_I_V_CHANGE_USER        VARCHAR2,
+        P_I_V_BL_SURRENDER_FSC   VARCHAR2,
+        P_O_V_FIRST_LEG_VESSEL   OUT NOCOPY VARCHAR2,
+        P_O_V_FIRST_LEG_VOYAGE   OUT NOCOPY VARCHAR2,
+        P_O_V_POL                OUT NOCOPY VARCHAR2,
+        P_O_V_POD                OUT NOCOPY VARCHAR2,
+        P_O_V_SECOND_LEG_VESSEL  OUT NOCOPY VARCHAR2,
+        P_O_V_SECOND_LEG_VOYAGE  OUT NOCOPY VARCHAR2,
+        P_O_V_THIRD_LEG_VESSEL   OUT NOCOPY VARCHAR2,
+        P_O_V_THIRD_LEG_VOYAGE   OUT NOCOPY VARCHAR2,
+        P_O_V_SHIPPER_NAME       OUT NOCOPY VARCHAR2,
+        P_O_V_CNEE_NAME          OUT NOCOPY VARCHAR2,
+        P_O_V_NTFY_NAME          OUT NOCOPY VARCHAR2,
+        P_O_V_SURRENDER_LOCATION OUT NOCOPY VARCHAR2,
+        P_O_V_TO_EXPORT_IMPORT   OUT NOCOPY VARCHAR2,
+        P_O_V_TO_FSC             OUT NOCOPY VARCHAR2,
+        P_O_V_FRM_FSC            OUT NOCOPY VARCHAR2,
+        P_O_V_FRM_EXPORT_IMPORT  OUT NOCOPY VARCHAR2,
+        P_O_V_CC_INFORMATION     OUT NOCOPY VARCHAR2,
+        P_O_V_FREIGHT_TERM       OUT NOCOPY VARCHAR2,
+        P_O_V_POL_FSC            OUT NOCOPY VARCHAR2,
+        P_O_V_POD_FSC            OUT NOCOPY VARCHAR2,
+        P_O_V_LOGIN_USER_FSC     OUT NOCOPY VARCHAR2,
+        P_O_V_ERROR              OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_GET_FSC (
+        P_I_V_PORT  VARCHAR2,
+        P_O_V_FSC   OUT NOCOPY VARCHAR2,
+        P_O_V_ERROR OUT NOCOPY VARCHAR2
+    );
+
+     /* *3 end * */
+END PCE_ECM_RAISE_ENOTICE;
+/

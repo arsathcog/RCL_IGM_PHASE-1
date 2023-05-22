@@ -1,0 +1,93 @@
+create or replace PACKAGE PCE_ECM_SEND_MAIL AS
+
+ /* -----------------------------------------------------------------------------
+System  : RCL-EZLL
+Module  : ECM
+Prog ID : PCE_ECM_SEND_MAIL.sql
+Name    : Send Online Mail
+Purpose : Allows to to send mail online
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author		Date		    What
+---------------	---------------	------------------------------------------------
+Rajeev 	  07/02/2009	<Initial version>
+--Change Log--------------------------------------------------------------------
+DD/MM/YY     User-Task/CR No -Short Description-
+----------------------------------------------------------------------------- */
+
+
+/**
+
+ * @ PRE_ECM_GET_SERVER_DETAILS
+ * Purpose : Get details of the server
+ * @param  : p_o_v_server_ip             Output
+ * @param  : p_o_v_server_user           Output
+ * @param  : p_o_v_server_user_password  Output
+ * @param  : p_o_v_error                 Output
+ * @return  : p_o_v_server_ip            Output
+ * @return  : p_o_v_server_user          Output
+ * @return  : p_o_v_server_user_password Output
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see    : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+PROCEDURE PRE_ECM_GET_SERVER_DETAILS
+                (
+                  p_o_v_server_ip                  OUT VARCHAR2
+                  ,p_o_v_server_user               OUT VARCHAR2
+                  ,p_o_v_server_user_password      OUT VARCHAR2
+                  ,p_o_v_error                     OUT VARCHAR2
+                 );
+
+/**
+
+ * @ PRE_ECM_GET_MAIL_RECIPIENTS
+ * Purpose : Get mail recipients
+ * @param  : p_o_refMail_recipients            Output
+ * @param  : p_o_v_error                       Output
+ * @return  : Returns the List of Mail Recipients in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see    : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+PROCEDURE PRE_ECM_GET_MAIL_RECIPIENTS
+                (
+                  p_o_refMail_recipients           OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+                  ,p_o_v_error                     OUT VARCHAR2
+                 );
+
+/**
+
+ * @ PRE_ECM_GET_MAIL_SENDER
+ * Purpose : Get mail sender
+ * @param  : p_o_refMail_sender            Output
+ * @param  : p_o_v_error                       Output
+ * @return  : Returns the List of Mail Sender in Ref Cursor
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see    : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+
+PROCEDURE PRE_ECM_GET_MAIL_SENDER
+                (
+                  p_o_refMail_sender           OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+                  ,p_o_v_error                     OUT VARCHAR2
+                 );
+
+END PCE_ECM_SEND_MAIL;
+/* End of Package Specification */
+/

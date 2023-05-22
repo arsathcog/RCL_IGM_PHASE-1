@@ -1,0 +1,74 @@
+create or replace
+PACKAGE         "PCE_ECM_SYNC_EZLL_BOOKING" AS
+   g_v_user            VARCHAR2(10) := 'EZLL';
+   g_v_sql_id          VARCHAR2(10);
+   g_v_err_code        VARCHAR2(50);
+   g_v_err_desc        VARCHAR2(100);
+   g_v_err_oth_type    VARCHAR2(1) := '1';
+
+   PROCEDURE PRE_BKG_EQUIPMENT_UPDATE
+   ( p_i_v_booking_no         IN   VARCHAR2
+   , p_i_n_equipment_seq_no   IN   NUMBER
+   , p_i_v_equipment_no       IN   VARCHAR2
+   , p_i_n_overheight         IN   NUMBER
+   , p_i_n_overlength_rear    IN   NUMBER
+   , p_i_n_overlength_front   IN   NUMBER
+   , p_i_n_overwidth_left     IN   NUMBER
+   , p_i_n_overwidth_right    IN   NUMBER
+   , p_i_v_imdg               IN   VARCHAR2
+   , p_i_v_unno               IN   VARCHAR2
+   , p_i_v_un_var             IN   VARCHAR2
+   , p_i_v_flash_point        IN   VARCHAR2
+   , p_i_n_flash_unit         IN   VARCHAR2
+   , p_i_v_reefer_tmp         IN   VARCHAR2
+   , p_i_v_reefer_tmp_unit    IN   VARCHAR2
+   , p_i_n_humidity           IN   NUMBER
+   , p_i_n_gross_wt           IN   NUMBER
+   , p_i_n_ventilation        IN   NUMBER
+   , P_I_V_VGM_CATEGORY       IN   VARCHAR2 --*2
+   , P_I_V_VGM                IN   NUMBER --*3 
+   , p_o_v_return_status      OUT NOCOPY  VARCHAR2
+   );
+
+   PROCEDURE PRE_BKG_CONDENSE
+   ( p_i_n_load_list_id       IN  NUMBER
+   , p_o_v_return_status      OUT NOCOPY  VARCHAR2
+   );
+
+   PROCEDURE PRE_BKG_RECALCULATE_DATA
+   ( p_i_v_ll_flg        IN         VARCHAR2
+   , p_i_v_booking_no    IN         VARCHAR2
+   , p_o_v_return_status OUT NOCOPY VARCHAR2
+   );
+
+   PROCEDURE PRE_BKG_AUTOEXPAND
+   ( p_i_n_over_shipped_id   IN         NUMBER
+   , p_i_v_booking_no        IN         VARCHAR2
+   , p_i_v_equipment_no      IN         VARCHAR2
+   , p_i_v_equipment_size    IN         NUMBER
+   , p_i_v_equipment_type    IN         VARCHAR2
+   , p_o_v_return_status     OUT NOCOPY VARCHAR2
+    );
+/*
+    Block added by vikas to take backup of bkp009 before update, 20.02.2012
+*/
+
+/*-----------------------------------------------------------------------------------------------------------
+PRR_INS_TOS_BKG_CNTR.SQL
+-------------------------------------------------------------------------------------------------------------
+Copyright RCL Public Co., Ltd. 2008
+-------------------------------------------------------------------------------------------------------------
+Author Sukit Narinsakchai 17/02/2012
+- Change Log ------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------*/
+/*
+ */
+PROCEDURE PRR_INS_TOS_BKG_CNTR(P_BKG_NO IN VARCHAR2
+                                  ,P_CONT_SEQNO IN NUMBER
+                                  ,P_USERNAME IN VARCHAR2);
+
+/*
+    Block ended by vikas , 20.02.2012
+*/
+
+END PCE_ECM_SYNC_EZLL_BOOKING;

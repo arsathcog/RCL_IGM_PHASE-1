@@ -1,0 +1,21 @@
+DELETE FROM ECM_LOOKUP_CONFIG_MST
+WHERE MASTER_CD = 'PLACE_OF_DELIVERY';
+
+INSERT INTO ECM_LOOKUP_CONFIG_MST
+VALUES ('PLACE_OF_DELIVERY'
+, 'Place Of Delivery Lookup'
+, 'Place Of Delivery List'
+, 'COUNTRY_CODE~PORT_CODE~RECORD_STATUS'
+, 'Country_Code~Port_Code~Status'
+, 'COUNTRY_CODE~PORT_CODE~RECORD_STATUS'
+, 'Country_Code~Port_Code~Status'
+, '3'
+, 'Country_Code~Port_Code~Status'
+, null
+, 'SELECT COUNTRY_CODE, PORT_CODE, DECODE(RECORD_STATUS,''A'',''Active'',''S'',''Suspended'') AS RECORD_STATUS FROM EZLL_GBL_PORT_MASTER WHERE EZLL_GBL_PORT_MASTER.RECORD_STATUS ='
+, 'THIWAT1'
+, sysdate
+, 'THIWAT1'
+, sysdate);
+
+commit;

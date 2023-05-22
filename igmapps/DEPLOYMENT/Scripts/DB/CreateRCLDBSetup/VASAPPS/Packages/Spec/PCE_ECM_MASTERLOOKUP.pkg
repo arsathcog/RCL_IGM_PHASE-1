@@ -1,0 +1,93 @@
+CREATE OR REPLACE PACKAGE PCE_ECM_MasterLookup IS 
+
+/* -----------------------------------------------------------------------------
+System  : RCL-VAS
+Module  : ECM
+Prog ID : ECM001 
+Name    : Master Lookup.
+Purpose : Package for Master Lookup.
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author          Date           What
+--------------------------------------------------------------------------------
+NTL)Ankit      4/2/2011    <Initial version>
+--Change Log--------------------------------------------------------------------
+DD/MM/YY     User-Task/CR No -Short Description-
+----------------------------------------------------------------------------- */
+
+/**
+ * @ PRV_VCM_MasterConfig
+ * Purpose : To select and return configuration information regarding one 
+ *           particular master.
+ * @param  : p_i_v_master_cd
+ * @param  : p_o_v_master_name             OutPut
+ * @param  : p_o_v_list_name               OutPut
+ * @param  : p_o_findin_field_cd           OutPut
+ * @param  : p_o_findin_field_desc         OutPut
+ * @param  : p_o_sortby_field_cd           OutPut
+ * @param  : p_o_sortby_field_desc         OutPut
+ * @param  : p_o_no_column                 OutPut
+ * @param  : p_o_column_name               OutPut
+ * @param  : p_o_v_error                   OutPut
+  * @see   : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+PROCEDURE PRE_ECM_MasterConfig (
+                  p_i_v_master_cd              VARCHAR2
+                 ,p_o_v_master_name            OUT VARCHAR2
+                 ,p_o_v_list_name              OUT VARCHAR2
+                 ,p_o_findin_field_cd          OUT VARCHAR2
+                 ,p_o_findin_field_desc        OUT VARCHAR2
+                 ,p_o_sortby_field_cd          OUT VARCHAR2
+                 ,p_o_sortby_field_desc        OUT VARCHAR2
+                 ,p_o_no_column                OUT NUMBER
+                 ,p_o_column_name              OUT VARCHAR2
+                 ,p_o_v_error                  OUT VARCHAR2
+);
+
+/**
+ * @ PRE_ECM_ResultList
+ * Purpose : Search for the records match with the user filter criteria
+ * @param  : p_o_ref_MasterResultData
+ * @param  : p_i_v_master_cd
+ * @param  : p_i_v_pre_criteria_val
+ * @param  : p_i_v_find_val
+ * @param  : p_i_v_find_in        
+ * @param  : p_i_v_wild_card      
+ * @param  : p_i_v_sort_by        (Sorting Column Name)
+ * @param  : p_i_v_sort_in      
+ * @param  : p_i_v_status     (A:Active or S:Suspended)
+ * @param  : p_i_v_curr_page
+ * @param  : p_o_v_tot_rec        OutPut
+ * @return : p_o_v_error (Output Error Code if Any, Error Code + Error Data)
+ * @see    : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/                   
+PROCEDURE PRE_ECM_MasterResultList (
+     p_o_ref_MasterResultData      OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+    ,p_i_v_master_cd               VARCHAR2
+    ,p_i_v_pre_criteria_val        VARCHAR2
+    ,p_i_v_find_val                VARCHAR2
+    ,p_i_v_find_in                 VARCHAR2
+    ,p_i_v_wild_card               VARCHAR2
+    ,p_i_v_sort_by                 VARCHAR2      
+    ,p_i_v_sort_in                 VARCHAR2     
+    ,p_i_v_status                  VARCHAR2      
+    ,p_i_v_curr_page               VARCHAR2
+    ,p_i_v_order_by                VARCHAR2
+    ,p_i_v_asc_desc                VARCHAR2
+    ,p_o_v_tot_rec                 OUT VARCHAR2
+    ,p_o_v_error                   OUT VARCHAR2
+);
+
+END PCE_ECM_MasterLookup ; /*  End of Package Specification */
+/

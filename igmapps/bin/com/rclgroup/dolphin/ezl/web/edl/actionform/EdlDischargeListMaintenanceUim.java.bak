@@ -1,0 +1,1186 @@
+/* -----------------------------------------------------------------------------
+System  : RCL-EZLL
+Module  : Discharge List Maintenance
+Prog ID : EDL002 - EdlDischargeListMaintenanceUim.java
+Name    : Discharge List Maintenance
+Purpose : Form Bean for Discharge List Maintenance
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author          Date            What
+--------------- --------------- ------------------------------------------------
+Anshul Mahajan  04/01/2011      <Initial version>
+--Change Log--------------------------------------------------------------------
+## DD/MM/YY –User- -Task/CR No- -Short Description-
+----------------------------------------------------------------------------- */
+
+package com.rclgroup.dolphin.ezl.web.edl.actionform;
+
+import com.niit.control.common.Debug;
+import com.niit.control.web.actionform.BaseActionForm;
+import com.niit.control.web.actionform.PaginationForm;
+
+import com.rclgroup.dolphin.ezl.web.edl.vo.EdlDischargeListBookingMod;
+import com.rclgroup.dolphin.ezl.web.edl.vo.EdlDischargeListOverlandedMod;
+import com.rclgroup.dolphin.ezl.web.edl.vo.EdlDischargeListRestowedMod;
+
+import com.rclgroup.dolphin.ezl.web.edl.vo.EdlDischargeListSummaryMod;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Form Bean for Discharge List Maintenance
+ * @class EldDischargeListMaintenanceUim
+ * @author NTL) Anshul Mahajan
+ * @version v1.00 2011/01/04
+ */
+public class EdlDischargeListMaintenanceUim extends PaginationForm{
+
+
+    private String readOnlyFlg            = null;
+    private String dischargeListId        = null;
+    private String scnOpnMode             = null;
+    private String vesselOwner            = null;    
+    private String sessionId              = null;
+    private String onloadPerformed        = null;
+    private String prevTabSelected        = null;
+    private String currTabSelected        = null;   
+    private String bookedDischargeId      = null;   
+    private String bookedTabFind          = null;
+    private String overlandedTabFind      = null;
+    private String restowedTabFind        = null;
+    private String summaryTabFind         = null;    
+    private String saveToMainFlag         = null;    
+    private String bookedFind1            = null;    
+    /* Start - Previous screen's parameter*/
+    private String selBookingNo           = null;
+    private String selBookingId           = null;
+
+    private String contLoadRemark1        = null;
+    private String contLoadRemark2        = null;
+    /* End - Previous screen's parameter*/
+    
+    /* Start - Main Header Section*/
+    private String hdrService             = null;
+    private String hdrVessel              = null;
+    private String hdrVesselName          = null;
+    private String hdrDirection           = null;
+    private String hdrVoyage              = null;
+    private String hdrPortSeq             = null;
+    private String hdrPort                = null;
+    private String hdrTerminal            = null;
+    private String hdrBargeNameVoyage     = null;
+    private String hdrEta                 = null;
+    private String hdrEtd                 = null;
+    private String hdrEtaTm               = null;
+    private String hdrEtdTm               = null;
+    private String hdrPrevPort            = null;
+    private String dischargeListStatus    = null;
+    
+    /* End - Main Header Section*/
+    private String restowedId             = null;
+    private String recordChangeDt         = null;
+    
+    /* Start - Booking Tab Search Section*/
+    private String srchBookingFind1       = null;
+    private String srchBookingIn1         = null;
+    private String srchBookingFind2       = null;
+    private String srchBookingIn2         = null;
+    private String srchBookingOrder1      = null;
+    private String srchBookingOrder1Ord   = null;
+    private String srchBookingOrder2      = null;
+    private String srchBookingOrder2Ord   = null;
+    private List bookedSearchCriteria     = new ArrayList();
+    
+    /* Start - Overlanded Tab Search Section*/
+    private String srchOverlandedFind1       = null;
+    private String srchOverlandedIn1         = null;
+    private String srchOverlandedFind2       = null;
+    private String srchOverlandedIn2         = null;
+    private String srchOverlandedOrder1      = null;
+    private String srchOverlandedOrder1Ord   = null;
+    private String srchOverlandedOrder2      = null;
+    private String srchOverlandedOrder2Ord   = null;
+    
+    /* Start - Restowed Tab Search Section*/
+    private String srchRestowedFind1       = null;
+    private String srchRestowedIn1         = null;
+    private String srchRestowedFind2       = null;
+    private String srchRestowedIn2         = null;
+    private String srchRestowedOrder1      = null;
+    private String srchRestowedOrder1Ord   = null;
+    private String srchRestowedOrder2      = null;
+    private String srchRestowedOrder2Ord   = null;
+    
+    /* Start - Summary Tab Search Section*/
+    private String srchSummaryFind1       = null;
+    private String srchSummaryIn1         = null;
+    private String srchSummaryFind2       = null;
+    private String srchSummaryIn2         = null;
+    private String srchSummaryOrder1      = null;
+    private String srchSummaryOrder1Ord   = null;
+    private String srchSummaryOrder2      = null;
+    private String srchSummaryOrder2Ord   = null;        
+    private String midstreamList            = null;
+    
+//  Fields to store search criteria for booked tab 
+    private String bookedIn1            = null;
+    private String bookedFind2          = null;
+    private String bookedIn2            = null;
+    private String bookedOrder1         = null;
+    private String bookedOrder2         = null;
+    private String bookedOrder1Ord      = null;
+    private String bookedOrder2Ord      = null;
+    private String onTabChangeFlag      = null;
+
+    //  Fields to store search criteria for overlanded tab 
+    private String overlandedFind1      = null;
+    private String overlandedIn1        = null;
+    private String overlandedFind2      = null;
+    private String overlandedIn2        = null;
+    private String overlandedOrder1     = null;
+    private String overlandedOrder2     = null;
+    private String overlandedOrder1Ord  = null;
+    private String overlandedOrder2Ord  = null;
+        
+    //  Fields to store search criteria for restowed tab 
+    private String restowedFind1        = null;
+    private String restowedIn1          = null;
+    private String restowedFind2        = null;
+    private String restowedIn2          = null;
+    private String restowedOrder1       = null;
+    private String restowedOrder2       = null;
+    private String restowedOrder1Ord    = null;
+    private String restowedOrder2Ord    = null;
+
+    private String dischargeListStatusHidden = null;
+    
+    private String matchingContainerId = null;
+    private String matchingContSeq = null;
+
+    /* To store the combo values in hidden variables */    
+    private String restowedView         = null;
+    private List   restowedViewValues   = null;
+    private String overlandedView       = null;
+    private List   overlandedViewValues = null;
+    private String bookedView           = null;
+    private List   bookedViewValues     = null;
+
+    private String hidBookedView        = null;
+    private String hidOverlandedView    = null;
+    private String hidRestowedView      = null;
+     
+    private String matchingFlag        = null;     
+     
+    private List marlBookedDtlTable     = new ArrayList();
+    private List marlOverlandedDtlTable = new ArrayList();
+    private List marlRestowedDtlTable   = new ArrayList();
+    private List marlSummaryDtlTable    = new ArrayList();
+    
+    private List midstreamValues        = new ArrayList();
+    
+    
+    private String fsc;    
+    
+    /**
+     * @method constructor
+     */
+    public EdlDischargeListMaintenanceUim() {
+        setBackVisible(true);
+        setRefreshVisible(true);
+        setSaveVisible(true);
+    }
+
+    public void setScnOpnMode(String scnOpnMode) {
+        this.scnOpnMode = scnOpnMode;
+    }
+
+    public String getScnOpnMode() {
+        return scnOpnMode;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setOnloadPerformed(String onloadPerformed) {
+        this.onloadPerformed = onloadPerformed;
+    }
+
+    public String getOnloadPerformed() {
+        return onloadPerformed;
+    }
+
+    public void setPrevTabSelected(String prevTabSelected) {
+        this.prevTabSelected = prevTabSelected;
+    }
+
+    public String getPrevTabSelected() {
+        return prevTabSelected;
+    }
+
+    public void setCurrTabSelected(String currTabSelected) {
+        this.currTabSelected = currTabSelected;
+    }
+
+    public String getCurrTabSelected() {
+        return currTabSelected;
+    }
+
+    public EdlDischargeListBookingMod getBookingValue(int aintIndex) {
+        
+        if (aintIndex > marlBookedDtlTable.size() - 1) {
+            for (int i = marlBookedDtlTable.size(); i <= aintIndex; i++) {
+                //Create blank dto
+                EdlDischargeListBookingMod dtoData = new EdlDischargeListBookingMod();
+                marlBookedDtlTable.add(dtoData);
+            } //for loop ends
+        } //if ends
+        return (EdlDischargeListBookingMod) marlBookedDtlTable.get(aintIndex);
+    }
+    
+    public void setmarlBookedDtlTable(List marlBookedDtlTable) {
+        this.marlBookedDtlTable = marlBookedDtlTable;
+    }
+
+    public List getmarlBookedDtlTable() {
+        return marlBookedDtlTable;
+    }    
+    
+    public EdlDischargeListOverlandedMod getOverlandedValue(int aintIndex) {
+        
+        if (aintIndex > marlOverlandedDtlTable.size() - 1) {
+            for (int i = marlOverlandedDtlTable.size(); i <= aintIndex; i++) {
+                //Create blank dto
+                EdlDischargeListOverlandedMod dtoData = new EdlDischargeListOverlandedMod();
+                marlOverlandedDtlTable.add(dtoData);
+            } //for loop ends
+        } //if ends
+        return (EdlDischargeListOverlandedMod) marlOverlandedDtlTable.get(aintIndex);
+    }
+    
+    // Created by vikas verma 
+    // For restowed tab.
+
+    /**
+     * @param aintIndex
+     * @return
+     */
+    public EdlDischargeListRestowedMod getRestowedValue(int aintIndex) {
+        
+        if (aintIndex > marlRestowedDtlTable.size() - 1) {
+            for (int i = marlRestowedDtlTable.size(); i <= aintIndex; i++) {
+                //Create blank dto
+                EdlDischargeListRestowedMod dtoData = new EdlDischargeListRestowedMod();
+                marlRestowedDtlTable.add(dtoData);
+            } //for loop ends
+        } //if ends
+        return (EdlDischargeListRestowedMod) marlRestowedDtlTable.get(aintIndex);
+    }
+    
+    // Created by vikas verma 
+    // For summary tab.
+
+    /**
+     * @param aintIndex
+     * @return
+     */
+    public EdlDischargeListSummaryMod getSummaryValue(int aintIndex) {
+        if (aintIndex > marlSummaryDtlTable.size() - 1) {
+            for (int i = marlSummaryDtlTable.size(); i <= aintIndex; i++) {
+                //Create blank dto
+                EdlDischargeListSummaryMod dtoData = new EdlDischargeListSummaryMod();
+                marlSummaryDtlTable.add(dtoData);
+            } //for loop ends
+        } //if ends
+        return (EdlDischargeListSummaryMod) marlSummaryDtlTable.get(aintIndex);
+    }
+    
+   
+    public void setRestowedViewValues(List restowedViewValues) {
+        this.restowedViewValues = restowedViewValues;
+    }
+
+    public List getRestowedViewValues() {
+        return restowedViewValues;
+    }
+
+    public void setSelBookingNo(String selBookingNo) {
+        this.selBookingNo = selBookingNo;
+    }
+
+    public String getSelBookingNo() {
+        return selBookingNo;
+    }
+
+    public void setSelBookingId(String selBookingId) {
+        this.selBookingId = selBookingId;
+    }
+
+    public String getSelBookingId() {
+        return selBookingId;
+    }
+    
+    /**
+     * Reset the fields for the form
+     */
+    public void resetFields() {
+        srchBookingFind1     = null;
+        srchBookingIn1       = null;
+        srchBookingFind2     = null;
+        srchBookingIn2       = null;
+        srchBookingOrder1    = null;
+        srchBookingOrder1Ord = null;
+        srchBookingOrder2    = null;
+        srchBookingOrder2Ord = null;
+
+    }
+
+
+    public void set_service(String _service) {
+        this.service = _service;
+    }
+
+    public String get_service() {
+        return service;
+    }
+
+    public void setHdrService(String hdrService) {
+        this.hdrService = hdrService.trim();
+    }
+
+    public String getHdrService() {
+        return hdrService;
+    }
+
+    public void setHdrVessel(String hdrVessel) {
+        this.hdrVessel = hdrVessel.trim();
+    }
+
+    public String getHdrVessel() {
+        return hdrVessel;
+    }
+
+    public void setHdrVesselName(String hdrVesselName) {
+        this.hdrVesselName = hdrVesselName.trim();
+    }
+
+    public String getHdrVesselName() {
+        return hdrVesselName;
+    }
+
+    public void setHdrDirection(String hdrDirection) {
+        this.hdrDirection = hdrDirection.trim();
+    }
+
+    public String getHdrDirection() {
+        return hdrDirection;
+    }
+
+    public void setHdrVoyage(String hdrVoyage) {
+        this.hdrVoyage = hdrVoyage.trim();
+    }
+
+    public String getHdrVoyage() {
+        return hdrVoyage;
+    }
+
+    public void setHdrPortSeq(String hdrPortSeq) {
+        this.hdrPortSeq = hdrPortSeq.trim();
+    }
+
+    public String getHdrPortSeq() {
+        return hdrPortSeq;
+    }
+
+    public void setHdrPort(String hdrPort) {
+        this.hdrPort = hdrPort.trim();
+    }
+
+    public String getHdrPort() {
+        return hdrPort;
+    }
+
+    public void setHdrTerminal(String hdrTerminal) {
+        this.hdrTerminal = hdrTerminal.trim();
+    }
+
+    public String getHdrTerminal() {
+        return hdrTerminal;
+    }
+
+    public void setHdrBargeNameVoyage(String hdrBargeNameVoyage) {
+        this.hdrBargeNameVoyage = hdrBargeNameVoyage.trim();
+    }
+
+    public String getHdrBargeNameVoyage() {
+        return hdrBargeNameVoyage;
+    }
+
+    public void setHdrEta(String hdrEta) {
+        this.hdrEta = hdrEta.trim();
+    }
+
+    public String getHdrEta() {
+        return hdrEta;
+    }
+
+    public void setHdrEtd(String hdrEtd) {
+        this.hdrEtd = hdrEtd.trim();
+    }
+
+    public String getHdrEtd() {
+        return hdrEtd;
+    }
+
+    public void setHdrPrevPort(String hdrPrevPort) {
+        this.hdrPrevPort = hdrPrevPort.trim();
+    }
+
+    public String getHdrPrevPort() {
+        return hdrPrevPort;
+    }
+
+    public void setSrchBookingFind1(String srchBookingFind1) {
+        this.srchBookingFind1 = srchBookingFind1;
+    }
+
+    public String getSrchBookingFind1() {
+        return srchBookingFind1;
+    }
+
+    public void setSrchBookingIn1(String srchBookingIn1) {
+        this.srchBookingIn1 = srchBookingIn1;
+    }
+
+    public String getSrchBookingIn1() {
+        return srchBookingIn1;
+    }
+
+    public void setSrchBookingFind2(String srchBookingFind2) {
+        this.srchBookingFind2 = srchBookingFind2;
+    }
+
+    public String getSrchBookingFind2() {
+        return srchBookingFind2;
+    }
+
+    public void setSrchBookingIn2(String srchBookingIn2) {
+        this.srchBookingIn2 = srchBookingIn2;
+    }
+
+    public String getSrchBookingIn2() {
+        return srchBookingIn2;
+    }
+
+    public void setSrchBookingOrder1(String srchBookingOrder1) {
+        this.srchBookingOrder1 = srchBookingOrder1;
+    }
+
+    public String getSrchBookingOrder1() {
+        return srchBookingOrder1;
+    }
+
+    public void setSrchBookingOrder1Ord(String srchBookingOrder1Ord) {
+        this.srchBookingOrder1Ord = srchBookingOrder1Ord;
+    }
+
+    public String getSrchBookingOrder1Ord() {
+        return srchBookingOrder1Ord;
+    }
+
+    public void setSrchBookingOrder2(String srchBookingOrder2) {
+        this.srchBookingOrder2 = srchBookingOrder2;
+    }
+
+    public String getSrchBookingOrder2() {
+        return srchBookingOrder2;
+    }
+
+    public void setSrchBookingOrder2Ord(String srchBookingOrder2Ord) {
+        this.srchBookingOrder2Ord = srchBookingOrder2Ord;
+    }
+
+    public String getSrchBookingOrder2Ord() {
+        return srchBookingOrder2Ord;
+    }
+
+    public void setFsc(String fsc) {
+        this.fsc = fsc;
+    }
+
+    public String getFsc() {
+        return fsc;
+    }
+
+    public void setBookedDischargeId(String bookedDischargeId) {
+        this.bookedDischargeId = bookedDischargeId;
+    }
+
+    public String getBookedDischargeId() {
+        return bookedDischargeId;
+    }
+
+    public void setSrchOverlandedFind1(String srchOverlandedFind1) {
+        this.srchOverlandedFind1 = srchOverlandedFind1;
+    }
+
+    public String getSrchOverlandedFind1() {
+        return srchOverlandedFind1;
+    }
+
+    public void setSrchOverlandedIn1(String srchOverlandedIn1) {
+        this.srchOverlandedIn1 = srchOverlandedIn1;
+    }
+
+    public String getSrchOverlandedIn1() {
+        return srchOverlandedIn1;
+    }
+
+    public void setSrchOverlandedFind2(String srchOverlandedFind2) {
+        this.srchOverlandedFind2 = srchOverlandedFind2;
+    }
+
+    public String getSrchOverlandedFind2() {
+        return srchOverlandedFind2;
+    }
+
+    public void setSrchOverlandedIn2(String srchOverlandedIn2) {
+        this.srchOverlandedIn2 = srchOverlandedIn2;
+    }
+
+    public String getSrchOverlandedIn2() {
+        return srchOverlandedIn2;
+    }
+
+    public void setSrchOverlandedOrder1(String srchOverlandedOrder1) {
+        this.srchOverlandedOrder1 = srchOverlandedOrder1;
+    }
+
+    public String getSrchOverlandedOrder1() {
+        return srchOverlandedOrder1;
+    }
+
+    public void setSrchOverlandedOrder1Ord(String srchOverlandedOrder1Ord) {
+        this.srchOverlandedOrder1Ord = srchOverlandedOrder1Ord;
+    }
+
+    public String getSrchOverlandedOrder1Ord() {
+        return srchOverlandedOrder1Ord;
+    }
+
+    public void setSrchOverlandedOrder2(String srchOverlandedOrder2) {
+        this.srchOverlandedOrder2 = srchOverlandedOrder2;
+    }
+
+    public String getSrchOverlandedOrder2() {
+        return srchOverlandedOrder2;
+    }
+
+    public void setSrchOverlandedOrder2Ord(String srchOverlandedOrder2Ord) {
+        this.srchOverlandedOrder2Ord = srchOverlandedOrder2Ord;
+    }
+
+    public String getSrchOverlandedOrder2Ord() {
+        return srchOverlandedOrder2Ord;
+    }
+
+    public void setDischargeListStatus(String dischargeListStatus) {
+        this.dischargeListStatus = dischargeListStatus.trim();
+    }
+
+    public String getDischargeListStatus() {
+        return dischargeListStatus;
+    }
+
+    public void setMarlRestowedDtlTable(List marlRestowedDtlTable) {
+        this.marlRestowedDtlTable = marlRestowedDtlTable;
+    }
+
+    public List getMarlRestowedDtlTable() {
+        return marlRestowedDtlTable;
+    }
+
+    public void setSrchRestowedFind1(String srchRestowedFind1) {
+        this.srchRestowedFind1 = srchRestowedFind1;
+    }
+
+    public String getSrchRestowedFind1() {
+        return srchRestowedFind1;
+    }
+
+    public void setSrchRestowedIn1(String srchRestowedIn1) {
+        this.srchRestowedIn1 = srchRestowedIn1;
+    }
+
+    public String getSrchRestowedIn1() {
+        return srchRestowedIn1;
+    }
+
+    public void setSrchRestowedFind2(String srchRestowedFind2) {
+        this.srchRestowedFind2 = srchRestowedFind2;
+    }
+
+    public String getSrchRestowedFind2() {
+        return srchRestowedFind2;
+    }
+
+    public void setSrchRestowedIn2(String srchRestowedIn2) {
+        this.srchRestowedIn2 = srchRestowedIn2;
+    }
+
+    public String getSrchRestowedIn2() {
+        return srchRestowedIn2;
+    }
+
+    public void setSrchRestowedOrder1(String srchRestowedOrder1) {
+        this.srchRestowedOrder1 = srchRestowedOrder1;
+    }
+
+    public String getSrchRestowedOrder1() {
+        return srchRestowedOrder1;
+    }
+
+    public void setSrchRestowedOrder1Ord(String srchRestowedOrder1Ord) {
+        this.srchRestowedOrder1Ord = srchRestowedOrder1Ord;
+    }
+
+    public String getSrchRestowedOrder1Ord() {
+        return srchRestowedOrder1Ord;
+    }
+
+    public void setSrchRestowedOrder2(String srchRestowedOrder2) {
+        this.srchRestowedOrder2 = srchRestowedOrder2;
+    }
+
+    public String getSrchRestowedOrder2() {
+        return srchRestowedOrder2;
+    }
+
+    public void setSrchRestowedOrder2Ord(String srchRestowedOrder2Ord) {
+        this.srchRestowedOrder2Ord = srchRestowedOrder2Ord;
+    }
+
+    public String getSrchRestowedOrder2Ord() {
+        return srchRestowedOrder2Ord;
+    }
+
+    public void setMarlOverlandedDtlTable(List marlOverlandedDtlTable) {
+        this.marlOverlandedDtlTable = marlOverlandedDtlTable;
+    }
+
+    public List getMarlOverlandedDtlTable() {
+        return marlOverlandedDtlTable;
+    }
+
+    public void setSrchSummaryFind1(String srchSummaryFind1) {
+        this.srchSummaryFind1 = srchSummaryFind1;
+    }
+
+    public String getSrchSummaryFind1() {
+        return srchSummaryFind1;
+    }
+
+    public void setSrchSummaryIn1(String srchSummaryIn1) {
+        this.srchSummaryIn1 = srchSummaryIn1;
+    }
+
+    public String getSrchSummaryIn1() {
+        return srchSummaryIn1;
+    }
+
+    public void setSrchSummaryFind2(String srchSummaryFind2) {
+        this.srchSummaryFind2 = srchSummaryFind2;
+    }
+
+    public String getSrchSummaryFind2() {
+        return srchSummaryFind2;
+    }
+
+    public void setSrchSummaryIn2(String srchSummaryIn2) {
+        this.srchSummaryIn2 = srchSummaryIn2;
+    }
+
+    public String getSrchSummaryIn2() {
+        return srchSummaryIn2;
+    }
+
+    public void setSrchSummaryOrder1(String srchSummaryOrder1) {
+        this.srchSummaryOrder1 = srchSummaryOrder1;
+    }
+
+    public String getSrchSummaryOrder1() {
+        return srchSummaryOrder1;
+    }
+
+    public void setSrchSummaryOrder1Ord(String srchSummaryOrder1Ord) {
+        this.srchSummaryOrder1Ord = srchSummaryOrder1Ord;
+    }
+
+    public String getSrchSummaryOrder1Ord() {
+        return srchSummaryOrder1Ord;
+    }
+
+    public void setSrchSummaryOrder2(String srchSummaryOrder2) {
+        this.srchSummaryOrder2 = srchSummaryOrder2;
+    }
+
+    public String getSrchSummaryOrder2() {
+        return srchSummaryOrder2;
+    }
+
+    public void setSrchSummaryOrder2Ord(String srchSummaryOrder2Ord) {
+        this.srchSummaryOrder2Ord = srchSummaryOrder2Ord;
+    }
+
+    public String getSrchSummaryOrder2Ord() {
+        return srchSummaryOrder2Ord;
+    }
+
+    public void setMarlSummaryDtlTable(List marlSummaryDtlTable) {
+        this.marlSummaryDtlTable = marlSummaryDtlTable;
+    }
+
+    public List getMarlSummaryDtlTable() {
+        return marlSummaryDtlTable;
+    }
+
+    public void setRestowedId(String restowedId) {
+        this.restowedId = restowedId;
+    }
+
+    public String getRestowedId() {
+        return restowedId;
+    }
+
+    public void setRecordChangeDt(String recordChangeDt) {
+        this.recordChangeDt = recordChangeDt;
+    }
+
+    public String getRecordChangeDt() {
+        return recordChangeDt;
+    }
+
+    public void setBookedTabFind(String bookedTabFind) {
+        this.bookedTabFind = bookedTabFind;
+    }
+
+    public String getBookedTabFind() {
+        return bookedTabFind;
+    }
+
+    public void setOverlandedTabFind(String overlandedTabFind) {
+        this.overlandedTabFind = overlandedTabFind;
+    }
+
+    public String getOverlandedTabFind() {
+        return overlandedTabFind;
+    }
+
+    public void setRestowedTabFind(String restowedTabFind) {
+        this.restowedTabFind = restowedTabFind;
+    }
+
+    public String getRestowedTabFind() {
+        return restowedTabFind;
+    }
+
+    public void setSummaryTabFind(String summaryTabFind) {
+        this.summaryTabFind = summaryTabFind;
+    }
+
+    public String getSummaryTabFind() {
+        return summaryTabFind;
+    }
+    public void setMidstreamList(String midstreamList) {
+        this.midstreamList = midstreamList;
+    }
+
+    public String getMidstreamList() {
+        return midstreamList;
+    }
+
+    public void setMidstreamValues(List midstreamValues) {
+        this.midstreamValues = midstreamValues;
+    }
+
+    public List getMidstreamValues() {
+        return midstreamValues;
+    }
+
+    public void setSaveToMainFlag(String saveToMainFlag) {
+        this.saveToMainFlag = saveToMainFlag;
+    }
+
+    public String getSaveToMainFlag() {
+        return saveToMainFlag;
+    }
+
+    public void setBookedSearchCriteria(List bookedSearchCriteria) {
+        this.bookedSearchCriteria = bookedSearchCriteria;
+    }
+
+    public List getBookedSearchCriteria() {
+        return bookedSearchCriteria;
+    }
+
+    public void setBookedFind1(String bookedFind1) {
+        this.bookedFind1 = bookedFind1;
+    }
+
+    public String getBookedFind1() {
+        return bookedFind1;
+    }
+
+    public void setBookedIn1(String bookedIn1) {
+        this.bookedIn1 = bookedIn1;
+    }
+
+    public String getBookedIn1() {
+        return bookedIn1;
+    }
+
+    public void setBookedFind2(String bookedFind2) {
+        this.bookedFind2 = bookedFind2;
+    }
+
+    public String getBookedFind2() {
+        return bookedFind2;
+    }
+
+    public void setBookedIn2(String bookedIn2) {
+        this.bookedIn2 = bookedIn2;
+    }
+
+    public String getBookedIn2() {
+        return bookedIn2;
+    }
+
+    public void setBookedOrder1(String bookedOrder1) {
+        this.bookedOrder1 = bookedOrder1;
+    }
+
+    public String getBookedOrder1() {
+        return bookedOrder1;
+    }
+
+    public void setBookedOrder2(String bookedOrder2) {
+        this.bookedOrder2 = bookedOrder2;
+    }
+
+    public String getBookedOrder2() {
+        return bookedOrder2;
+    }
+
+
+    public void setBookedOrder1Ord(String bookedOrder1Ord) {
+        this.bookedOrder1Ord = bookedOrder1Ord;
+    }
+
+    public String getBookedOrder1Ord() {
+        return bookedOrder1Ord;
+    }
+
+    public void setBookedOrder2Ord(String bookedOrder2Ord) {
+        this.bookedOrder2Ord = bookedOrder2Ord;
+    }
+
+    public String getBookedOrder2Ord() {
+        return bookedOrder2Ord;
+    }
+
+    public void setOnTabChangeFlag(String onTabChangeFlag) {
+        this.onTabChangeFlag = onTabChangeFlag;
+    }
+
+    public String getOnTabChangeFlag() {
+        return onTabChangeFlag;
+    }
+
+    public void setOverlandedFind1(String overlandedFind1) {
+        this.overlandedFind1 = overlandedFind1;
+    }
+
+    public String getOverlandedFind1() {
+        return overlandedFind1;
+    }
+
+    public void setOverlandedIn1(String overlandedIn1) {
+        this.overlandedIn1 = overlandedIn1;
+    }
+
+    public String getOverlandedIn1() {
+        return overlandedIn1;
+    }
+
+    public void setOverlandedFind2(String overlandedFind2) {
+        this.overlandedFind2 = overlandedFind2;
+    }
+
+    public String getOverlandedFind2() {
+        return overlandedFind2;
+    }
+
+    public void setOverlandedIn2(String overlandedIn2) {
+        this.overlandedIn2 = overlandedIn2;
+    }
+
+    public String getOverlandedIn2() {
+        return overlandedIn2;
+    }
+
+    public void setOverlandedOrder1(String overlandedOrder1) {
+        this.overlandedOrder1 = overlandedOrder1;
+    }
+
+    public String getOverlandedOrder1() {
+        return overlandedOrder1;
+    }
+
+    public void setOverlandedOrder2(String overlandedOrder2) {
+        this.overlandedOrder2 = overlandedOrder2;
+    }
+
+    public String getOverlandedOrder2() {
+        return overlandedOrder2;
+    }
+
+    public void setOverlandedOrder1Ord(String overlandedOrder1Ord) {
+        this.overlandedOrder1Ord = overlandedOrder1Ord;
+    }
+
+    public String getOverlandedOrder1Ord() {
+        return overlandedOrder1Ord;
+    }
+
+    public void setOverlandedOrder2Ord(String overlandedOrder2Ord) {
+        this.overlandedOrder2Ord = overlandedOrder2Ord;
+    }
+
+    public String getOverlandedOrder2Ord() {
+        return overlandedOrder2Ord;
+    }
+
+    public void setRestowedFind1(String restowedFind1) {
+        this.restowedFind1 = restowedFind1;
+    }
+
+    public String getRestowedFind1() {
+        return restowedFind1;
+    }
+
+    public void setRestowedIn1(String restowedIn1) {
+        this.restowedIn1 = restowedIn1;
+    }
+
+    public String getRestowedIn1() {
+        return restowedIn1;
+    }
+
+    public void setRestowedFind2(String restowedFind2) {
+        this.restowedFind2 = restowedFind2;
+    }
+
+    public String getRestowedFind2() {
+        return restowedFind2;
+    }
+
+    public void setRestowedIn2(String restowedIn2) {
+        this.restowedIn2 = restowedIn2;
+    }
+
+    public String getRestowedIn2() {
+        return restowedIn2;
+    }
+
+    public void setRestowedOrder1(String restowedOrder1) {
+        this.restowedOrder1 = restowedOrder1;
+    }
+
+    public String getRestowedOrder1() {
+        return restowedOrder1;
+    }
+
+    public void setRestowedOrder2(String restowedOrder2) {
+        this.restowedOrder2 = restowedOrder2;
+    }
+
+    public String getRestowedOrder2() {
+        return restowedOrder2;
+    }
+
+    public void setRestowedOrder1Ord(String restowedOrder1Ord) {
+        this.restowedOrder1Ord = restowedOrder1Ord;
+    }
+
+    public String getRestowedOrder1Ord() {
+        return restowedOrder1Ord;
+    }
+
+    public void setRestowedOrder2Ord(String restowedOrder2Ord) {
+        this.restowedOrder2Ord = restowedOrder2Ord;
+    }
+
+    public String getRestowedOrder2Ord() {
+        return restowedOrder2Ord;
+    }
+
+    public void setDischargeListStatusHidden(String dischargeListStatusHidden) {
+        this.dischargeListStatusHidden = dischargeListStatusHidden;
+    }
+
+    public String getDischargeListStatusHidden() {
+        return dischargeListStatusHidden;
+    }
+    public void setVesselOwner(String vesselOwner) {
+        this.vesselOwner = vesselOwner;
+    }
+
+    public String getVesselOwner() {
+        return vesselOwner;
+    }
+
+    public void setRestowedView(String restowedView) {
+        this.restowedView = restowedView;
+    }
+
+    public String getRestowedView() {
+        return restowedView;
+    }
+
+    public void setOverlandedView(String overlandedView) {
+        this.overlandedView = overlandedView;
+    }
+
+    public String getOverlandedView() {
+        return overlandedView;
+    }
+
+    public void setBookedView(String bookedView) {
+        this.bookedView = bookedView;
+    }
+
+    public String getBookedView() {
+        return bookedView;
+    }
+
+    public void setOverlandedViewValues(List overlandedViewValues) {
+        this.overlandedViewValues = overlandedViewValues;
+    }
+
+    public List getOverlandedViewValues() {
+        return overlandedViewValues;
+    }
+
+    public void setBookedViewValues(List bookedViewValues) {
+        this.bookedViewValues = bookedViewValues;
+    }
+
+    public List getBookedViewValues() {
+        return bookedViewValues;
+    }
+
+
+    public void setReadOnlyFlg(String readOnlyFlg) {
+        this.readOnlyFlg = readOnlyFlg.trim();
+    }
+
+    public void setHidBookedView(String hidBookedView) {
+        this.hidBookedView = hidBookedView;
+    }
+
+    public String getHidBookedView() {
+        return hidBookedView;
+    }
+
+    public void setHidOverlandedView(String hidOverlandedView) {
+        this.hidOverlandedView = hidOverlandedView;
+    }
+
+    public String getReadOnlyFlg() {
+        return readOnlyFlg;
+    }
+
+
+    public void setDischargeListId(String dischargeListId) {
+        this.dischargeListId = dischargeListId.trim();
+    }
+
+    public String getDischargeListId() {
+        return dischargeListId;
+    }
+
+    public String getHidOverlandedView() {
+        return hidOverlandedView;
+    }
+
+    public void setHidRestowedView(String hidRestowedView) {
+        this.hidRestowedView = hidRestowedView;
+    }
+
+    public String getHidRestowedView() {
+        return hidRestowedView;
+    }
+
+    public void setMatchingFlag(String matchingFlag) {
+        this.matchingFlag = matchingFlag;
+    }
+
+    public String getMatchingFlag() {
+        return matchingFlag;
+    }
+
+
+    public void setHdrEtaTm(String hdrEtaTm) {
+        this.hdrEtaTm = hdrEtaTm;
+    }
+
+    public String getHdrEtaTm() {
+        return hdrEtaTm;
+    }
+
+    public void setHdrEtdTm(String hdrEtdTm) {
+        this.hdrEtdTm = hdrEtdTm;
+    }
+
+    public String getHdrEtdTm() {
+        return hdrEtdTm;
+    }
+
+    public void setMatchingContainerId(String matchingContainerId) {
+        this.matchingContainerId = matchingContainerId;
+    }
+
+    public String getMatchingContainerId() {
+        return matchingContainerId;
+    }
+
+    public void setMatchingContSeq(String matchingContSeq) {
+        this.matchingContSeq = matchingContSeq;
+    }
+
+    public String getMatchingContSeq() {
+        return matchingContSeq;
+    }
+
+    public void setContLoadRemark1(String contLoadRemark1) {
+        this.contLoadRemark1 = contLoadRemark1;
+    }
+
+    public String getContLoadRemark1() {
+        return contLoadRemark1;
+    }
+
+    public void setContLoadRemark2(String contLoadRemark2) {
+        this.contLoadRemark2 = contLoadRemark2;
+    }
+
+    public String getContLoadRemark2() {
+        return contLoadRemark2;
+    }
+}

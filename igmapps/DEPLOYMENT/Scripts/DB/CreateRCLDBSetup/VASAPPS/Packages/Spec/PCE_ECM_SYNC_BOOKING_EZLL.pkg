@@ -1,0 +1,318 @@
+CREATE OR REPLACE PACKAGE VASAPPS.PCE_ECM_SYNC_BOOKING_EZLL AS
+    /*
+        *8:  Modified by Leena, Add from-terminal in delete logic of renom, 23.04.2012
+        *13: Modified by vikas, while updating container in ezll/ezdl, if discharge list status
+             is more or equal to 10 and cell location not blank, then update
+             loading /discharge status to loaded/discharge, as k'chatgamol, 06.07.2012
+        *19: Modified by vikas,In booking synchronization check booking(BKP009) updated by user (not EZLL)
+             then no need to update DG information into EZLL/EZDL, if booking(or DG information) updated by EZLL
+             (EZLL/EZDL maintenance screen) then update DG information back to EZLL/EZDL, as k'chatgamol, 11.09.2012
+        *21: Modified by vikas, In booking synch check if special handling is normal then no need
+             to update DG information into booking, as k'chatgamol, 29.11.2012
+        *23: Modified by vikas, raise enotice only for the discharge/load list which is
+             complete or higher then discahrge complete/load complete, 26.11.2012.
+        *24: Modified by vikas, for synchronization e-notice call from first leg only,
+             as k'chatgamol, 24.01.2013
+    *
+    */
+    g_v_user            VARCHAR2(10)  := 'EZLL';
+    g_v_sql_id          VARCHAR2(15);
+    g_v_err_code        VARCHAR2(50);
+    g_v_err_desc        VARCHAR2(100);
+    g_v_err_handler_flg VARCHAR2(1)   :='N';
+    g_v_prog_name       VARCHAR2(100) := 'PCE_ECM_SYNC_BOOKING_EZLL';
+    g_v_record_filter   VARCHAR2(1000);
+    g_v_record_table    VARCHAR2(500);
+    TRUE CONSTANT VARCHAR2(5) DEFAULT 'TRUE'; -- *21
+    FALSE CONSTANT VARCHAR2(5) DEFAULT 'FALSE'; -- *21
+
+   -- Business key for Container Change
+   g_n_bussiness_key_sync_cch_add  ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 4;
+   g_n_bussiness_key_sync_cch_ud1  ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 4;
+   g_n_bussiness_key_sync_cch_ud2  ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 4;
+   g_n_bussiness_key_sync_cch_del  ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 4;
+
+   --  Business key for Pod Require Alert.
+   g_n_bussiness_key_sync_dws_add  ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 4;
+   g_n_bussiness_key_sync_dws_ud1  ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 4;
+   g_n_bussiness_key_sync_dws_ud2  ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 4;
+   g_n_bussiness_key_sync_dws_del  ZND_E_NOTICE_REQUEST.BUSINESS_KEY_ID%TYPE := 4;
+
+    p_record_filter  TOS_SYNC_ERROR_LOG.RECORD_FILTER%TYPE;
+    p_record_table TOS_SYNC_ERROR_LOG.RECORD_TABLE%TYPE;
+
+   PROCEDURE PRE_TOS_CREATE_REMOVE_LL_DL
+   (
+        p_i_v_booking_no              IN           VARCHAR2
+      , p_i_v_booking_type            IN           VARCHAR2
+      , p_i_v_old_booking_status      IN           VARCHAR2
+      , p_i_v_new_booking_status      IN           VARCHAR2
+      , p_o_v_return_status           OUT NOCOPY   VARCHAR2
+   );
+
+   PROCEDURE PRE_TOS_CREATE_LL_DL
+   (
+        p_i_v_booking_no              IN              VARCHAR2
+      , p_o_v_return_status           OUT  NOCOPY     VARCHAR2
+   );
+
+   PROCEDURE PRE_TOS_CREATE_LOAD_LIST
+   (
+        p_i_v_booking_no              IN              VARCHAR2
+      , p_i_n_voyseq                  IN              NUMBER
+      , p_i_n_loadid                  IN              NUMBER
+      , p_i_n_equipment_seq_no        IN              NUMBER
+      , p_i_n_size_type_seq_no        IN              NUMBER
+      , p_i_n_supplier_seq_no         IN              NUMBER
+      , p_o_v_return_status           OUT  NOCOPY     VARCHAR2
+   );
+
+   PROCEDURE PRE_TOS_CREATE_DISCHARGE_LIST
+   (
+        p_i_v_booking_no              IN              VARCHAR2
+      , p_i_n_voyseq                  IN              NUMBER
+      , p_i_n_dischargeid             IN              NUMBER
+      , p_i_n_equipment_seq_no        IN              NUMBER
+      , p_i_n_size_type_seq_no        IN              NUMBER
+      , p_i_n_supplier_seq_no         IN              NUMBER
+      , p_o_v_return_status           OUT  NOCOPY     VARCHAR2
+    );
+
+    PROCEDURE PRE_GET_NEXT_POD
+    (
+         p_i_v_booking_no    VARCHAR2
+       , p_i_n_voyno_seq     NUMBER
+       , p_o_v_next_pod1     OUT NOCOPY VARCHAR2
+       , p_o_v_next_pod2     OUT NOCOPY VARCHAR2
+       , p_o_v_next_pod3     OUT NOCOPY VARCHAR2
+       , p_o_v_next_service  OUT NOCOPY VARCHAR2
+       , p_o_v_next_vessel   OUT NOCOPY VARCHAR2
+       , p_o_v_next_voyno    OUT NOCOPY VARCHAR2
+       , p_o_v_next_dir      OUT NOCOPY VARCHAR2
+    );
+
+    FUNCTION FE_GET_VOYAGE_NO
+    (
+         p_i_v_service VARCHAR2
+       , p_i_v_vessel VARCHAR2
+       , p_i_v_voyage VARCHAR2
+       , p_i_v_direction VARCHAR2
+       , p_i_v_pol_pcsq NUMBER
+       , p_i_v_port_loading VARCHAR2
+       , p_i_v_discharge_port VARCHAR2
+       , p_i_v_pod_pcsq VARCHAR2
+    ) RETURN VARCHAR2;
+
+    FUNCTION FE_DATE_TIME
+    (
+        p_i_n_date NUMBER
+      , p_i_n_time NUMBER
+    ) RETURN DATE;
+
+    PROCEDURE PRE_TOS_STATUS_COUNT
+    (
+        p_i_n_id     IN   NUMBER
+      , p_i_n_flg    IN   VARCHAR2
+      , p_o_v_return_status      OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_EQUIPMENT_ADD
+    (
+        p_i_v_booking_no       IN VARCHAR2
+      , p_i_n_equipment_seq_no IN NUMBER
+      , p_i_n_size_type_seq_no IN NUMBER
+      , p_i_n_supplier_seq_no  IN NUMBER
+      , p_o_v_return_status    OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_EQUIPMENT_REMOVE
+    (
+        p_i_v_booking_no       IN VARCHAR2
+      , p_i_n_equipment_seq_no IN NUMBER
+      , p_o_v_return_status    OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_REMOVE_BKG
+    (
+         p_i_v_booking_no        IN  VARCHAR2
+       , p_o_v_return_status     OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_REMOVE_BKG_DL
+    (
+         p_i_v_booking_no        IN  VARCHAR2
+       , p_i_n_equipment_seq_no  IN  NUMBER
+       , p_i_n_discharge_list_id IN  NUMBER
+       , p_o_v_return_status     OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_REMOVE_BKG_LL
+    (
+        p_i_v_booking_no        IN  VARCHAR2
+      , p_i_n_equipment_seq_no  IN  NUMBER
+      , p_i_n_load_list_id      IN  NUMBER
+      , p_o_v_return_status     OUT NOCOPY VARCHAR2
+    );
+
+
+    PROCEDURE PRE_TOS_ROUTING_UPDATE(
+         p_i_v_booking_no               IN    VARCHAR2
+       , p_i_n_voyage_seq_no            IN    NUMBER
+       , p_i_v_old_service              IN    VARCHAR2
+       , p_i_v_new_service              IN    VARCHAR2
+       , p_i_v_old_vessel               IN    VARCHAR2
+       , p_i_v_new_vessel               IN    VARCHAR2
+       , p_i_v_old_voyage               IN    VARCHAR2
+       , p_i_v_new_voyage               IN    VARCHAR2
+       , p_i_v_old_direction            IN    VARCHAR2
+       , p_i_v_new_direction            IN    VARCHAR2
+       , p_i_v_old_load_port            IN    VARCHAR2
+       , p_i_v_new_load_port            IN    VARCHAR2
+       , p_i_n_old_pol_pcsq             IN    NUMBER
+       , p_i_n_new_pol_pcsq             IN    NUMBER
+       , p_i_v_old_discharge_port       IN    VARCHAR2
+       , p_i_v_new_discharge_port       IN    VARCHAR2
+       , p_i_v_old_act_service          IN    VARCHAR2
+       , p_i_v_new_act_service          IN    VARCHAR2
+       , p_i_v_old_act_vessel           IN    VARCHAR2
+       , p_i_v_new_act_vessel           IN    VARCHAR2
+       , p_i_v_old_act_voyage           IN    VARCHAR2
+       , p_i_v_new_act_voyage           IN    VARCHAR2
+       , p_i_v_old_act_port_direction   IN    VARCHAR2
+       , p_i_v_new_act_port_direction   IN    VARCHAR2
+       , p_i_n_old_act_port_seq         IN    NUMBER
+       , p_i_n_new_act_port_seq         IN    NUMBER
+       , p_i_v_old_to_terminal          IN    VARCHAR2
+       , p_i_v_new_to_terminal          IN    VARCHAR2
+       , p_i_v_old_from_terminal        IN    VARCHAR2 -- *8
+       , p_i_v_new_from_terminal        IN    VARCHAR2 -- *8
+       , p_i_v_record_status            IN    VARCHAR2
+       , p_o_v_return_status            OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_EQUIPMENT_UPDATE
+    (
+         p_i_v_booking_no         IN VARCHAR2
+       , p_i_n_equipment_seq_no   IN NUMBER
+       , p_i_v_old_equipment_no   IN VARCHAR2
+       , p_i_v_new_equipment_no   IN VARCHAR2
+       , p_i_n_overheight         IN NUMBER
+       , p_i_n_overlength_rear    IN NUMBER
+       , p_i_n_overlength_front   IN NUMBER
+       , p_i_n_overwidth_left     IN NUMBER
+       , p_i_n_overwidth_right    IN NUMBER
+       , p_i_v_imdg               IN VARCHAR2
+       , p_i_v_unno               IN VARCHAR2
+       , p_i_v_un_var             IN VARCHAR2
+       , p_i_v_flash_point        IN VARCHAR2
+       , p_i_n_flash_unit         IN VARCHAR2
+       , p_i_n_reefer_tmp         IN VARCHAR2
+       , p_i_v_reefer_tmp_unit    IN VARCHAR2
+       , p_i_n_humidity           IN NUMBER
+       , p_i_n_ventilation        IN NUMBER
+       , P_I_V_USER_ID            IN   VARCHAR2 -- *19
+       , P_I_V_WEIGHT             IN NUMBER --*30
+       , P_I_V_VGM_CATEGORY       IN VARCHAR2 -- *30
+       , P_I_V_VGM                IN NUMBER --*31
+       , p_o_v_return_status      OUT NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_TEMP_CONT_REMOVAL
+   (
+        p_i_v_booking_no              IN         VARCHAR2
+      , p_i_n_list_id                 IN         NUMBER
+      , p_i_n_booked_id               IN         NUMBER
+      , p_i_v_preadvice_flg           IN         VARCHAR2
+      , p_i_v_ll_dl_flg               IN         VARCHAR2
+      , p_o_v_return_status           OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_UPDATE_DG
+    (
+         p_i_v_booking_no              IN         VARCHAR2
+       , p_i_v_imo_class               IN         VARCHAR2
+       , p_i_v_un_no                   IN         VARCHAR2
+       , p_i_v_fumigation_only         IN         VARCHAR2
+       , p_i_v_residue                 IN         VARCHAR2
+       , p_o_v_return_status           OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_CHECK_CREATE_LL_DL
+    (   p_i_v_booking_no      IN           VARCHAR2
+      , p_o_v_return_status   OUT  NOCOPY  VARCHAR2
+      , p_o_v_exec_flg        OUT  NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_SYNC_ERROR_LOG
+    (
+           p_parameter_string   IN VARCHAR2
+         , p_prog_type          IN VARCHAR2
+         , p_opeartion_type     IN VARCHAR2
+         , p_error_msg          IN VARCHAR2
+         , p_record_status      IN VARCHAR2
+         , p_record_add_user    IN VARCHAR2
+         , p_record_add_date    IN TIMESTAMP
+         , p_record_change_user IN VARCHAR2
+         , p_record_change_date IN TIMESTAMP
+           , p_record_filter      IN VARCHAR2
+           , p_record_table       IN VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_SYNC_ERROR_LOG
+    (
+         p_parameter_string   IN VARCHAR2
+       , p_prog_type          IN VARCHAR2
+       , p_opeartion_type     IN VARCHAR2
+       , p_error_msg          IN VARCHAR2
+       , p_record_status      IN VARCHAR2
+       , p_record_add_user    IN VARCHAR2
+       , p_record_add_date    IN TIMESTAMP
+       , p_record_change_user IN VARCHAR2
+       , p_record_change_date IN TIMESTAMP
+
+    ) ;
+
+    PROCEDURE PRE_REMOVE_DUPLICATE_LLDL (
+          p_i_v_booking_no            TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE
+        , p_i_v_bkg_equipm_dtl        TOS_LL_BOOKED_LOADING.FK_BKG_EQUIPM_DTL%TYPE
+        , p_i_v_voyage_seqno          TOS_LL_BOOKED_LOADING.FK_BKG_VOYAGE_ROUTING_DTL%TYPE
+        , p_i_v_discharge_port        TOS_LL_BOOKED_LOADING.DN_DISCHARGE_PORT%TYPE
+        , p_i_v_discharge_terminal    TOS_LL_BOOKED_LOADING.DN_DISCHARGE_TERMINAL%TYPE
+        , p_i_v_dn_equipment_no       TOS_LL_BOOKED_LOADING.DN_EQUIPMENT_NO%type
+        , p_o_v_loading_status        OUT TOS_LL_BOOKED_LOADING.LOADING_STATUS%TYPE
+    );
+    /*
+        *13: start
+    */
+    PROCEDURE PRE_GET_LL_DL_STATUS (
+        P_I_V_LIST_ID             TOS_DL_DISCHARGE_LIST.PK_DISCHARGE_LIST_ID%TYPE,
+        P_I_V_EQUIPMENT_NO        TOS_DL_BOOKED_DISCHARGE.DN_EQUIPMENT_NO%TYPE,
+        P_I_V_LL_DL_TYPE          VARCHAR2,
+        P_O_V_STATUS              OUT TOS_DL_BOOKED_DISCHARGE.DISCHARGE_STATUS%TYPE
+    );
+    /*
+        *13: end
+    */
+
+    /* *21 start * */
+    FUNCTION FN_CAN_UPDATE_DG(
+        P_V_SPECIAL_HNDL VARCHAR2,
+        P_V_SIZE_TYPE VARCHAR2
+    ) RETURN VARCHAR2;
+    /* *21 end * */
+
+    /* *23 start *  */
+    PROCEDURE PRE_GET_LIST_STATUS (
+        P_I_V_LIST_ID     VARCHAR2,
+        P_I_LL_DL_FLAG    VARCHAR2,
+        P_O_V_LIST_STATUS OUT VARCHAR2
+    );
+    /* *23 end *  */
+    /* *24 start * */
+    PROCEDURE PRE_EQ_REMOVE_SYNC_MAIL(
+        P_I_V_BOOKING_NO       VARCHAR2,
+        P_I_N_EQUIPMENT_SEQ_NO VARCHAR2
+    );
+    /* *24 end * */
+/* End of Package Specification */
+END PCE_ECM_SYNC_BOOKING_EZLL;

@@ -1,0 +1,66 @@
+create or replace
+PACKAGE PCE_ECM_DECLARE_LIST AS
+
+g_record_filter          TOS_SYNC_ERROR_LOG.RECORD_FILTER%TYPE;    -- added by vikas on 19.10.2011
+g_record_table           TOS_SYNC_ERROR_LOG.RECORD_TABLE%TYPE;     -- added by vikas on 19.10.2011
+
+PROCEDURE PRE_ECM_GENERATE_EDI (
+      p_i_v_activity_code           VARCHAR2 -- Called For Decalare Load List Outbound  or Declare Discharge List Outbound
+    , p_i_v_list_id                 VARCHAR2
+    , p_i_v_function_cd             VARCHAR2 --(O-Original, M - Modification, C - Cancelleation)
+    , p_i_v_terminal                VARCHAR2
+    , p_i_v_message_recipient       VARCHAR2
+    , p_i_v_message_set             VARCHAR2
+    , p_i_v_all_ports_flag          VARCHAR2
+    , p_i_v_specific_port_name      VARCHAR2
+    , p_i_v_flat_rack_flag          VARCHAR2
+    , p_i_v_fumigation_flag         VARCHAR2
+    , p_i_n_eme_uid                 NUMBER
+    , p_i_v_user_id                 VARCHAR2
+    , p_i_v_cont_op_flag            VARCHAR2
+    , p_i_v_slot_op_flag            VARCHAR2
+    , p_i_v_cont_op                 VARCHAR2
+    , p_i_v_slot_op                 VARCHAR2
+    , p_o_v_err_cd           OUT    VARCHAR2
+);
+
+PROCEDURE PRE_ECM_DOWNLOAD (
+      p_o_refListData        OUT    PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_activity_code           VARCHAR2 -- Called For Decalare Load List Outbound  or Declare Discharge List Outbound
+    , p_i_v_list_id                 VARCHAR2
+    , p_i_v_all_ports_flag          VARCHAR2
+    , p_i_v_specific_port_name      VARCHAR2
+    , p_i_v_flat_rack_flag          VARCHAR2
+    , p_i_v_fumigation_flag         VARCHAR2
+    , p_i_v_cont_op_flag            VARCHAR2
+    , p_i_v_slot_op_flag            VARCHAR2
+    , p_i_v_cont_op                 VARCHAR2
+    , p_i_v_slot_op                 VARCHAR2
+    , p_o_v_err_cd           OUT    VARCHAR2
+);
+
+PROCEDURE PRV_EDL_GET_MSG_RCPNT_SET_VAL(
+      p_i_v_terminal                 IN  VARCHAR2
+    , p_o_v_msg_recp                 OUT VARCHAR2
+    , p_o_v_msg_set                  OUT VARCHAR2
+    , p_o_v_eme_uid                  OUT VARCHAR2
+    , p_o_v_err_cd                   OUT VARCHAR2
+);
+
+    /*
+        Procecure to get the terminal for pod1, pod2, pod3, 06.06.2012 by vikas
+    */
+    PROCEDURE PRE_GET_NEXT_POD_TERMINAL (
+        p_i_v_booking_no                 VARCHAR2,
+        p_i_n_voyno_seq                  NUMBER,
+        p_o_v_next_pod1_terminal         OUT NOCOPY VARCHAR2,
+        p_o_v_next_pod2_terminal         OUT NOCOPY VARCHAR2,
+        p_o_v_next_pod3_terminal         OUT NOCOPY VARCHAR2,
+        p_o_v_final_pod_terminal         OUT NOCOPY VARCHAR2,
+        p_o_v_next_service               OUT NOCOPY VARCHAR2,
+        p_o_v_next_vessel                OUT NOCOPY VARCHAR2,
+        p_o_v_next_voyno                 OUT NOCOPY VARCHAR2,
+        p_o_v_next_dir                   OUT NOCOPY VARCHAR2
+    );
+END PCE_ECM_DECLARE_LIST;
+/

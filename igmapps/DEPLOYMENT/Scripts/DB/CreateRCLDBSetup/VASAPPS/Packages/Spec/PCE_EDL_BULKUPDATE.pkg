@@ -1,0 +1,176 @@
+CREATE OR REPLACE PACKAGE VASAPPS."PCE_EDL_BULKUPDATE" AS
+/*************************************************************************************************
+* Name           : PCE_EDL_BULKUPDATE                                                            *
+* Module         : EZLL                                                                          *
+* Purpose        : This  Package is for Bulk Update                                              *
+* Calls          : None                                                                          *
+* Returns        : NONE                                                                          *
+* Steps Involved :                                                                               *
+* History        : None                                                                          *
+* Author           Date          What                                                            *
+* ---------------  ----------    ----                                                            *
+* Richa                          1.0                                                             *
+* --- Change Log --------------------------------------------------------------------------------*
+* ** DD/MM/YY         -User-     -TaskRef-      -Short Description--                             *
+* *1 10/04/12          LEE                      Add duplicate stowage while updating             *
+*                                               discharge/load status                            *
+* *2 27/04/2012        Vikas                    When screen open from disccharge list booked tab *
+*                                               then update activity date also in                *
+*                                               tos_dl_boooked_discharge table, as k'chatgamol   *
+*7  vikas, Added ex-mlovessel, ex-mlo_voyage and temrminal in overshipped/overlanded
+    tab., 10/10/2012
+*8  Modified by vikas, issue fix, when loading status is changed bye giving loading staus as
+    search criteria then loading status is not updating in discharge list, 12.10.20012
+*12 Modified by vikas, added activity date, as k'chatgamol, 01.11.2012
+*13 Modified by vikas, When changing
+*14 Modified by vikas, issue fix, when loading status is changed by giving loading staus as
+    search criteria then loading status is not updating in discharge list, 04.12.20012
+*15 Add category for CR that update table TOS_LL_BOOKED_LOADING.CATEGORY_CODE and  TOS_DL_BOOKED_DISCHARGE.CATEGORY_CODE.
+*15.1  07/08/2016     WACCHO1                   REMOVE FOR CHECKING 1ST LEG 
+**************************************************************************************************/
+
+    g_exp_invalid_container_op        EXCEPTION;
+    g_exp_invalid_slot_op             EXCEPTION;
+    g_exp_invalid_out_slot_op         EXCEPTION;
+    g_exp_invalid_equipment_type      EXCEPTION;
+    g_exp_invalid_pol                 EXCEPTION;
+    g_exp_invalid_pod                 EXCEPTION;
+    g_exp_invalid_handling_code       EXCEPTION;
+    g_exp_finished_with_exception     EXCEPTION;
+    g_exp_equipment_null              EXCEPTION;
+    g_exp_finish                      EXCEPTION;
+    g_exp_duplicate_stowage_pos       EXCEPTION; --* 01
+
+    PROCEDURE PRE_EDL_BULKUPDATE(
+          p_i_v_flag                                            VARCHAR2
+        , p_i_v_find1                                           VARCHAR2
+        , p_i_v_in1                                             VARCHAR2
+        , p_i_v_find2                                           VARCHAR2
+        , p_i_v_in2                                             VARCHAR2
+        , p_i_v_container_op                                    VARCHAR2
+        , p_i_v_slot_op                                         VARCHAR2
+        , p_i_v_out_slot_op                                     VARCHAR2
+        , p_i_v_pod                                             VARCHAR2
+        , p_i_v_pol                                             VARCHAR2
+        , p_i_v_equip_type                                      VARCHAR2
+        , p_i_v_midstream_handling                              VARCHAR2
+        , p_i_v_mlo_vessel                                      VARCHAR2
+        , p_i_v_mlo_voyage                                      VARCHAR2
+        , p_i_v_soc_coc                                         VARCHAR2
+        , p_i_v_con_mlo_vessel                                  VARCHAR2
+        , p_i_v_con_mlo_voyage                                  VARCHAR2
+        , p_i_v_con_mlo_pod1                                    VARCHAR2
+        , p_i_v_con_mlo_pod2                                    VARCHAR2
+        , p_i_v_con_mlo_pod3                                    VARCHAR2
+        , p_i_v_con_mlo_del                                     VARCHAR2
+        , p_i_v_con_handl_code1                                 VARCHAR2
+        , p_i_v_con_handl_code2                                 VARCHAR2
+        , p_i_v_con_handl_code3                                 VARCHAR2
+        , p_i_v_load_disch_status                               VARCHAR2
+        , p_i_v_tab_flag                                        VARCHAR2
+        , p_i_v_id                                              VARCHAR2
+        , p_i_v_local_containr_sts                              VARCHAR2
+        , p_i_v_ata_date                                        VARCHAR2 /* *2 * */
+        , p_i_v_ex_mlo_vessel                                   VARCHAR2 /* *7 * */
+        , p_i_v_ex_mlo_voyage                                   VARCHAR2 /* *7 * */
+        , p_i_v_terminal                                        VARCHAR2 /* *7 * */
+        , p_i_v_user_id                                         VARCHAR2
+        , p_i_v_activity_date                                   VARCHAR2 /* *12 * */
+        , p_i_v_category_code                                VARCHAR2 --*15
+        , p_o_v_error                                           OUT VARCHAR2
+    )  ;
+
+    PROCEDURE ADDITION_WHERE_CONDTIONS(
+          p_i_v_in                  IN  VARCHAR2
+        , p_i_v_find                IN  VARCHAR2
+        , p_i_v_flag                IN  VARCHAR2
+        , p_i_v_tab_flag            IN VARCHAR2
+        , p_i_v_load_disch_status   IN VARCHAR2
+        , p_o_v_sql                 OUT VARCHAR2
+    );
+
+    PROCEDURE GET_INVALID_RECORDS(
+          p_i_v_flag                    VARCHAR2
+        , p_i_v_tab_flag                VARCHAR2
+        , p_o_v_error_count             OUT VARCHAR2
+        , p_o_v_equipment_no            OUT VARCHAR2
+        , p_o_v_preadvice_err_count     OUT VARCHAR2
+        , p_o_v_preadvice_err_eq_no     OUT VARCHAR2
+        , p_o_v_error                   OUT VARCHAR2
+    );
+
+    PROCEDURE GET_WHERE_COND_FOR_VALID(
+          p_i_v_in1                     IN  VARCHAR2
+        , p_i_v_find1                   IN  VARCHAR2
+        , p_i_v_in2                     IN  VARCHAR2
+        , p_i_v_find2                   IN  VARCHAR2
+        , p_i_v_id                      IN  VARCHAR2
+        , p_i_v_containerFlag           IN  VARCHAR2
+        , p_i_v_flag                    IN  VARCHAR2
+        , p_i_v_tab_flag                IN  VARCHAR2
+        , p_i_v_validate_soc            IN  VARCHAR2
+    );
+
+    PROCEDURE PRE_UPDATE_LLDL_STATUS (
+        p_i_v_ll_dl_flag              VARCHAR2
+        , p_i_v_id                    VARCHAR2
+        , p_i_v_user_id               VARCHAR2 -- added 30.01.2012
+        /* *8 start* */
+        , P_I_V_IN1                   VARCHAR2
+        , P_I_V_FIND1                 VARCHAR2
+        , P_I_V_IN2                   VARCHAR2
+        , P_I_V_FIND2                 VARCHAR2
+        , P_I_V_FLAG                  VARCHAR2
+        , P_I_V_TAB_FLAG              VARCHAR2
+        , P_I_V_LOAD_DISCH_STATUS     VARCHAR2
+        /* *8 end * */
+        , P_I_V_CATEGORY_FLAG VARCHAR --*15
+    );
+
+    /* *8 start * */
+    PROCEDURE PRE_GET_UPDATED_WHERE_COND(
+        P_I_V_IN1                VARCHAR2,
+        P_I_V_FIND1              VARCHAR2,
+        P_I_V_IN2                VARCHAR2,
+        P_I_V_FIND2              VARCHAR2,
+        P_I_V_FLAG               VARCHAR2,
+        P_I_V_TAB_FLAG           VARCHAR2,
+        P_I_V_LOAD_DISCH_STATUS  VARCHAR2,
+        P_I_O_V_SQL              IN OUT NOCOPY VARCHAR2
+    );
+    /* *8 end * */
+
+
+    /*
+        logic to update loading status in discharge list
+    */
+    PROCEDURE PRE_UPDATE_LL_STATUS (
+        p_i_v_id                      VARCHAR2
+        , p_i_v_where_condition       VARCHAR2
+        , p_i_v_user_id               VARCHAR2
+       , p_i_v_category_flag varchar2 --*15
+    );
+
+    /*
+        logic to update tos_onboard_list
+    */
+    PROCEDURE PRE_UPDATE_DL_STATUS (
+        p_i_v_id                      VARCHAR2
+        , p_i_v_where_condition       VARCHAR2
+    );
+
+    PROCEDURE PRE_CHECK_DUP_STOW_POS_PRESENT(
+        p_i_v_id varchar2,
+        p_i_v_tab_flag varchar2,
+        p_i_v_flag  varchar2,
+        p_o_v_dup_present OUT varchar2
+    );
+
+    /* *14 start * */
+    PROCEDURE PRE_GET_CONTAINER_STATUS(
+        P_I_V_FIND VARCHAR2,
+        P_O_V_STATUS OUT VARCHAR2
+    );
+    /* *14 end * */
+
+END PCE_EDL_BULKUPDATE; /* End of Package Specification */

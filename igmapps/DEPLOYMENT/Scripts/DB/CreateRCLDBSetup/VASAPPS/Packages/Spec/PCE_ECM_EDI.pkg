@@ -1,0 +1,194 @@
+CREATE OR REPLACE PACKAGE VASAPPS."PCE_ECM_EDI" AS
+    g_v_user            VARCHAR2(10) := 'EDI';
+    g_v_sql_id          VARCHAR2(10);
+    g_v_err_code        VARCHAR2(50);
+    g_v_err_desc        VARCHAR2(100);
+    g_v_opr_type        VARCHAR2(1);
+
+
+    /*
+        *10: Modified by vikas, to update handling_ins1,2,3 also in matching,
+             as k'chatgamol, 09.03.2012
+        *29: Modified by Vikas, When data come from terminal EDI then update activity date
+             from overshipped/overlanded container to booked table, no need to update activity
+             date for excel upload EDI, as k'chatgamol, 05.11.2012
+    */
+
+    PROCEDURE PRE_TOS_LLDL_COMMON_MATCHING(
+    p_i_v_match_type                            VARCHAR2
+    , p_i_v_list_type                             VARCHAR2
+    , p_i_n_discharge_list_id                     NUMBER
+    , p_i_n_dl_container_seq                      NUMBER
+    , p_i_n_overlanded_container_id               NUMBER
+    , p_i_n_load_list_id                          NUMBER
+    , p_i_n_ll_container_seq                      NUMBER
+    , p_i_n_overshipped_container_id              NUMBER
+    , p_o_v_return_status             OUT NOCOPY  VARCHAR2
+    );
+
+PROCEDURE PRE_TOS_LLDL_MATCH_UPDATE(
+      p_i_n_list_type                    IN   VARCHAR2
+    , p_i_v_equipment_no                 IN   VARCHAR2
+    , p_i_n_overheight                   IN   NUMBER
+    , p_i_n_overlength_rear              IN   NUMBER
+    , p_i_n_overlength_front             IN   NUMBER
+    , p_i_n_overwidth_left               IN   NUMBER
+    , p_i_n_overwidth_right              IN   NUMBER
+    , p_i_v_unno                         IN   VARCHAR2
+    , p_i_v_un_var                       IN   VARCHAR2
+    , p_i_v_flash_point                  IN   NUMBER
+    , p_i_n_flash_unit                   IN   VARCHAR2
+    , p_i_v_imdg                         IN   VARCHAR2
+    , p_i_n_reefer_tmp                   IN   NUMBER
+    , p_i_v_reefer_tmp_unit              IN   VARCHAR2
+    , p_i_n_humidity                     IN   NUMBER
+    , p_i_n_ventilation                  IN   NUMBER
+    , p_i_v_port_class                   IN   VARCHAR2
+    , p_i_v_portclass_type               IN   VARCHAR2
+    , p_i_n_discharge_id                 IN   NUMBER
+    , p_i_n_overlanded_container_id      IN   NUMBER
+    , p_i_n_booked_load_id               IN   NUMBER
+    , p_i_n_overshipped_container_id     IN   NUMBER
+    , p_i_n_equipment_seq_no             IN   NUMBER
+    , p_i_v_booking_no                   IN   VARCHAR2
+    , p_i_v_gross_wt                     IN   NUMBER
+    , p_i_v_vgm                          IN   NUMBER  --#01 Add VGM Column
+    , p_i_v_stowage_position             IN   VARCHAR2
+    , p_i_v_container_operator           IN   VARCHAR2
+    , p_i_v_preadvice_flg                IN   VARCHAR2
+    , p_i_n_list_id                      IN   NUMBER
+    , p_i_v_mid_stream                   IN   VARCHAR2
+    , p_i_v_handling_ins_1               IN   TOS_LL_OVERSHIPPED_CONTAINER.HANDLING_INSTRUCTION_1%TYPE -- *10
+    , p_i_v_handling_ins_2               IN   TOS_LL_OVERSHIPPED_CONTAINER.HANDLING_INSTRUCTION_2%TYPE -- *10
+    , p_i_v_handling_ins_3               IN   TOS_LL_OVERSHIPPED_CONTAINER.HANDLING_INSTRUCTION_3%TYPE -- *10
+    , P_I_V_ACTIVITY_DATE                IN   TOS_LL_OVERSHIPPED_CONTAINER.ACTIVITY_DATE_TIME%TYPE -- *29
+    , p_i_v_ex_mlo_vessel                in   TOS_LL_OVERSHIPPED_CONTAINER.EX_MLO_VESSEL%TYPE -- *36
+    , p_i_v_ex_mlo_voyage                in   TOS_LL_OVERSHIPPED_CONTAINER.EX_MLO_VOYAGE%TYPE -- *36
+    , p_o_v_return_status                OUT  NOCOPY  VARCHAR2
+    );
+
+    PROCEDURE TOS_EZLL_EDI_INBOUND
+    ( p_i_v_api_uid       IN         VARCHAR2
+    , p_i_v_ezl           IN         VARCHAR2
+    , p_i_v_new_old       IN         VARCHAR2
+    --, p_o_v_return_status OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_GET_NEXT_VALUE
+    ( p_i_n_etd_uid                IN         NUMBER
+    , p_i_n_esdh_uid               IN         NUMBER
+    , p_i_n_esdco_uid              IN         NUMBER
+    , p_i_n_esde_uid               IN         NUMBER
+    , p_o_v_handling_instruction1  OUT NOCOPY VARCHAR2
+    , p_o_v_handling_instruction2  OUT NOCOPY VARCHAR2
+    , p_o_v_handling_instruction3  OUT NOCOPY VARCHAR2
+    , p_o_v_container_loading_rem1 OUT NOCOPY VARCHAR2
+    , p_o_v_container_loading_rem2 OUT NOCOPY VARCHAR2
+    , p_o_v_return_status          OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_ERROR_LOG
+    ( p_i_v_ll_dl_flg          IN VARCHAR2
+    , p_i_n_load_list_id       IN NUMBER
+    , p_i_n_overshipped_id     IN NUMBER
+    , p_i_n_discharge_list_id  IN NUMBER
+    , p_i_n_overlanded_id      IN NUMBER
+    , p_i_v_bkg_no             IN VARCHAR2
+    , p_i_v_equipment_no       IN VARCHAR2
+    , p_i_v_error_code         IN VARCHAR2
+    , p_i_v_record_add_user    IN VARCHAR2
+    , p_i_v_record_change_user IN VARCHAR2
+    );
+
+    PROCEDURE PCE_TOS_TEMP_AUTOMATCH
+    ( p_i_n_load_list_id              IN NUMBER
+    , p_i_n_overshipped_contained_id  IN NUMBER
+    , p_i_v_booking_no                IN VARCHAR2
+    , p_i_v_equipment_no              IN VARCHAR2
+    , p_o_v_return_status             OUT NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_LLDL_MOVE
+    ( p_i_n_booked_loading_id   IN NUMBER
+    , p_i_n_booked_discharge_id IN NUMBER
+    , p_i_v_lldl_flg            IN VARCHAR2
+    , p_o_v_return_status       OUT  NOCOPY VARCHAR2
+    );
+
+    PROCEDURE PRE_TOS_LLDL_MANUAL_MATCHING
+    ( p_i_v_match_type                IN          VARCHAR2
+    , p_i_v_list_type                 IN          VARCHAR2
+    , p_i_n_discharge_list_id         IN          NUMBER
+    , p_i_n_dl_container_seq          IN          NUMBER
+    , p_i_n_overlanded_container_id   IN          NUMBER
+    , p_i_n_load_list_id              IN          NUMBER
+    , p_i_n_ll_container_seq          IN          NUMBER
+    , p_i_n_overshipped_container_id  IN          NUMBER
+    , p_o_v_return_status             OUT NOCOPY  VARCHAR2
+    );
+
+    FUNCTION VALIDATE_INBOUND_FIELD
+    ( p_i_n_edi_etd_uid            IN         NUMBER
+    , p_i_v_info                   IN         VARCHAR2
+    , p_i_v_equ_no                 IN         VARCHAR2
+    , p_i_v_act_plc                IN         VARCHAR2
+    , p_i_v_act_term               IN         VARCHAR2
+    , p_i_v_act_cd                 IN         VARCHAR2
+    , p_i_v_act_dt                 IN         DATE
+    ) RETURN NUMBER;
+
+        PROCEDURE GET_LLDL_ID
+    (  p_i_v_voy                 IN  VARCHAR2
+        , p_i_v_ves                 IN  VARCHAR2
+        , p_i_v_loc                 IN  VARCHAR2
+        , p_i_v_term                IN  VARCHAR2
+        , p_i_v_serv                IN  VARCHAR2
+        , p_i_v_dir                 IN  VARCHAR2
+        , p_i_v_seq                 IN  VARCHAR2
+        , p_i_v_ver                 IN  VARCHAR2
+        , p_i_v_lldl_fl             IN  VARCHAR2
+        , p_o_v_lldl_id             OUT NUMBER
+    ) ;
+
+    PROCEDURE GET_SVRDIRSEQ
+        ( p_i_v_bkg_no              IN     VARCHAR2
+        , p_i_v_voy                 IN     VARCHAR2
+        , p_i_v_loc                 IN     VARCHAR2
+        , p_i_v_term                IN     VARCHAR2
+        , p_i_v_act_cd              IN     VARCHAR2
+        , p_i_o_v_ves               IN OUT VARCHAR2
+        , p_i_v_ves_nm              IN     VARCHAR2
+        , p_i_v_ezl                 IN     VARCHAR2 -- added 09.01.2012
+        , p_i_v_new_old             IN     VARCHAR2 -- added 09.01.2012
+        , p_o_v_serv                OUT    VARCHAR2
+        , p_o_v_dir                 OUT    VARCHAR2
+        , p_o_v_seq                 OUT    VARCHAR2
+        , p_o_v_ret                 OUT    VARCHAR2
+    );
+
+    PROCEDURE PRE_UPDATE_STOW_WEIGHT_DL(
+          p_i_v_booked_id               VARCHAR2
+    );
+
+    /*
+        This procedure is used to check duplicate container exists in booked table or not
+        Date: 15.02.2012
+
+        Parameters
+        ===========
+        All parateters should have EDI values (value of overlanded/overshipped table).
+    */
+    PROCEDURE PRE_CHECK_DUPLICATE_CONTAINER (
+          P_I_OL_EQUIPMENT_NO                 VASAPPS.TOS_LL_BOOKED_LOADING.DN_EQUIPMENT_NO%TYPE
+        , P_I_N_LIST_ID                       VASAPPS.TOS_LL_BOOKED_LOADING.FK_LOAD_LIST_ID%TYPE
+        , P_I_LLDL_FLAG                       VARCHAR2 -- 'L/D'
+        , P_I_BOOKED_LLDL_ID                  VASAPPS.TOS_LL_BOOKED_LOADING.PK_BOOKED_LOADING_ID%TYPE -- ADDED 17.02.2012
+        , P_V_OL_BOOKING_NO                   VASAPPS.TOS_LL_BOOKED_LOADING.FK_BOOKING_NO%TYPE -- ADDED 02.03.2012
+        , P_V_OL_EQ_SIZE                      VASAPPS.TOS_LL_OVERSHIPPED_CONTAINER.EQ_SIZE%TYPE -- ADDED 02.03.2012
+        , P_V_OL_EQ_TYPE                      VASAPPS.TOS_LL_OVERSHIPPED_CONTAINER.EQ_TYPE%TYPE -- ADDED 02.03.2012
+        , P_I_BK_EQUPIMENT_NO                 VASAPPS.TOS_LL_BOOKED_LOADING.DN_EQUIPMENT_NO%TYPE -- ADDED 02.03.2012
+        , P_O_V_DUP_PK_BOOKED_ID              OUT VASAPPS.TOS_LL_BOOKED_LOADING.PK_BOOKED_LOADING_ID%TYPE -- ADDED 02.03.2012
+        , P_O_V_RETURN_STATUS                 OUT VARCHAR2 -- ADDED 02.03.2012
+    );
+
+END PCE_ECM_EDI;

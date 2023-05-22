@@ -1,0 +1,65 @@
+CREATE OR REPLACE PACKAGE PCE_EDL_DISCHARGELISTREPORT AS
+
+ /* -----------------------------------------------------------------------------
+System  : RCL-VAS
+Module  : Contracts
+Prog ID : VCT005 - PCV_VCT_ContractListReport.sql
+Name    : Contract List Report
+Purpose : Allows to view the contracts
+--------------------------------------------------------------------------------
+History : None
+--------------------------------------------------------------------------------
+Author		Date		    What
+---------------	---------------	------------------------------------------------
+Swati 	  20/11/2009	<Initial version>
+--Change Log--------------------------------------------------------------------
+DD/MM/YY     User-Task/CR No -Short Description-
+----------------------------------------------------------------------------- */
+
+
+/**
+
+ * @ PRV_VCT_ContractList
+ * Purpose : Search for the List of Contracts from VAS Contract Table
+ * @param  : p_o_refContractList
+ * @param  : p_i_v_contract_no
+ * @param  : p_i_v_vendor_cd
+ * @param  : p_i_v_vendor_nm
+ * @param  : p_i_v_service_cd
+ * @param  : p_i_v_contract_dt   (Format : DD/MM/YYYY)
+ * @param  : p_i_v_effective_dt   (Format : DD/MM/YYYY)
+ * @param  : p_i_v_expiry_dt      (Format : DD/MM/YYYY)
+ * @param  : p_i_v_fsc_cd
+ * @param  : p_i_v_sort_by        (Sorting Column Name)
+ * @param  : p_i_v_sort_in        (Asc:Asceding or Desc:Descending Order)
+ * @param  : p_i_v_rec_status     (A:Active or S:Suspended)
+ * @param  : p_i_v_user_id
+ * @param  : p_o_v_service_nm      Output
+ * @param  : p_i_v_date_tm
+ * @return : List of contracts in Ref Cursor
+ * @return : p_o_v_err_cd (Output Error Code if Any, Error Code + Error Data)
+ * @see    : None
+ * @exception None
+ * -----------------------------------------------------------------------------
+ * Steps/Checks involved :
+ * Check A : None
+ * -----------------------------------------------------------------------------
+*/
+PROCEDURE PRE_EDL_BayplanReport
+    (   p_o_refCreateArrivalBayPlan     OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+        , p_i_v_port                    IN           VARCHAR2
+        , p_i_v_service                 IN           VARCHAR2
+        , p_i_v_vessel                  IN           VARCHAR2
+        , p_i_v_terminal                IN           VARCHAR2
+        , p_i_v_voyage                  IN           VARCHAR2
+        , p_i_v_direction               IN           VARCHAR2
+        , p_i_dt_dl_eta                 IN           VARCHAR2
+        , p_i_dt_ll_etd                 IN           VARCHAR2
+        , p_i_v_rob                     IN           VARCHAR2
+        , p_o_v_err_cd                   OUT NOCOPY  VARCHAR2
+    );
+    
+END PCE_EDL_DISCHARGELISTREPORT;
+/* End of Package Specification */
+
+/

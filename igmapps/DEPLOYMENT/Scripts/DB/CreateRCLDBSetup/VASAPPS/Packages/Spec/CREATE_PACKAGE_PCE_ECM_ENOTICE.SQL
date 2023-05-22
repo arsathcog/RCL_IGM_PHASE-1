@@ -1,0 +1,298 @@
+CREATE OR REPLACE PACKAGE VASAPPS.PCE_ECM_ENOTICE AS
+
+g_v_success                     VARCHAR2(6) := '000000';
+
+g_v_sql_id                      ZND_DISPATCH_ERROR.USER_ERR_CD%TYPE; -- Which SQL is executing
+g_v_usr_err_cd                  ZND_DISPATCH_ERROR.USER_ERR_CD%TYPE;
+g_v_usr_err_msg                 ZND_DISPATCH_ERROR.USER_ERR_MSG%TYPE;
+g_v_ora_err_cd                  ZND_DISPATCH_ERROR.ORA_ERR_CD%TYPE;
+g_v_ora_err_msg                 ZND_DISPATCH_ERROR.ORA_ERR_MSG%TYPE;
+
+g_c_new_line                    VARCHAR2(4) := CHR(13) || CHR(10);
+g_c_placeholder_begin_text      VARCHAR2(4) := '<<';
+g_c_placeholder_end_text        VARCHAR2(4) := '>>';
+g_c_param_seperator             VARCHAR2(1) := '~' ;
+g_v_default_lang_cd             VARCHAR2(7) := 'ENGLISH';
+
+TYPE tab_tokens IS TABLE OF VARCHAR2(4000) INDEX BY BINARY_INTEGER;
+
+PROCEDURE PRE_GET_SYSTEM_DATE (
+      p_i_v_format                          VARCHAR2
+    , p_o_v_system_date         OUT NOCOPY  VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+FUNCTION EXTRACT_TOKENS(
+      p_i_v_input_txt                       VARCHAR2
+    , p_i_v_seperator                       VARCHAR2
+) RETURN tab_tokens;
+
+FUNCTION EXTRACT_PLACEHOLDERS (
+      p_i_v_input_txt                       VARCHAR2
+    , p_i_v_begin_identifier                VARCHAR2
+    , p_i_v_end_identifier                  VARCHAR2
+) RETURN tab_tokens;
+
+-- Procedure to populate ENotice Type Dropdown for screens
+-- ENotice Template and ENotice Receiving Organization
+PROCEDURE PRE_GET_ENOTICE_TYPE (
+      p_o_refNoticeType         OUT         PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+-- Procedure to populate Language Dropdown for Screen - ENotice Template
+PROCEDURE PRE_GET_TEMPLATE_LANGUAGE (
+      p_o_refTemplateLanguage   OUT         PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+-- Procedure to get Search Result for screen - ENotice Template
+PROCEDURE PRE_GET_ENOTICE_TEMPLATE_DATA (
+      p_o_refResultList         OUT        PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_enotice_type_id                 VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+-- Procedure to insert new template record
+PROCEDURE PRE_INS_ENOTICE_TEMPLATE (
+      p_i_v_template_desc                   VARCHAR2
+    , p_i_v_enotice_type_id                 VARCHAR2
+    , p_i_v_template_language               VARCHAR2
+    , p_i_v_subject                         VARCHAR2
+    , p_i_v_body_header                     VARCHAR2
+    , p_i_v_body_detail                     VARCHAR2
+    , p_i_v_body_footer                     VARCHAR2
+    , p_i_v_attachment_flag                 VARCHAR2
+    , p_i_v_record_status                   VARCHAR2
+    , p_i_v_record_add_user                 VARCHAR2
+    , p_i_v_record_add_date                 VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+-- Procedure to update existing template record
+PROCEDURE PRE_UPD_ENOTICE_TEMPLATE (
+      p_i_v_template_id                     VARCHAR2
+    , p_i_v_template_desc                   VARCHAR2
+    , p_i_v_template_language               VARCHAR2
+    , p_i_v_subject                         VARCHAR2
+    , p_i_v_body_header                     VARCHAR2
+    , p_i_v_body_detail                     VARCHAR2
+    , p_i_v_body_footer                     VARCHAR2
+    , p_i_v_attachment_flag                 VARCHAR2
+    , p_i_v_record_status                   VARCHAR2
+    , p_i_v_record_change_user              VARCHAR2
+    , p_i_v_record_change_date              VARCHAR2
+    , p_i_v_last_upd_time                   VARCHAR2
+    , p_o_v_error              OUT  NOCOPY  VARCHAR2
+);
+
+-- Procedure to get variables for an enotice
+PROCEDURE PRE_GET_ENOTICE_VARIABLES (
+      p_o_refENoticeVariables   OUT         PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_enotice_type_id                 VARCHAR2
+    , p_i_v_template_section                VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+-- Procedure to get data for template description dropdown for screen - ENotice Receiving Organization
+PROCEDURE PRE_GET_TEMPLATE_DESCRIPTION (
+      p_o_refTemplateList       OUT         PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_enotice_type_id                 VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+-- Procedure to get data search result for screen - ENotice Receiving Organization
+PROCEDURE PRE_GET_RECIEVING_ORG_DATA (
+      p_o_refResultList         OUT         PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_search_on                       VARCHAR2
+    , p_i_v_enotice_type_id                 VARCHAR2
+    , p_i_v_org_type                        VARCHAR2
+    , p_i_v_recipient_org                   VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+-- Procedure to insert a record for receiving organization for an enotice
+PROCEDURE PRE_INS_ENOTICE_RECIEVING_ORG (
+      p_i_v_template_id                     VARCHAR2
+    , p_i_v_org_type                        VARCHAR2
+    , p_i_v_reciever_org                    VARCHAR2
+    , p_i_v_priority                        VARCHAR2
+    , p_i_v_record_status                   VARCHAR2
+    , p_i_v_record_add_user                 VARCHAR2
+    , p_i_v_record_add_date                 VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+-- Procedure to modify a record for receiving organization for an enotice
+PROCEDURE PRE_UPD_ENOTICE_RECIEVING_ORG(
+      p_i_v_reciever_id                     VARCHAR2
+    , p_i_v_priority                        VARCHAR2
+    , p_i_v_record_status                   VARCHAR2
+    , p_i_v_record_change_user              VARCHAR2
+    , p_i_v_record_change_date              VARCHAR2
+    , p_i_v_last_upd_time                   VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_GET_RCV_ORG_RECIPIENT_DATA (
+      p_o_refResultList         OUT         PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_reciever_org                    VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_INS_RCV_ORG_RECIPIENT (
+     p_i_v_reciever_org                     VARCHAR2
+    , p_i_v_recipient_type                  VARCHAR2
+    , p_i_v_recipient_email                 VARCHAR2
+    , p_i_v_record_status                   VARCHAR2
+    , p_i_v_record_add_user                 VARCHAR2
+    , p_i_v_record_add_date                 VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_UPD_RCV_ORG_RECIPIENT (
+      p_i_v_org_recipient_id                VARCHAR2
+    , p_i_v_recipient_type                  VARCHAR2
+    , p_i_v_recipient_email                 VARCHAR2
+    , p_i_v_record_status                   VARCHAR2
+    , p_i_v_record_change_user              VARCHAR2
+    , p_i_v_record_change_date              VARCHAR2
+    , p_i_v_last_upd_time                   VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_PREPARE_ENOTICE_CONTENTS (
+      p_i_v_enotice_request_id              VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_REPLACE_PLACEHOLDERS (
+      p_i_v_template_text                   VARCHAR2
+    , p_i_v_variable_key                    VARCHAR2
+    , p_i_v_variable_value                  VARCHAR2
+    , p_io_v_return_text     IN OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_UPD_ENOTICE (
+      p_i_v_pk_e_notice_id                  VARCHAR2
+    , p_i_v_priority                        VARCHAR2
+    , p_i_v_subject_line                    VARCHAR2
+    , p_i_v_mail_body_header                VARCHAR2
+    , p_i_v_mail_body_detail                VARCHAR2
+    , p_i_v_mail_body_footer                VARCHAR2
+);
+
+PROCEDURE PRE_INS_ENOTICE_RECIPIENTS (
+      p_i_v_enotice_id                      VARCHAR2
+    , p_i_v_receiver_org_id                 VARCHAR2
+    , p_i_v_system_date                     VARCHAR2
+);
+
+PROCEDURE PRE_GEN_ENOTICE_REQUEST (
+      p_io_enotice_request_id OUT    NOCOPY   VARCHAR2
+    , p_i_v_business_key                      VARCHAR2
+    , p_i_v_notice_type                       VARCHAR2
+    , p_array_data_key                        STRING_ARRAY
+    , p_array_data_value                      STRING_ARRAY
+    , p_i_v_originating_fsc                   VARCHAR2
+    , p_i_v_add_user                          VARCHAR2
+    , p_i_v_add_date                          VARCHAR2
+    , p_o_v_error               OUT NOCOPY    VARCHAR2
+);
+
+PROCEDURE PRE_GEN_ENOTICE_DETAIL_LINE (
+      p_i_v_enotice_request_id                VARCHAR2
+    , p_array_data_key                        STRING_ARRAY
+    , p_array_data_value                      STRING_ARRAY
+    , p_i_v_add_user                          VARCHAR2
+    , p_i_v_add_date                          VARCHAR2
+    , p_o_v_error               OUT NOCOPY    VARCHAR2
+);
+
+PROCEDURE PRE_GEN_ENOTICE_RCV_ORG (
+      p_i_v_enotice_request_id              VARCHAR2
+    , p_i_v_org_type                        VARCHAR2
+    , p_i_v_fsc_id                          VARCHAR2
+    , p_i_v_customer_id                     VARCHAR2
+    , p_i_v_vendor_id                       VARCHAR2
+    , p_i_v_system_level_line               VARCHAR2
+    , p_i_v_system_level_trade              VARCHAR2
+    , p_i_v_system_level_agent              VARCHAR2
+    , p_i_v_attachment_flag                 VARCHAR2
+    , p_i_v_add_user                        VARCHAR2
+    , p_i_v_add_date                        VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_GEN_ENOTICE_ATTACHMENT (
+      p_i_v_enotice_request_id              VARCHAR2
+    , p_i_v_file_name                       VARCHAR2
+    , p_i_v_add_user                        VARCHAR2
+    , p_i_v_add_date                        VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_GET_DAEMON_FREQUENCY (
+      p_o_v_daemon_frequency    OUT NOCOPY  VARCHAR2
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_GET_SERVER_DETAILS (
+      p_o_v_server_ip            OUT NOCOPY  VARCHAR2
+    , p_o_v_server_user          OUT NOCOPY  VARCHAR2
+    , p_o_v_server_user_password OUT NOCOPY  VARCHAR2
+    , p_o_v_sender_name          OUT NOCOPY  VARCHAR2
+    , p_o_v_sender_email         OUT NOCOPY  VARCHAR2
+    , p_o_v_purge_days           OUT NOCOPY  VARCHAR2
+    , p_o_v_error                OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_GET_PENDING_MAILS (
+      p_o_ref_pending_mails     OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_UPD_PROCESS_STATUS (
+      p_i_v_enotice_id                      VARCHAR
+    , p_i_v_process_status                  VARCHAR
+    , p_o_v_error              OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_GET_MAIL_RECIPIENTS (
+      p_o_ref_mail_recipients    OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_enotice_id                      VARCHAR
+    , p_i_v_mail_recipient_type             VARCHAR
+    , p_o_v_error                OUT NOCOPY VARCHAR2
+);
+
+PROCEDURE PRE_GET_ORIGIN_FSC_RECIPIENTS (
+      p_o_ref_mail_recipients    OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_enotice_request_id              VARCHAR
+    , p_i_v_mail_recipient_type             VARCHAR
+    , p_i_v_enotice_id                     VARCHAR
+    , p_o_v_error                OUT NOCOPY VARCHAR2
+);
+
+PROCEDURE PRE_GET_MAIL_ATTACHMENTS (
+      p_o_ref_mail_attachments OUT PCE_ECM_REF_CUR.ECM_REF_CUR
+    , p_i_v_enotice_request_id              VARCHAR
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+PROCEDURE PRE_INS_ERR_LOG (
+      p_i_v_enotice_id                      VARCHAR
+    , p_i_v_err_cd                          VARCHAR
+    , p_i_v_err_msg                         VARCHAR
+    , p_o_v_error               OUT NOCOPY  VARCHAR2
+);
+
+
+
+PROCEDURE PRE_IS_DEFINED_APP_SERVER (
+      p_i_app_server_id             VARCHAR2
+    , p_o_is_defined_app_server     OUT NOCOPY  VARCHAR2
+    , p_o_v_error                   OUT NOCOPY  VARCHAR2
+);
+
+END PCE_ECM_ENOTICE;
+/

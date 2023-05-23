@@ -1930,6 +1930,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					isNull(reqlength(objForm.getIgmNo(), 7)), removeSlash(isNull(objForm.getIgmDate())),
 					isNull(reqlength(objForm.getImoCode(), 10)), isNull(reqlength(objForm.getCallSign(), 10)),
 					isNull(reqlength(voyage, 9)),
+					
 					isNull(reqlength(objForm.getLineCode(), 10))
 //					"RCA1" hard code value for line no 
 					, isNull(reqlength(objForm.getAgentCode(), 16)),
@@ -2074,7 +2075,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				}
 
 				// Need some values if not found keep hard coding for each line
-				bw.write(String.join(Character.toString(fieldSepOp), mesType, isNull(objForm.getCustomCode()),
+				bw.write(String.join(Character.toString(fieldSepOp), mesType,isNull(reqlength(objForm.getCustomCode(),6)),
 						isNull(reqlength(objForm.getIgmNo(), 7)), removeSlash(isNull(objForm.getIgmDate())),
 						isNull(reqlength(objForm.getImoCode(), 10)), reqlength(objForm.getCallSign(), 10),
 						reqlength(voyage, 10), 
@@ -2096,7 +2097,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(objForm.getGeneralDescription()), isNullUno((String)blObj.get("UNO Code")), // "UNO_CODE",
 //						isNull(reqlength(objForm.getImoCode(), 3)), // Duplicate
 						reqlength(tpBond, 10), reqlength(rc_Code, 10),
-						isNull(reqlength((String) blObj.get("Transport Mode"), 1)),
+						isNull(reqlength((String)objForm.getModeofTransport(), 1)),
 						isNull(reqlength(objForm.getAgentCode(), 16))
 						
 						/*
@@ -2186,9 +2187,22 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 			// Need some values if not found keep hard coding
 			bw.write("<contain>" + newLine);
+			
+			String iso = null;
 			for (Object containDtls : containeerDtls) {
 				JSONObject coDtl = (JSONObject) containDtls;
+				
 
+				if(coDtl.get("containerSize").equals("40")) {
+					if(coDtl.get("containerType").equals("HC")) {
+						iso = "4200";
+					}
+					
+				}else if(coDtl.get("containerSize").equals("20") ) {
+					iso = "2000";
+				}else {
+					iso = "4000";
+				}
 				// Need some values if not found keep hard coding
 				bw.write(String.join(Character.toString(fieldSepOp), mesType, isNull(objForm.getCustomCode()),
 						isNull(reqlength(objForm.getImoCode(), 10)), reqlength(vessel, 10), reqlength(voyage, 10),
@@ -2203,8 +2217,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(containerStatus), isNull((String) coDtl.get("totalNumberOfPackagesInContainer")),
 						isNull((String) coDtl.get("containerWeight")),
 				
-						isNull((String) coDtl.get("ISOCode")), "N"// "SOC_FLAG"
-								+ newLine));
+						iso, "N"// "SOC_FLAG"
+						
+						+ newLine));
 			}
 			// hard code
 			bw.write("<END-contain>" + newLine);

@@ -1991,6 +1991,7 @@ function submitData() {
 					listofcontainerdetails["container_voyage"]=caontainrVoyage;
 					listofcontainerdetails["container_pod"]=containerPOD;
 					
+					
 					if(valueOfWeight=="" || (Number(valueOfWeight)==0)){
 						showBarMessages("Container weight can not be blank or 0.",1);
 						document.getElementById(i+"Container Details").focus();
@@ -5354,6 +5355,48 @@ function onUpload()
 					}
 					containerinfot.appendChild(element);
 				}
+				else if(CND[i].columnName=="container size") 
+				{
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CND[i].type);
+					element.setAttribute("class", "containerSize");
+					element.setAttribute("name", CND[i].columnName);
+					element.setAttribute("id", j
+							+ CND[i].columnName);
+					eachcontainerDetailsInfonRow[CND[i].columnName] = j
+					+ CND[i].columnName;
+					//console.log(CND[i].mappedCol);
+					//console.log(containerDetailsInfonpath[j][CND[i].mappedCol])
+					if (!containerDetailsInfonpath[j][CND[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else 
+					{
+						element.setAttribute("value",
+								containerDetailsInfonpath[j][CND[i].mappedCol]);
+					}
+					containerinfot.appendChild(element);
+				}
+				else if(CND[i].columnName=="container type") 
+				{
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CND[i].type);
+					element.setAttribute("class", "containerType");
+					element.setAttribute("name", CND[i].columnName);
+					element.setAttribute("id", j
+							+ CND[i].columnName);
+					eachcontainerDetailsInfonRow[CND[i].columnName] = j
+					+ CND[i].columnName;
+					//console.log(CND[i].mappedCol);
+					//console.log(containerDetailsInfonpath[j][CND[i].mappedCol])
+					if (!containerDetailsInfonpath[j][CND[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else 
+					{
+						element.setAttribute("value",
+								containerDetailsInfonpath[j][CND[i].mappedCol]);
+					}
+					containerinfot.appendChild(element);
+				}
 				else if(CND[i].columnName=="ISO Code") 
 				{
 					var element = popupWindow.document.createElement("input");
@@ -6321,13 +6364,15 @@ function manifestFileGeneratorEdiFile() {
 							var listofcontainerdetails={};
 							var valueOfWeight=popupjson.popup[blnoforpopupdata].containerDetailes[j].containerWeight;
 							var valueOfPackage=popupjson.popup[blnoforpopupdata].containerDetailes[j].totalNumberOfPackagesInContainer;
-							listofcontainerdetails["ISOCode"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].ISOCode;
+							listofcontainerdetails["ISO Code"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].ISOCode;
 							listofcontainerdetails["blNO"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].blNO;
 							listofcontainerdetails["containerAgentCode"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].containerAgentCode;
 							listofcontainerdetails["containerNumber"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].containerNumber;
 							listofcontainerdetails["containerSealNumber"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].containerSealNumber;
 							listofcontainerdetails["containerWeight"]=valueOfWeight;
 							listofcontainerdetails["status"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].status;
+							  listofcontainerdetails["containerSize"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].ContainerSize;
+                            listofcontainerdetails["containerType"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].ContainerType;
 							listofcontainerdetails["totalNumberOfPackagesInContainer"]=valueOfPackage;
 							listofcontainerdetailsForSave.push(listofcontainerdetails);
 						}

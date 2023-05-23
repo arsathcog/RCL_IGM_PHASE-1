@@ -1916,7 +1916,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 			// Need some values if not found keep hard coding
 			bw.write(String.join(Character.toString(fieldSepOp), "HREC", "ZZ", "RCLAIPL123", // isNull(sId),
-					"ZZ", isNull(objForm.getCustomCode()), "ICES1_5", "P", isNull(blank), "SACHI01", isNull(sId), // isNull(objForm.getSerialNumber()),
+					"ZZ", isNull(reqlength(objForm.getCustomCode(),6)), "ICES1_5", "P", isNull(blank), "SACHI01", isNull(sId), // isNull(objForm.getSerialNumber()),
 					currDate, currTime + newLine));
 
 			// hard code
@@ -1926,7 +1926,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			bw.write("<vesinfo>" + newLine);
 
 			// Need some values if not found keep hard coding for each line.
-			bw.write(String.join(Character.toString(fieldSepOp), mesType, isNull(objForm.getCustomCode()),
+			bw.write(String.join(Character.toString(fieldSepOp), mesType, isNull(reqlength(objForm.getCustomCode(),6)),
 					isNull(reqlength(objForm.getIgmNo(), 7)), removeSlash(isNull(objForm.getIgmDate())),
 					isNull(reqlength(objForm.getImoCode(), 10)), isNull(reqlength(objForm.getCallSign(), 10)),
 					isNull(reqlength(voyage, 9)),
@@ -2087,8 +2087,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3), isNull(nodifyName), isNull(nodifyAdd1),
 						isNull(nodifyAdd2), isNull(nodifyAdd3), isNull((String) blObj.get("Cargo Nature")),
 						isNull((String) blObj.get("Item Type")), isNull((String) blObj.get("Cargo Movement")),
-						isNull((String) serviceObj.get("Port")), // "NUMBER_PACKAGES",
-						isNull((String) blObj.get("totalNumberOfPackagesInContainer")), isNull((String) blObj.get("Type of Package")),
+						isNull((String) serviceObj.get("CFS-Custom Code")), // "NUMBER_PACKAGES",
+						isNull((String) blObj.get("Number of Packages")), isNull((String) blObj.get("Type of Package")),
 						isNull(objForm.getGrossWeightVessel()),isNull((String) blObj.get("Unit of weight")), isNull((String) blObj.get("Gross Volume")),
 						isNull((String) blObj.get("Unit of Volume")), 
 						// "MARKS_NUMBER",

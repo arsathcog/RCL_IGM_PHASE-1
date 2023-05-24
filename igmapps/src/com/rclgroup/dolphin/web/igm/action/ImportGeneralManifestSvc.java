@@ -2191,7 +2191,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			String iso = null;
 			for (Object containDtls : containeerDtls) {
 				JSONObject coDtl = (JSONObject) containDtls;
-				if( null != coDtl.get("containerSize") || coDtl.get("containerSize").equals(" ") ) {
+				if( null == coDtl.get("containerSize") || coDtl.get("containerSize").equals(" ") ) {
 					iso = " ";
 				}else if(coDtl.get("containerSize").equals("40")) {
 					if(coDtl.get("containerType").equals("HC")) {

@@ -1592,6 +1592,36 @@ var bld = [{
 	    }
 	}
 		 */
+/*
+ * Function for restricting the legnth of the text filed
+ */
+
+
+		 var igmNoTxtBox = document.getElementById('igmNo');
+		  var maxLength = 7;
+
+		  igmNoTxtBox.addEventListener('input', function() {
+		    if (igmNoTxtBox.value.length > maxLength) {
+		    	igmNoTxtBox.value = igmNoTxtBox.value.slice(0, maxLength);
+		    }
+		  });
+
+  /*
+  * Function for restricting the legnth of the text filed
+  */
+/*    function setMaxLength() {
+	    var textbox = document.getElementById('myTextbox');
+	    textbox.maxLength = 10;
+	  }
+			 var cfsCustCodeTxtBox = document.getElementById('0CFS-Custom Code');
+		  var maxLength = 7;
+
+		  cfsCustCodeTxtBox.addEventListener('input', function() {
+		    if (cfsCustCodeTxtBox.value.length > maxLength) {
+		    	cfsCustCodeTxtBox.value = cfsCustCodeTxtBox.value.slice(0, maxLength);
+		    }
+		  }); */
+		  
 </script>
 
 <script>

@@ -689,7 +689,7 @@ roundshap4 {
 
 					<tr>
 
-						<th><input type="text" name="figm001" id="customCode"
+						<th><input type="text" name="figm001" id="customCode" size="6" maxlength="6" 
 							value="" onblur="changeUpper(this)"></th>
 						<th><input type="text" name="figm001" id="callSign" value=""
 							onblur="changeUpper(this)"></th>
@@ -739,9 +739,9 @@ roundshap4 {
 							onblur="changeUpper(this)" readonly="readonly"></th>
 						<th><input type="text" name="figm001" id="ataAt" value=""
 							onblur="changeUpper(this)"></th>
-						<th><input type="text" name="figm001" id="totalItem" value=""
+						<th><input type="Number" name="figm001" id="totalItem" value=""
 							onblur="changeUpper(this)" readonly="readonly"></th>
-						<th><input type="text" name="figm001" id="lhd" value=""
+						<th><input type="Number" name="figm001" id="lhd" value=""
 							onblur="changeUpper(this)"></th>
 						<th><input type="text" name="figm001" id="gwv" value=""
 							onblur="changeUpper(this)"></th>

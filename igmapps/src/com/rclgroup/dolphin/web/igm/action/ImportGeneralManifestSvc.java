@@ -2028,7 +2028,11 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				} else
 					add1 = add;
 				// System.out.println("length = " + add.length());
-
+				
+				
+				
+				
+				
 				for (Object notifyObj : notifyPartyDetailes) {
 					JSONObject notyObj = (JSONObject) notifyObj;
 					if (((String) blObj.get("BL#")).equals(notyObj.get("blNO"))) {
@@ -2107,11 +2111,11 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						reqlength(SUB_LINE_NO,4),
 						isNull(reqlength((String)blObj.get("BL#"),20)), isNull(removeSlash((String) blObj.get("BL_Date"))),
 						isNull(reqlength(pol, 6)), isNull(reqlength((String)blObj.get("First Port of Entry/Last Port of Departure"),6)),
-						isNull(reqlength((String) blObj.get("HBL_NO"),20)), isNull((String) blObj.get("HBL_Date")), isNull(reqlength(consigneeName,35)),
-						isNull(reqlength(consigneeAdd1,35)), isNull(reqlength(consigneeAdd2,35)), isNull(reqlength(consigneeAdd3,35)), isNull(reqlength(nodifyName,35)), isNull(reqlength(nodifyAdd1,35)),
-						isNull(reqlength(nodifyAdd2,35)), isNull(reqlength(nodifyAdd2,35)), isNull(reqlength((String)blObj.get("Cargo Nature"),2)),
+						isNull((String) blObj.get("HBL_NO")), isNull((String)blObj.get("HBL_Date")), isNull(consigneeName),
+						isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3), isNull(nodifyName), isNull(nodifyAdd1),
+						isNull(nodifyAdd2), isNull(nodifyAdd2), isNull(reqlength((String)blObj.get("Cargo Nature"),2)),
 						isNull(reqlength((String) blObj.get("Item Type"),2)), isNull(reqlength((String) blObj.get("Cargo Movement"),2)),
-						isNull(reqlength((String) serviceObj.get("CFS-Custom Code"),10)), // "NUMBER_PACKAGES",
+						isNull(reqlength((String) blObj.get("CFS-Custom Code"),10)), // "NUMBER_PACKAGES",
 						isNull(reqlength((String) blObj.get("Number of Packages"),8)), isNull(reqlength((String) blObj.get("Type of Package"),3)),
 						isNull(settingLengthForDouble(objForm.getGrossWeightVessel(),12,3)),isNull(reqlength((String) blObj.get("Unit of weight"),3)), isNull(settingLengthForDouble((String) blObj.get("Gross Volume"),12,3)),
 						isNull(reqlength((String) blObj.get("Unit of Volume"),3)), 

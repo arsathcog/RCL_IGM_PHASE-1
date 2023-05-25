@@ -296,11 +296,11 @@ var CND= [ {
 		'columnName' : 'Equipment seal type',
 		'mappedCol' : 'equipment_seal_type'
 	},{																		
-		'type' : 'text',
+		'type' : 'hidden',
 		'columnName' : 'container size',
 		'mappedCol' : 'ContainerSize'
 	},{																		
-		'type' : 'text',
+		'type' : 'hidden',
 		'columnName' : 'container type',
 		'mappedCol' : 'ContainerType'
 	}]

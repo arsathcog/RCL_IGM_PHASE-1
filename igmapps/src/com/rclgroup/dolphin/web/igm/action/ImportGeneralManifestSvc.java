@@ -2139,7 +2139,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(reqlength((String) blObj.get("CFS-Custom Code"),10)), // "NUMBER_PACKAGES",
 						isNull(reqlength((String) blObj.get("Number of Packages"),8)), isNull(reqlength((String) blObj.get("Type of Package"),3)),
 						isNull(settingLengthForDouble(objForm.getGrossWeightVessel(),12,3)),isNull(reqlength((String) blObj.get("Unit of weight"),3)), isNull(settingLengthForDouble((String) blObj.get("Gross Volume"),12,3)),
-						isNull(reqlength((String) blObj.get("Unit of Volume"),3)),isNull(reqlength( marksNo,300)), isNull(reqlength(  description,300)),
+						isNull(reqlength((String) blObj.get("Unit of Volume"),3)),isNull(reqlength( marksNo,300)), isNull(reqlength(  description,250)),
 						// "MARKS_NUMBER",
 						 isNullUno(reqlength((String)blObj.get("UNO Code"),5)), // "UNO_CODE",
 //						isNull(reqlength(objForm.getImoCode(), 3)), // Duplicate
@@ -2235,7 +2235,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			// Need some values if not found keep hard coding
 			bw.write("<contain>" + newLine);
 			
-			String iso = null;
+			String iso = "";
 			for (Object containDtls : containeerDtls) {
 				JSONObject coDtl = (JSONObject) containDtls;
 				if( null == coDtl.get("containerSize") || coDtl.get("containerSize").equals(" ") ) {
@@ -2246,9 +2246,16 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					}
 					
 				}else if(coDtl.get("containerSize").equals("20") ) {
-					iso = "2000";
-				}else {
-					iso = "4000";
+					if(coDtl.get("containerType").equals("DV")) {
+						iso = "2000";
+					}
+					
+				}else if (coDtl.get("containerSize").equals("40") ) {
+					if(coDtl.get("containerType").equals("GP")) {
+						iso = "2000";
+					}else {
+						iso="";
+					}
 				}
 				// Need some values if not found keep hard coding
 				bw.write(String.join(Character.toString(fieldSepOp), mesType, isNull(reqlength(objForm.getCustomCode(),6)),

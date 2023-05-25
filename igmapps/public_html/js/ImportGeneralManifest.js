@@ -990,7 +990,7 @@ function blDataInsert() {
 					{
 						element1.setAttribute("readonly", true);
 					}
-					if (i + bld[t].columnName == i + "BL Validate Flag" && ((blsValueObject[i][bld[t].mappedCol])=="TRUE") )
+					if (i + bld[t].columnName == i + "BL Validate Flag" && ((blsValueObject[i][bld[t].mappedCol])=="FAlSE") )
 					{
 
 						//document.getElementById(i+"sequence").classList.add("validateBL");
@@ -1168,7 +1168,7 @@ function blDataInsert() {
 					
 					if(blsValueObject[i].isValidateBL!=""){
 						eachcontainerDetailesindexdtl["vaidation"]=blsValueObject[i].isValidateBL;	
-					}else{
+					}else{	
 						eachcontainerDetailesindexdtl["vaidation"]="";	
 					}
 					arrayofcontainerDetailes.push(eachcontainerDetailesindexdtl);

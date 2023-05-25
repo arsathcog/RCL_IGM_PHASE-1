@@ -1872,7 +1872,6 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		new File(path).delete();
 		System.out.println("onSaveFile :" + path);
 		JSONArray blList = (org.json.simple.JSONArray) parser.parse(objForm.getBLDetails());
-		System.out.println(blList);
 		JSONArray vesselVoyageList = (org.json.simple.JSONArray) parser.parse(objForm.getVesselVoyageDtls());
 		JSONObject serviceVesselVoyageObj = (JSONObject) vesselVoyageList.get(0);
 		JSONArray notifyPartyDetailes = (org.json.simple.JSONArray) parser.parse(objForm.getNotifyPartyDlts());
@@ -1964,24 +1963,39 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					isNull(reqlength(objForm.getSameBottomCargo(), 1)),
 					isNull(reqlength(objForm.getShipStoreDeclaration(), 1)), "N",
 					isNull(reqlength(objForm.getPassengerList(),1)), isNull(reqlength(objForm.getCrewEffect(),1)),
-					isNull(reqlength(objForm.getMaritimeDeclaration(),1)),isNull(reqlength(objForm.getCustomCode(),10)),
+					isNull(reqlength(objForm.getMaritimeDeclaration(),1)),isNull(reqlength(objForm.getCustomCode(),10))
+				
 					// newly added-------------------------------------------
-					isNull(objForm.getDepartureManifestNumber()), isNull(objForm.getDepartureManifestDate()),
-					isNull(objForm.getSubmitterType()), isNull(objForm.getSubmitterCode()),
-					isNull(objForm.getAuthorizedRepresentativeCode()), isNull(objForm.getShippingLineBondNumber()),
-					isNull(objForm.getModeofTransport()), isNull(objForm.getShipType()),
+					/*isNull(objForm.getDepartureManifestNumber()),
+					*isNull(objForm.getDepartureManifestDate()),
+					*isNull(objForm.getSubmitterType()),
+					*isNull(objForm.getSubmitterCode()),
+					*isNull(objForm.getAuthorizedRepresentativeCode()),
+					*isNull(objForm.getShippingLineBondNumber()),
+					isNull(objForm.getModeofTransport()),
+					isNull(objForm.getShipType()),
 					isNull(objForm.getConveyanceReferenceNumber()),
-					isNull(objForm.getTotalNoofTransportEquipmentManifested()), isNull(objForm.getCargoDescription()),
-					isNull(reqlength(objForm.getBriefCargoDescription(),30)), isNull(objForm.getExpectedDate()),
+					isNull(objForm.getTotalNoofTransportEquipmentManifested()),
+					isNull(objForm.getCargoDescription()),
+					isNull(reqlength(objForm.getBriefCargoDescription(),30)),
+					isNull(objForm.getExpectedDate()),
 					isNull(objForm.getTimeofDeparture()),
 					isNull(objForm.getTotalnooftransportcontractsreportedonArrivalDeparture()),
-					isNull(objForm.getMesstype()), isNull(objForm.getVesType()), isNull(objForm.getAuthoseaCarcode()),
-					isNull(objForm.getPortoDreg()), isNull(objForm.getRegDate()), isNull(objForm.getVoyDetails()),
-					isNull(objForm.getShipItiseq()), isNull(objForm.getShipItinerary()),
-					isNull(objForm.getPortofCallname()), isNull(objForm.getArrivalDepdetails()),
-					isNull(objForm.getTotalnoTransarrivdep()), isNull(objForm.getGeneratFalg()) + newLine));
-			// hard code
-			// hard code
+					isNull(objForm.getMesstype()), 
+					isNull(objForm.getVesType()),
+					isNull(objForm.getAuthoseaCarcode()),
+					isNull(objForm.getPortoDreg()), 
+					isNull(objForm.getRegDate()),
+					isNull(objForm.getVoyDetails()),
+					isNull(objForm.getShipItiseq()),
+					isNull(objForm.getShipItinerary()),
+					isNull(objForm.getPortofCallname()), 
+					isNull(objForm.getArrivalDepdetails()),
+					isNull(objForm.getTotalnoTransarrivdep()), 
+					isNull(objForm.getGeneratFalg()) */
+					
+					+ newLine));
+			
 			bw.write("<END-vesinfo>" + newLine);
 			bw.write("<cargo>" + newLine);
 			String containerStatus = "";
@@ -2008,6 +2022,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				String consigneeAdd2 = "";
 				String consigneeAdd3 = "";
 				String consigneeName = "";
+				String marksNo = "";
+				String description = "";
 				int l = add.length();
 				System.out.println("length of address " + l);
 				if (l > 35) {
@@ -2099,7 +2115,13 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						break;
 					}
 				}
-
+				
+				for (Object marksNumObj : marksNumberDtlstls) {
+					JSONObject marksObj = (JSONObject) marksNumObj;
+					marksNo = (String) marksObj.get("marksNumbers");
+					description  = (String) marksObj.get("description");
+					
+				}
 				// Need some values if not found keep hard coding for each line
 				bw.write(String.join(Character.toString(fieldSepOp), mesType,isNull(reqlength(objForm.getCustomCode(),6)),
 						igmNo,igmDate,
@@ -2117,10 +2139,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(reqlength((String) blObj.get("CFS-Custom Code"),10)), // "NUMBER_PACKAGES",
 						isNull(reqlength((String) blObj.get("Number of Packages"),8)), isNull(reqlength((String) blObj.get("Type of Package"),3)),
 						isNull(settingLengthForDouble(objForm.getGrossWeightVessel(),12,3)),isNull(reqlength((String) blObj.get("Unit of weight"),3)), isNull(settingLengthForDouble((String) blObj.get("Gross Volume"),12,3)),
-						isNull(reqlength((String) blObj.get("Unit of Volume"),3)), 
+						isNull(reqlength((String) blObj.get("Unit of Volume"),3)),isNull(reqlength( marksNo,300)), isNull(reqlength(  description,300)),
 						// "MARKS_NUMBER",
-						isNull(reqlength(getMarksNumber((String) blObj.get("BL#"), marksNumberDtlstls), 300)),
-						isNull(reqlength(objForm.getGeneralDescription(),250)), isNullUno(reqlength((String)blObj.get("UNO Code"),5)), // "UNO_CODE",
+						 isNullUno(reqlength((String)blObj.get("UNO Code"),5)), // "UNO_CODE",
 //						isNull(reqlength(objForm.getImoCode(), 3)), // Duplicate
 						reqlength(tpBond, 10), reqlength(rc_Code, 10),
 						isNull(reqlength((String)objForm.getModeofTransport(), 1)),

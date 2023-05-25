@@ -1952,9 +1952,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			bw.write(String.join(Character.toString(fieldSepOp), mesType, isNull(reqlength(objForm.getCustomCode(),6)),
 					igmNo,igmDate,
 					isNull(reqlength(objForm.getImoCode(), 10)), isNull(reqlength(objForm.getCallSign(), 10)),
-					isNull(reqlength(voyage, 10)),
-					
-					isNull(reqlength(objForm.getLineCode(), 10))
+					isNull(reqlength(voyage, 10)),		
+					isNull(reqlength("RCA1", 10))
 //					"RCA1" hard code value for line no 
 					, isNull(reqlength(objForm.getAgentCode(), 16)),
 					isNull(reqlength(objForm.getMasterName(), 30)), isNull(reqlength(objForm.getPortOfArrival(), 6)),

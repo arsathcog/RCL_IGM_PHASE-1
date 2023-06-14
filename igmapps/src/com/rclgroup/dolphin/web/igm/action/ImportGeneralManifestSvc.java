@@ -1906,6 +1906,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		String Item_Number = null;
 		String igmNo = "";
 		String igmDate = "";
+		String msgType = "";
 		String currTime = new StringBuffer().append(LocalTime.now().getHour()).append(LocalTime.now().getMinute())
 				.toString();
 		System.out.println(currTime);
@@ -1928,9 +1929,11 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		if (newVessel != null && !newVessel.trim().equals("")) {
 			vessel = newVessel;
 		}
-		if(objForm.getMesstype().equals("A")) {
-			 igmNo = isNull(reqlength(objForm.getIgmNo(), 7));
-			 igmDate = removeSlash(isNull(objForm.getIgmDate()));
+		
+		if(null == objForm.getIgmNo() || ("").equals(objForm.getIgmNo())) {
+			msgType = "F";
+		}else {
+			msgType = "A";
 		}
 
 		File manifestFile = new File(path);
@@ -1938,7 +1941,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 			// Need some values if not found keep hard coding
 			bw.write(String.join(Character.toString(fieldSepOp), "HREC", "ZZ", "RCLAIPL123", // isNull(sId),
-					"ZZ", isNull(reqlength(objForm.getCustomCode(),6)), "ICES1_5", "P", isNull(blank), "SACHI01", isNull(sId), // isNull(objForm.getSerialNumber()),
+					"ZZ", isNull(reqlength(objForm.getPod(),6)+"1"), "ICES1_5", "P", isNull(blank), "SACHI01", isNull(sId), // isNull(objForm.getSerialNumber()),
 					currDate, currTime + newLine));
 
 			// hard code
@@ -1946,24 +1949,26 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 			// hard code
 			bw.write("<vesinfo>" + newLine);
-
-			// Need some values if not found keep hard coding for each line.
-			bw.write(String.join(Character.toString(fieldSepOp), mesType, isNull(reqlength(objForm.getCustomCode(),6)),
-					igmNo,igmDate,
-					isNull(reqlength(objForm.getImoCode(), 10)), isNull(reqlength(objForm.getCallSign(), 10)),
-					isNull(reqlength(voyage, 10)),		
-					isNull(reqlength("RCA1", 10))
-//					"RCA1" hard code value for line no 
-					, isNull(reqlength(objForm.getAgentCode(), 16)),
-					isNull(reqlength(objForm.getMasterName(), 30)), isNull(reqlength(objForm.getPortOfArrival(), 6)),
-					isNull(reqlength(objForm.getPrt1(),6)), isNull(reqlength(objForm.getPrt2(),6)), isNull(reqlength(objForm.getPrt3(),6)),
-					isNull(reqlength(objForm.getVesselTypes(), 1)), isNull(reqlength(objForm.getTotalItem(), 4)),
-					"CONTAINERS", removeSlash(isNull(objForm.getAtaAd())) + " " + isNull(objForm.getaTime()),
-					isNull(reqlength(objForm.getLighthouseDue(), 9)),
-					isNull(reqlength(objForm.getSameBottomCargo(), 1)),
-					isNull(reqlength(objForm.getShipStoreDeclaration(), 1)), "N",
-					isNull(reqlength(objForm.getPassengerList(),1)), isNull(reqlength(objForm.getCrewEffect(),1)),
-					isNull(reqlength(objForm.getMaritimeDeclaration(),1)),isNull(reqlength(objForm.getCustomCode(),10))
+			for (Object blObjjson : blList) {
+				JSONObject blObj = (JSONObject) blObjjson;
+				// Need some values if not found keep hard coding for each line.
+				bw.write(String.join(Character.toString(fieldSepOp), msgType,
+				isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getIgmNo(), 7)),
+				isNull(objForm.getIgmDate()), isNull(reqlength(objForm.getImoCode(), 10)),
+				isNull(reqlength(objForm.getCallSign(), 10)), isNull(reqlength(voyage, 10)),
+				isNull(reqlength("RCA1", 10)) // "RCA1" hard code value for line no
+						, isNull(reqlength(objForm.getAgentCode(), 16)), isNull(reqlength(objForm.getMasterName(), 30)),
+						isNull(reqlength(objForm.getPortOrigin(), 6)), isNull(reqlength(objForm.getPrt1(), 6)),
+						isNull(reqlength(objForm.getPrt2(), 6)), isNull(reqlength(objForm.getPrt3(), 6)),
+						isNull(reqlength(objForm.getVesselTypes(), 1)), isNull((String) objForm.getTotalItem()),
+						"CONTAINERS", removeSlash(isNull(objForm.getAtaAd())) + " " + isNull(objForm.getaTime()),
+						isNull(reqlength(objForm.getLighthouseDue(), 9)),
+						isNull(reqlength(objForm.getSameBottomCargo(), 1)),
+						isNull(reqlength(objForm.getShipStoreDeclaration(), 1)), "N",
+						isNull(reqlength(objForm.getPassengerList(), 1)), isNull(reqlength(objForm.getCrewEffect(), 1)),
+						isNull(reqlength(objForm.getMaritimeDeclaration(), 1)),
+						isNull(reqlength(objForm.getCustomCode(), 6)) + isNull(reqlength(objForm.getAgentCode(), 3))
+								+ isNull(reqlength(sId, 1))
 				
 					// newly added-------------------------------------------
 					/*isNull(objForm.getDepartureManifestNumber()),
@@ -1995,7 +2000,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					isNull(objForm.getGeneratFalg()) */
 					
 					+ newLine));
-			
+			}
 			bw.write("<END-vesinfo>" + newLine);
 			bw.write("<cargo>" + newLine);
 			String containerStatus = "";
@@ -2004,8 +2009,21 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				String rc_Code = "";
 				String tpBond = "";
 				containerStatus = (String) blObj.get("Cargo Movement Type");
+				
+				String unoCd = "";
+				String imoCd = "";
+				if(null == blObj.get("UNO Code") || ("").equals(blObj.get("UNO Code"))  ) {
+					unoCd = (String) blObj.get("UNO Code");
+				}else {
+					unoCd = "ZZZZZ";
+				}
+				if(null != objForm.getImoCode() || !("").equals( objForm.getImoCode())) {
+					imoCd = objForm.getImoCode();
+				}else {
+					imoCd = "ZZZ";
+				}
 
-				if ("TI".equalsIgnoreCase((String) blObj.get("Cargo Movement"))) {
+				if (!"TI".equalsIgnoreCase((String) blObj.get("Cargo Movement"))) {
 					rc_Code = isNull((String) serviceObj.get("Road Carr code"));
 					tpBond = isNull((String) blObj.get("TP Bond No"));
 				}
@@ -2120,31 +2138,41 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					JSONObject marksObj = (JSONObject) marksNumObj;
 					marksNo = (String) marksObj.get("marksNumbers");
 					description  = (String) marksObj.get("description");
+					if(description.contains("\r\n")) {
+						description = description.replace("\r\n", " ");
+					}else if(description.contains("\n")) {
+						description = description.replace("\n", " ");
+					}
 					
 				}
 				// Need some values if not found keep hard coding for each line
-				bw.write(String.join(Character.toString(fieldSepOp), mesType,isNull(reqlength(objForm.getCustomCode(),6)),
-						igmNo,igmDate,
-						isNull(reqlength(objForm.getImoCode(), 10)), reqlength(objForm.getCallSign(), 10),
-						reqlength(voyage, 10), 
-						isNull(reqlength(objForm.getTotalItem(), 4)),
+				bw.write(String.join(Character.toString(fieldSepOp), msgType,
+						isNull(reqlength(objForm.getCustomCode(), 6)), reqlength(objForm.getCallSign(), 10),
+						reqlength(voyage, 10),isNull(reqlength(objForm.getIgmNo(), 7)),
+						isNull(objForm.getIgmDate()), isNull((String) blObj.get("Item Number")),
 //						Item_Number = isNull((String) blObj.get("Item Number")), putting above line for line num 
-						reqlength(SUB_LINE_NO,4),
-						isNull(reqlength((String)blObj.get("BL#"),20)), isNull(removeSlash((String) blObj.get("BL_Date"))),
-						isNull(reqlength(pol, 6)), isNull(reqlength((String)blObj.get("First Port of Entry/Last Port of Departure"),6)),
-						isNull((String) blObj.get("HBL_NO")), isNull((String)blObj.get("HBL_Date")), isNull(consigneeName),
-						isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3), isNull(nodifyName), isNull(nodifyAdd1),
-						isNull(nodifyAdd2), isNull(nodifyAdd2), isNull(reqlength((String)blObj.get("Cargo Nature"),2)),
-						isNull(reqlength((String) blObj.get("Item Type"),2)), isNull(reqlength((String) blObj.get("Cargo Movement"),2)),
-						isNull(reqlength((String) blObj.get("CFS-Custom Code"),10)), // "NUMBER_PACKAGES",
-						isNull(reqlength((String) blObj.get("Number of Packages"),8)), isNull(reqlength((String) blObj.get("Type of Package"),3)),
-						isNull(settingLengthForDouble(objForm.getGrossWeightVessel(),12,3)),isNull(reqlength((String) blObj.get("Unit of weight"),3)), isNull(settingLengthForDouble((String) blObj.get("Gross Volume"),12,3)),
-						isNull(reqlength((String) blObj.get("Unit of Volume"),3)),isNull(reqlength( marksNo,300)), isNull(reqlength(  description,250)),
+						reqlength(SUB_LINE_NO, 4), isNull(reqlength((String) blObj.get("BL#"), 20)),
+						isNull(removeSlash((String) blObj.get("BL_Date"))), isNull(reqlength(pol, 6)),
+						isNull(reqlength((String) blObj.get("First Port of Entry/Last Port of Departure"), 6)),
+						isNull((String) blObj.get("HBL_NO")), isNull((String) blObj.get("HBL_Date")),
+						isNull(consigneeName), isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3),
+						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3),
+						isNull(reqlength((String) blObj.get("Cargo Nature"), 2)),
+						isNull(reqlength((String) blObj.get("Item Type"), 2)),
+						isNull(reqlength((String) blObj.get("Cargo Movement"), 2)),
+						isNull(reqlength((String) blObj.get("CFS-Custom Code"), 10)), // "NUMBER_PACKAGES",
+						isNull(reqlength((String) blObj.get("Number of Packages"), 8)),
+						isNull(reqlength((String) blObj.get("Type of Package"), 3)),
+						isNull(settingLengthForDouble(objForm.getGrossWeightVessel(), 12, 3)),
+						isNull(reqlength((String) blObj.get("Unit of weight"), 3)),
+						isNull(settingLengthForDouble((String) blObj.get("Gross Volume"), 12, 3)),
+						isNull(reqlength((String) blObj.get("Unit of Volume"), 3)), isNull(reqlength(marksNo, 300)),
+						isNull(reqlength(description, 250)),
 						// "MARKS_NUMBER",
-						 isNullUno(reqlength((String)blObj.get("UNO Code"),5)), // "UNO_CODE",
-//						isNull(reqlength(objForm.getImoCode(), 3)), // Duplicate
+						/* isNullUno(reqlength((String)blObj.get("UNO Code"),5)) */ isNull(reqlength((String) unoCd, 5)), // "UNO_CODE",
+						/* isNull(reqlength(objForm.getImoCode(), 10)) */isNull(reqlength((String) imoCd, 10)),
 						reqlength(tpBond, 10), reqlength(rc_Code, 10),
-						isNull(reqlength((String)objForm.getModeofTransport(), 1)),
+						isNull(reqlength((String) objForm.getModeofTransport(), 1)),
 						isNull(reqlength(objForm.getAgentCode(), 16))
 						
 						/*
@@ -2236,6 +2264,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			bw.write("<contain>" + newLine);
 			
 			String iso = "";
+			for (Object blObjjson : blList) {
+				JSONObject blObj = (JSONObject) blObjjson;
 			for (Object containDtls : containeerDtls) {
 				JSONObject coDtl = (JSONObject) containDtls;
 				if( null == coDtl.get("containerSize") || coDtl.get("containerSize").equals(" ") ) {
@@ -2246,10 +2276,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					}
 					
 				}else if(coDtl.get("containerSize").equals("20") ) {
-					if(coDtl.get("containerType").equals("DV")) {
-						iso = "2000";
-					}
 					
+						iso = "2000";		
+						
 				}else if (coDtl.get("containerSize").equals("40") ) {
 					if(coDtl.get("containerType").equals("GP")) {
 						iso = "2000";
@@ -2258,22 +2287,24 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					}
 				}
 				// Need some values if not found keep hard coding
-				bw.write(String.join(Character.toString(fieldSepOp), mesType, isNull(reqlength(objForm.getCustomCode(),6)),
-						isNull(reqlength(objForm.getImoCode(), 10)), reqlength(vessel, 10), reqlength(voyage, 10),
-						igmNo,igmDate,
+				bw.write(String.join(Character.toString(fieldSepOp), msgType,
+						isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getImoCode(), 10)),
+						reqlength(vessel, 10), reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
+						isNull(objForm.getIgmDate()),
 						// "Line_No",
-						isNull(reqlength(objForm.getTotalItem(), 4)),
+						 isNull((String) blObj.get("Item Number")),
 						// "SUB_LINE_NO",
-						reqlength(SUB_LINE_NO,4), isNull(reqlength((String) coDtl.get("containerNumber"),11)),
-						isNull(reqlength((String) coDtl.get("containerSealNumber"),15)),
+						reqlength(SUB_LINE_NO, 4), isNull(reqlength((String) coDtl.get("containerNumber"), 11)),
+						isNull(reqlength((String) coDtl.get("containerSealNumber"), 15)),
 						isNull(reqlength(objForm.getAgentCode(), 16)),
 						// ---->"CONTAINER_STATUS"
-						isNull(reqlength(containerStatus,3)), isNull(reqlength((String) coDtl.get("totalNumberOfPackagesInContainer"),8)),
-						isNull(settingLengthForDouble((String) coDtl.get("containerWeight"),14,2)),
-				
-						reqlength(iso,4), "N"// "SOC_FLAG"
-						
-						+ newLine));
+						isNull(reqlength(containerStatus, 3)),
+						isNull(reqlength((String) coDtl.get("totalNumberOfPackagesInContainer"), 8)),
+						isNull(settingLengthForDouble((String) coDtl.get("containerWeight"), 14, 2)),
+						isNull(reqlength(iso, 4)), "N"// "SOC_FLAG"
+
+								+ newLine));
+			}
 			}
 			// hard code
 			bw.write("<END-contain>" + newLine);

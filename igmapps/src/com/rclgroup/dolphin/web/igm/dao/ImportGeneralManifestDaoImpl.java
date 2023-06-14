@@ -105,6 +105,17 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 
 	private static final String MARKS_NUMBER_QUERY2 =  "union select  'updated' as type,BL_NO as FK_BL_NO,DBMS_LOB.SUBSTR(MARKS_AND_NUMBER, 4000, 1) as MARKS_NO, DBMS_LOB.SUBSTR(DESCRIPTION, 4000, 1) as DESCRIPTION from rcl_igm_details  WHERE BL_NO IN";
 
+	private static final String  MARKS_NUMBER_QUERY3 = "SUBSTR( (SELECT MYMKNO FROM sealiner.idp061" +
+			           " WHERE MYBLNO='SHACB21022749'"
+			+ "AND MYCNTR  ='XXXXXXXXX01'"
+			+ "AND rownum  =1\r\n"
+			+ "), INSTR ((SELECT MYMKNO\r\n"
+			+ "FROM sealiner.idp061\r\n"
+			+ "WHERE MYBLNO='SHACB21022749'\r\n"
+			+ "AND MYCNTR  ='XXXXXXXXX01'\r\n"
+			+ "AND rownum  =1\r\n"
+			+ "), '(S)', -1 )+3,512) ";
+	
 	/**END OF LIST OF QUERY FOR  GET ORIGINAL AND UPDETE DATA*/
 	
 	private static final String roadCarrCodeQUerry = " select PARTNER_VALUE,DESCRIPTION from EDI_TRANSLATION_DETAIL where ETH_UID in (" + 
@@ -301,7 +312,19 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 				marksNumberQuery += ") order by type asc";
 				//rs = pre.executeQuery(marksNumberQuery);
 				
-				 pre1 = con.prepareStatement(marksNumberQuery);
+				String marksQuery = " select SUBSTR( (SELECT MYMKNO FROM sealiner.idp061 "+
+			              "WHERE MYBLNO in (";
+			              marksQuery += inParam+")";
+			              marksQuery +=" AND MYCNTR  ='XXXXXXXXX01' AND rownum  =1 )," 
+			              +"INSTR ((SELECT MYMKNO  FROM sealiner.idp061 "
+			              +" WHERE MYBLNO in (";
+			              marksQuery += inParam+")";
+			              marksQuery +="AND MYCNTR  ='XXXXXXXXX01' AND rownum  =1 ), '(S)', -1 )+3,512) MARKS_NUMBER,MYBLNO "
+			              		+ " from sealiner.idp061  "+" WHERE MYBLNO in(";
+			              		 marksQuery += inParam+") AND ROWNUM = 1";
+				
+			              System.out.println(marksQuery+"Query for marks and description");
+				 pre1 = con.prepareStatement(marksQuery);
 				 index=1;
 				for(String  bl : blrNumber ) {
 					pre1.setString(index++,bl);
@@ -309,16 +332,20 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 				for(String  bl : blrNumber ) {
 					pre1.setString(index++,bl);
 				}
+				for(String  bl : blrNumber ) {
+				pre1.setString(index++,bl);
+			}
 				rs =  pre1.executeQuery();
 				
 				MarksNumber marksnumber=null;
 				while(rs.next())
 				{
 					marksnumber=new MarksNumber();
-					marksnumber.setBlNO(rs.getString("FK_BL_NO"));
-					marksnumber.setMarksNumbers(rs.getString("MARKS_NO"));
-					marksnumber.setDescription(rs.getString("DESCRIPTION"));
-					if(marksNumbersMap.get(marksnumber.getBlNO())==null || "updated".equals(rs.getString("type")) )
+		
+					marksnumber.setDescription(rs.getString("MARKS_NUMBER"));
+					marksnumber.setBlNO(rs.getString("MYBLNO"));
+
+					if(marksNumbersMap.get(marksnumber.getBlNO())==null )
 					{
 						List<MarksNumber> listofMarksNumber=new ArrayList<MarksNumber>();
 						marksNumbersMap.put(marksnumber.getBlNO(), listofMarksNumber);

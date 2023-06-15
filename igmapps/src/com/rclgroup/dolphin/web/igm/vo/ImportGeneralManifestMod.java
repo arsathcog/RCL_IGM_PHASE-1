@@ -468,6 +468,8 @@ public class ImportGeneralManifestMod {
 	
 	private String imdg_code; 
 	
+	private String port_of_destination;
+	
 	
 	//end bl section 
 	
@@ -485,6 +487,15 @@ public class ImportGeneralManifestMod {
 
 	public void setImdg_code(String imdg_code) {
 		this.imdg_code = imdg_code;
+	}
+
+
+	public String getPort_of_destination() {
+		return port_of_destination;
+	}
+
+	public void setPort_of_destination(String port_of_destination) {
+		this.port_of_destination = port_of_destination;
 	}
 
 	/**
@@ -2692,15 +2703,18 @@ public class ImportGeneralManifestMod {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
-	
+
 	@Override
 	public String toString() {
-		return "ImportGeneralManifestMod [bl=" + bl + ", service=" + service + ", vessel=" + vessel + ", voyage="
-				+ voyage + ", pol=" + pol + ", polTerminal=" + polTerminal + ", pod=" + pod + ", podTerminal="
-				+ podTerminal + ", codeCode=" + codeCode + ", callSing=" + callSing + ", lineCode=" + lineCode
-				+ ", agentCode=" + agentCode + ", portOrigin=" + portOrigin + ", portArrival=" + portArrival
-				+ ", lastPort1=" + lastPort1 + ", lastPort2=" + lastPort2 + ", lastPort3=" + lastPort3 + ", terminal="
-				+ terminal + ", vesselType=" + vesselType + ", genDesc=" + genDesc + ", masterName=" + masterName
+		return "ImportGeneralManifestMod [consignee=" + consignee + ", consigner=" + consigner + ", notifyParty="
+				+ notifyParty + ", marksNumber=" + marksNumber + ", containerDetailes=" + containerDetailes + ", bl="
+				+ bl + ", service=" + service + ", vessel=" + vessel + ", voyage=" + voyage + ", pol=" + pol
+				+ ", polTerminal=" + polTerminal + ", del=" + del + ", depot=" + depot + ", pod=" + pod
+				+ ", podTerminal=" + podTerminal + ", codeCode=" + codeCode + ", callSing=" + callSing + ", lineCode="
+				+ lineCode + ", agentCode=" + agentCode + ", portOrigin=" + portOrigin + ", portArrival=" + portArrival
+				+ ", lastPort1=" + lastPort1 + ", lastPort2=" + lastPort2 + ", lastPort3=" + lastPort3 + ", nextport1="
+				+ nextport1 + ", nextport2=" + nextport2 + ", nextport3=" + nextport3 + ", terminal=" + terminal
+				+ ", vesselType=" + vesselType + ", genDesc=" + genDesc + ", masterName=" + masterName
 				+ ", vesselNation=" + vesselNation + ", igmNumber=" + igmNumber + ", igmDate=" + igmDate
 				+ ", arrivalDate=" + arrivalDate + ", arrivalTime=" + arrivalTime + ", ataarrivalDate=" + ataarrivalDate
 				+ ", ataarrivalTime=" + ataarrivalTime + ", totalBls=" + totalBls + ", lightDue=" + lightDue
@@ -2708,15 +2722,59 @@ public class ImportGeneralManifestMod {
 				+ ", shipStrDect=" + shipStrDect + ", crewEffect=" + crewEffect + ", mariTimeDecl=" + mariTimeDecl
 				+ ", itemNumber=" + itemNumber + ", cargoNature=" + cargoNature + ", cargoMovmnt=" + cargoMovmnt
 				+ ", itemType=" + itemType + ", cargoMovmntType=" + cargoMovmntType + ", transportMode=" + transportMode
-				+ ", roadCarrCode=" + roadCarrCode + ", roadTPBondNo=" + roadTPBondNo + ", submitDateTime="
-				+ submitDateTime + ", weight=" + weight + ", nhavaShevaEta=" + nhavaShevaEta + ", finalPlaceDelivery="
-				+ finalPlaceDelivery + ", packages=" + packages + ", cfsName=" + cfsName + ", mblNo=" + mblNo
-				+ ", hblNo=" + hblNo + ", blDate=" + blDate + ", blStatus=" + blStatus + ", fromItemNo=" + fromItemNo
-				+ ", toItemNo=" + toItemNo + ", imoCode=" + imoCode + ", newVessel=" + newVessel + ", newVoyage="
-				+ newVoyage + ", serialNumber=" + serialNumber + ", crewListDeclaration=" + crewListDeclaration
-				+ ", cargoDeclaration=" + cargoDeclaration + ", passengerList=" + passengerList + ", dpdMovement="
-				+ dpdMovement + ", dpdCode=" + dpdCode + ", blVersion=" + blVersion + "]";
+				+ ", roadCarrCode=" + roadCarrCode + ", roadTPBondNo=" + roadTPBondNo + ", customTerminalCode="
+				+ customTerminalCode + ", submitDateTime=" + submitDateTime + ", weight=" + weight + ", nhavaShevaEta="
+				+ nhavaShevaEta + ", finalPlaceDelivery=" + finalPlaceDelivery + ", packages=" + packages + ", cfsName="
+				+ cfsName + ", mblNo=" + mblNo + ", hblNo=" + hblNo + ", blDate=" + blDate + ", blStatus=" + blStatus
+				+ ", fromItemNo=" + fromItemNo + ", toItemNo=" + toItemNo + ", imoCode=" + imoCode + ", newVessel="
+				+ newVessel + ", newVoyage=" + newVoyage + ", serialNumber=" + serialNumber + ", crewListDeclaration="
+				+ crewListDeclaration + ", cargoDeclaration=" + cargoDeclaration + ", passengerList=" + passengerList
+				+ ", dpdMovement=" + dpdMovement + ", dpdCode=" + dpdCode + ", blVersion=" + blVersion + ", CusAdd1="
+				+ CusAdd1 + ", CusAdd2=" + CusAdd2 + ", CusAdd3=" + CusAdd3 + ", CusAdd4=" + CusAdd4 + ", IsValidateBL="
+				+ IsValidateBL + ", GrossCargoWeightBLlevel=" + GrossCargoWeightBLlevel + ", PackageBLLevel="
+				+ PackageBLLevel + ", dep_manif_no=" + dep_manif_no + ", dep_manifest_date=" + dep_manifest_date
+				+ ", submitter_type=" + submitter_type + ", submitter_code=" + submitter_code + ", authoriz_rep_code="
+				+ authoriz_rep_code + ", shipping_line_bond_no_r=" + shipping_line_bond_no_r + ", mode_of_transport="
+				+ mode_of_transport + ", ship_type=" + ship_type + ", conveyance_reference_no="
+				+ conveyance_reference_no + ", cargo_description=" + cargo_description + ", tol_no_of_trans_equ_manif="
+				+ tol_no_of_trans_equ_manif + ", brief_cargo_des=" + brief_cargo_des + ", expected_date="
+				+ expected_date + ", time_of_dept=" + time_of_dept + ", no_of_crew_manif=" + no_of_crew_manif
+				+ ", port_of_call_cod=" + port_of_call_cod + ", total_no_of_tran_s_cont_repo_on_ari_dep="
+				+ total_no_of_tran_s_cont_repo_on_ari_dep + ", message_type=" + message_type + ", port_of_reporting="
+				+ port_of_reporting + ", job_number=" + job_number + ", job_date=" + job_date + ", reporting_event="
+				+ reporting_event + ", manifest_no_csn_no=" + manifest_no_csn_no + ", manifest_date_csn_date="
+				+ manifest_date_csn_date + ", vessel_type_movement=" + vessel_type_movement + ", shipping_line_code="
+				+ shipping_line_code + ", authorized_sea_carrier_code=" + authorized_sea_carrier_code
+				+ ", port_of_registry=" + port_of_registry + ", registry_date=" + registry_date
+				+ ", voyage_details_movement=" + voyage_details_movement + ", ship_itinerary_sequence="
+				+ ship_itinerary_sequence + ", ship_itinerary=" + ship_itinerary + ", port_of_call_name="
+				+ port_of_call_name + ", arrival_departure_details=" + arrival_departure_details + ", number_of_crew="
+				+ number_of_crew + ", total_no_of_transport_equipment_reported_on_arrival_departure="
+				+ total_no_of_transport_equipment_reported_on_arrival_departure + ", consolidated_indicator="
+				+ consolidated_indicator + ", previous_declaration=" + previous_declaration + ", consolidator_pan="
+				+ consolidator_pan + ", cin_type=" + cin_type + ", mcin=" + mcin + ", csn_submitted_type="
+				+ csn_submitted_type + ", csn_submitted_by=" + csn_submitted_by + ", csn_reporting_type="
+				+ csn_reporting_type + ", csn_site_id=" + csn_site_id + ", csn_number=" + csn_number + ", csn_date="
+				+ csn_date + ", previous_mcin=" + previous_mcin + ", split_indicator=" + split_indicator
+				+ ", number_of_packages=" + number_of_packages + ", type_of_package=" + type_of_package
+				+ ", first_port_of_entry_last_port_of_departure=" + first_port_of_entry_last_port_of_departure
+				+ ", type_of_cargo=" + type_of_cargo + ", split_indicator_list=" + split_indicator_list
+				+ ", port_of_acceptance=" + port_of_acceptance + ", port_of_receipt=" + port_of_receipt + ", ucr_type="
+				+ ucr_type + ", ucr_code=" + ucr_code + ", soc_flag=" + soc_flag + ", equipment_load_status="
+				+ equipment_load_status + ", equipment_seal_type=" + equipment_seal_type + ", port_of_acceptance_name="
+				+ port_of_acceptance_name + ", port_of_receipt_name=" + port_of_receipt_name
+				+ ", pan_of_notified_party=" + pan_of_notified_party + ", unit_of_weight=" + unit_of_weight
+				+ ", gross_volume=" + gross_volume + ", unit_of_volume=" + unit_of_volume + ", cargo_item_sequence_no="
+				+ cargo_item_sequence_no + ", cargo_item_description=" + cargo_item_description
+				+ ", total_number_of_packages=" + total_number_of_packages + ", number_of_packages_hidden="
+				+ number_of_packages_hidden + ", type_of_packages_hidden=" + type_of_packages_hidden
+				+ ", mc_item_details=" + mc_item_details + ", container_weight=" + container_weight
+				+ ", port_of_call_sequence_number=" + port_of_call_sequence_number + ", port_of_call_coded="
+				+ port_of_call_coded + ", next_port_of_call_coded=" + next_port_of_call_coded + ", mc_location_customs="
+				+ mc_location_customs + ", uno_code=" + uno_code + ", imdg_code=" + imdg_code + ", port_of_destination="
+				+ port_of_destination + "]";
 	}
+	
 
 	
 

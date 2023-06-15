@@ -524,6 +524,9 @@ public interface ImportGeneralManifestDao {
 	/** The Constant KEY_IGM_TYPE_OF_CARGO. */
 	public static final String KEY_IGM_IMDG_CODE = "P_I_V_IMDG_CODE";
 	
+	/** The Constant KEY_IGM_TYPE_OF_CARGO. */
+	public static final String KEY_IGM_PORT_OF_DESTINATION  = "P_I_V_PORT_OF_DESTINATION";
+	
 	//BL SECTION END
 	
 	

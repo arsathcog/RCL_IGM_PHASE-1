@@ -674,7 +674,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_AGENT_CODE, objForm.getAgentCode());
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_LINE_CODE, objForm.getLineCode());
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_PORT_ORIGIN, objForm.getPortOrigin());
-		mapParam.put(ImportGeneralManifestDao.KEY_IGM_PORT_ARRIVAL, objForm.getPortOfArrival());
+		mapParam.put(ImportGeneralManifestDao.KEY_IGM_PORT_ARRIVAL,(String) blObj.get("Port arrival"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_LAST_PORT_1, objForm.getPrt1());
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_LAST_PORT_2, objForm.getPrt2());
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_LAST_PORT_3, objForm.getPrt3());
@@ -816,7 +816,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_NEXT_PORT_OF_CALL_CODED,
 				(String) blObj.get("Next port of call coded"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_MC_LOCATION_CUSTOMS, (String) blObj.get("MC Location Customsl"));
-
+		mapParam.put(ImportGeneralManifestDao.KEY_IGM_PORT_OF_DESTINATION, (String) blObj.get("Port Of Destination"));
+		mapParam.put(ImportGeneralManifestDao.KEY_IGM_TERMINAL_OP_COD, (String) blObj.get("Terminal op cod"));
 		if (!consigneeArray.isEmpty()) {
 			for (Object consobj : consigneeArray) {
 				JSONObject consigneeObj = (JSONObject) consobj;
@@ -1907,6 +1908,10 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		String igmNo = "";
 		String igmDate = "";
 		String msgType = "";
+		String msgTypeCon  = "";
+		String sequence = "";
+		String portOfArrival = "";
+		String terminalOpCod = "";
 		String currTime = new StringBuffer().append(LocalTime.now().getHour()).append(LocalTime.now().getMinute())
 				.toString();
 		System.out.println(currTime);
@@ -1935,13 +1940,14 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		}else {
 			msgType = "A";
 		}
-
+		
+		sequence = sId.substring(2,8);
 		File manifestFile = new File(path);
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(manifestFile));) {
 
 			// Need some values if not found keep hard coding
 			bw.write(String.join(Character.toString(fieldSepOp), "HREC", "ZZ", "RCLAIPL123", // isNull(sId),
-					"ZZ", isNull(reqlength(objForm.getPod(),6)+"1"), "ICES1_5", "P", isNull(blank), "SACHI01", isNull(sId), // isNull(objForm.getSerialNumber()),
+					"ZZ", isNull(reqlength(objForm.getPod(),6)+"1"), "ICES1_5", "P", isNull(blank), "SACHI01", isNull(sequence), // isNull(objForm.getSerialNumber()),
 					currDate, currTime + newLine));
 
 			// hard code
@@ -1951,14 +1957,18 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			bw.write("<vesinfo>" + newLine);
 			for (Object blObjjson : blList) {
 				JSONObject blObj = (JSONObject) blObjjson;
+				portOfArrival = isNull((String) blObj.get("Port arrival"));
+				terminalOpCod =isNull((String) blObj.get("Terminal op cod"));
+				
+			}
 				// Need some values if not found keep hard coding for each line.
 				bw.write(String.join(Character.toString(fieldSepOp), msgType,
 				isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getIgmNo(), 7)),
-				isNull(objForm.getIgmDate()), isNull(reqlength(objForm.getImoCode(), 10)),
+				removeSlash(isNull(objForm.getIgmDate())), isNull(reqlength(objForm.getImoCode(), 10)),
 				isNull(reqlength(objForm.getCallSign(), 10)), isNull(reqlength(voyage, 10)),
 				isNull(reqlength("RCA1", 10)) // "RCA1" hard code value for line no
 						, isNull(reqlength(objForm.getAgentCode(), 16)), isNull(reqlength(objForm.getMasterName(), 30)),
-						isNull(reqlength(objForm.getPortOrigin(), 6)), isNull(reqlength(objForm.getPrt1(), 6)),
+						 portOfArrival, isNull(reqlength(objForm.getPrt1(), 6)),
 						isNull(reqlength(objForm.getPrt2(), 6)), isNull(reqlength(objForm.getPrt3(), 6)),
 						isNull(reqlength(objForm.getVesselTypes(), 1)), isNull((String) objForm.getTotalItem()),
 						"CONTAINERS", removeSlash(isNull(objForm.getAtaAd())) + " " + isNull(objForm.getaTime()),
@@ -1967,8 +1977,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(reqlength(objForm.getShipStoreDeclaration(), 1)), "N",
 						isNull(reqlength(objForm.getPassengerList(), 1)), isNull(reqlength(objForm.getCrewEffect(), 1)),
 						isNull(reqlength(objForm.getMaritimeDeclaration(), 1)),
-						isNull(reqlength(objForm.getCustomCode(), 6)) + isNull(reqlength(objForm.getAgentCode(), 3))
-								+ isNull(reqlength(sId, 1))
+						terminalOpCod
 				
 					// newly added-------------------------------------------
 					/*isNull(objForm.getDepartureManifestNumber()),
@@ -2000,7 +2009,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					isNull(objForm.getGeneratFalg()) */
 					
 					+ newLine));
-			}
+		
 			bw.write("<END-vesinfo>" + newLine);
 			bw.write("<cargo>" + newLine);
 			String containerStatus = "";
@@ -2012,7 +2021,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				
 				String unoCd = "";
 				String imoCd = "";
-				if(null == blObj.get("UNO Code") || ("").equals(blObj.get("UNO Code"))  ) {
+				if(!("").equals(blObj.get("UNO Code"))  ) {
 					unoCd = (String) blObj.get("UNO Code");
 				}else {
 					unoCd = "ZZZZZ";
@@ -2021,9 +2030,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					imoCd = objForm.getImoCode();
 				}else {
 					imoCd = "ZZZ";
-				}
+				}	
 
-				if (!"TI".equalsIgnoreCase((String) blObj.get("Cargo Movement"))) {
+				if ("TI".equalsIgnoreCase((String) blObj.get("Cargo Movement"))) {
 					rc_Code = isNull((String) serviceObj.get("Road Carr code"));
 					tpBond = isNull((String) blObj.get("TP Bond No"));
 				}
@@ -2042,6 +2051,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				String consigneeName = "";
 				String marksNo = "";
 				String description = "";
+				String transPrtMode = "";
+ 				String portOfDsetination = (String)blObj.get("Port Of Destination");
+				String cargoMovmnt = (String)blObj.get("Cargo Movement");
 				int l = add.length();
 				System.out.println("length of address " + l);
 				if (l > 35) {
@@ -2061,10 +2073,6 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				} else
 					add1 = add;
 				// System.out.println("length = " + add.length());
-				
-				
-				
-				
 				
 				for (Object notifyObj : notifyPartyDetailes) {
 					JSONObject notyObj = (JSONObject) notifyObj;
@@ -2136,7 +2144,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				
 				for (Object marksNumObj : marksNumberDtlstls) {
 					JSONObject marksObj = (JSONObject) marksNumObj;
-					marksNo = (String) marksObj.get("marksNumbers");
+					/* marksNo = (String) marksObj.get("marksNumbers"); */
+					marksNo ="No Marks";
 					description  = (String) marksObj.get("description");
 					if(description.contains("\r\n")) {
 						description = description.replace("\r\n", " ");
@@ -2145,21 +2154,32 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					}
 					
 				}
+				if( blObj.get("Port Of Destination").equals(objForm.getPod()) && !"INBOM".equals(objForm.getPod())) {
+					transPrtMode = "T";
+				}else if("INBOM".equals( blObj.get("Port Of Destination")) || "".equals( blObj.get("Port Of Destination")) ) {
+					transPrtMode = "R";
+				}else if("1".equals( blObj.get("Transhipment flag")) ) {
+					transPrtMode = "S";
+				}
+				
+				if("1".equals( blObj.get("Transhipment flag")) && !portOfDsetination.substring(0, 2).equals("IN")) {
+					cargoMovmnt = "TC";
+				}
 				// Need some values if not found keep hard coding for each line
 				bw.write(String.join(Character.toString(fieldSepOp), msgType,
 						isNull(reqlength(objForm.getCustomCode(), 6)), reqlength(objForm.getCallSign(), 10),
 						reqlength(voyage, 10),isNull(reqlength(objForm.getIgmNo(), 7)),
-						isNull(objForm.getIgmDate()), isNull((String) blObj.get("Item Number")),
+						removeSlash(isNull(objForm.getIgmDate())), isNull((String) blObj.get("Item Number")),
 //						Item_Number = isNull((String) blObj.get("Item Number")), putting above line for line num 
 						reqlength(SUB_LINE_NO, 4), isNull(reqlength((String) blObj.get("BL#"), 20)),
 						isNull(removeSlash((String) blObj.get("BL_Date"))), isNull(reqlength(pol, 6)),
-						isNull(reqlength((String) blObj.get("First Port of Entry/Last Port of Departure"), 6)),
+						isNull(reqlength((String) blObj.get("Port Of Destination"), 6)),
 						isNull((String) blObj.get("HBL_NO")), isNull((String) blObj.get("HBL_Date")),
 						isNull(consigneeName), isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3),
 						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3),
 						isNull(reqlength((String) blObj.get("Cargo Nature"), 2)),
 						isNull(reqlength((String) blObj.get("Item Type"), 2)),
-						isNull(reqlength((String) blObj.get("Cargo Movement"), 2)),
+						isNull(reqlength((String) cargoMovmnt, 2)),
 						isNull(reqlength((String) blObj.get("CFS-Custom Code"), 10)), // "NUMBER_PACKAGES",
 						isNull(reqlength((String) blObj.get("Number of Packages"), 8)),
 						isNull(reqlength((String) blObj.get("Type of Package"), 3)),
@@ -2172,7 +2192,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						/* isNullUno(reqlength((String)blObj.get("UNO Code"),5)) */ isNull(reqlength((String) unoCd, 5)), // "UNO_CODE",
 						/* isNull(reqlength(objForm.getImoCode(), 10)) */isNull(reqlength((String) imoCd, 10)),
 						reqlength(tpBond, 10), reqlength(rc_Code, 10),
-						isNull(reqlength((String) objForm.getModeofTransport(), 1)),
+						
+						isNull(reqlength((String) transPrtMode, 1)),
 						isNull(reqlength(objForm.getAgentCode(), 16))
 						
 						/*
@@ -2264,35 +2285,52 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			bw.write("<contain>" + newLine);
 			
 			String iso = "";
-			for (Object blObjjson : blList) {
+			String ItemNumber = "";
+			for (Object blObjjson : blList) {  
 				JSONObject blObj = (JSONObject) blObjjson;
+				ItemNumber =  isNull((String) blObj.get("Item Number"));
+		
+			
 			for (Object containDtls : containeerDtls) {
 				JSONObject coDtl = (JSONObject) containDtls;
+				if(coDtl.get("blNO").equals( blObj.get("BL#"))) {
+					
+			
 				if( null == coDtl.get("containerSize") || coDtl.get("containerSize").equals(" ") ) {
 					iso = " ";
 				}else if(coDtl.get("containerSize").equals("40")) {
 					if(coDtl.get("containerType").equals("HC")) {
-						iso = "4200";
+						iso = "4400";
 					}
 					
 				}else if(coDtl.get("containerSize").equals("20") ) {
 					
-						iso = "2000";		
-						
+					if(coDtl.get("containerType").equals("GP")) {
+						iso = "2200";
+					}
 				}else if (coDtl.get("containerSize").equals("40") ) {
 					if(coDtl.get("containerType").equals("GP")) {
-						iso = "2000";
+						iso = "4200";
 					}else {
 						iso="";
 					}
 				}
+				
+				if(msgType.equals("A")) {
+					msgTypeCon = "S";
+				}else {
+					msgTypeCon = "F";
+					
+				}
 				// Need some values if not found keep hard coding
-				bw.write(String.join(Character.toString(fieldSepOp), msgType,
+				bw.write(String.join(Character.toString(fieldSepOp), msgTypeCon,
 						isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getImoCode(), 10)),
 						reqlength(vessel, 10), reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
-						isNull(objForm.getIgmDate()),
+						removeSlash(isNull(objForm.getIgmDate())),
 						// "Line_No",
-						 isNull((String) blObj.get("Item Number")),
+						isNull(reqlength(objForm.getCustomCode(), 6)),
+						isNull((String) blObj.get("Item Number")),  
+						
 						// "SUB_LINE_NO",
 						reqlength(SUB_LINE_NO, 4), isNull(reqlength((String) coDtl.get("containerNumber"), 11)),
 						isNull(reqlength((String) coDtl.get("containerSealNumber"), 15)),
@@ -2306,12 +2344,14 @@ public class ImportGeneralManifestSvc extends BaseAction {
 								+ newLine));
 			}
 			}
+			}
+			
 			// hard code
 			bw.write("<END-contain>" + newLine);
 			// hard code
 			bw.write("<END-manifest>" + newLine);
 			// hard code need value of sequence char
-			bw.write("TREC" + fieldSepOp + sId);
+			bw.write("TREC" + fieldSepOp + sequence);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -346,7 +346,10 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 		             }catch (Exception e) {
 		            	 marksnumber.setMarksNumbers(rs.getString("MARKS_NO"));
 					}
-					
+//					if(!rs.getString("DESCRIPTION").contains("\r\n")) {
+//						String Description = rs.getString("DESCRIPTION").replace("\\s+", "");
+//						
+//					}
 					marksnumber.setDescription(rs.getString("DESCRIPTION"));
 					if(marksNumbersMap.get(marksnumber.getBlNO())==null || "updated".equals(rs.getString("type")) )
 					{
@@ -700,6 +703,8 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 				{	KEY_IGM_MC_LOCATION_CUSTOMS            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_MC_LOCATION_CUSTOMS	) },
 				{	KEY_IGM_UNO_CODE            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_UNO_CODE	) },
 				{	KEY_IGM_IMDG_CODE            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_IMDG_CODE	) },
+				{	KEY_IGM_PORT_OF_DESTINATION            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_PORT_OF_DESTINATION	) },
+				{	KEY_IGM_TERMINAL_OP_COD            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_TERMINAL_OP_COD	) },
 
 				//BL SECTION END
 				
@@ -889,7 +894,10 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 			objMod.setUno_code(rs.getString("UNO_CODE"));
 			objMod.setImdg_code(rs.getString("IMDG_CODE"));
 			objMod.setPort_of_destination(rs.getString("port_of_destination"));
+			objMod.setTshipmentFlag(rs.getString("TSHIPMNT_FLAG"));
+			objMod.setTerminal_op_cod(rs.getString("TERMINAL_OP_COD"));
 			
+
 			//END BL SECTION 
 
 			return objMod;

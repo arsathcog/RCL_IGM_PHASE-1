@@ -939,8 +939,18 @@ function blDataInsert() {
 							element1.setAttribute("value",
 									blsValueObject[i][bld[t].mappedCol]);
 						}
-					}
-					else {
+					}else if(bld[t].columnName == "Cargo Movement"){
+						var element1 = document.createElement("input");
+						element1.setAttribute("type", bld[t].type);
+						element1.setAttribute("class", "smallInputBox")
+
+						if (!blsValueObject[i][bld[t].mappedCol]){
+							element1.setAttribute("value", "");
+						}else{
+							element1.setAttribute("value",
+									blsValueObject[i][bld[t].mappedCol]);
+						}
+					}else {
 						var element1 = document.createElement("input");
 						element1.setAttribute("type", bld[t].type);
 						element1.setAttribute("class", "roundshap2")
@@ -1901,6 +1911,16 @@ function submitData() {
 				.getElementById(idJsonObjectForTextBox[i]["Next port of call coded"]).value;
 				listOfBlDetails["MC Location Customsl"] = document
 				.getElementById(idJsonObjectForTextBox[i]["MC Location Customs"]).value;
+				listOfBlDetails["Port Of Destination"] = document
+				.getElementById(idJsonObjectForTextBox[i]["Port Of Destination"]).value;
+				listOfBlDetails["Transhipment flag"] = document
+				.getElementById(idJsonObjectForTextBox[i]["Transhipment flag"]).value;
+				listOfBlDetails["Terminal op cod"] = document
+				.getElementById(idJsonObjectForTextBox[i]["Terminal op cod"]).value;
+				listOfBlDetails["Terminal op cod"] = document
+				.getElementById(idJsonObjectForTextBox[i]["Terminal op cod"]).value;
+				listOfBlDetails["Port arrival"] = document
+				.getElementById(idJsonObjectForTextBox[i]["Port arrival"]).value;
 
 				if(popupjson.popup[blnoforpopupdata].consignee[0].vaidation=="TRUE" && popupjson.popup[blnoforpopupdata].notifyParty[0].vaidation=="TRUE"
 					&& popupjson.popup[blnoforpopupdata].containerDetailes[0].vaidation=="TRUE" && popupjson.popup[blnoforpopupdata].marksNumber[0].vaidation=="TRUE"){
@@ -6291,7 +6311,15 @@ function manifestFileGeneratorEdiFile() {
 						.getElementById(idJsonObjectForTextBox[i]["Next port of call coded"]).value;
 						listOfBlDetails["MC Location Customsl"] = document
 						.getElementById(idJsonObjectForTextBox[i]["MC Location Customs"]).value;
-
+						listOfBlDetails["Port Of Destination"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Port Of Destination"]).value;
+						listOfBlDetails["Transhipment flag"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Transhipment flag"]).value;
+						listOfBlDetails["Terminal op cod"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Terminal op cod"]).value;
+						listOfBlDetails["Port arrival"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Port arrival"]).value;
+				
 						blDetails.push(listOfBlDetails);
 						
 						console.log(blDetails);

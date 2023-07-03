@@ -1387,6 +1387,24 @@ var bld = [{
 		'type'      : 'hidden',
 		'columnName': 'MC Location Customs',
 	    'mappedCol' : 'mc_location_customs'
+	},
+	{
+		'type'      : 'hidden',
+		'columnName': 'Port Of Destination',
+	    'mappedCol' : 'port_of_destination'
+	},{
+		'type'      : 'hidden',
+		'columnName': 'Transhipment flag',
+	    'mappedCol' : 'tshipmentFlag'
+	},{
+		'type'      : 'hidden',
+		'columnName': 'Terminal op cod',
+	    'mappedCol' : 'terminal_op_cod'
+	},
+	{
+		'type'      : 'hidden',
+		'columnName': 'Port arrival',
+	    'mappedCol' : 'portArrival'
 	}]
 
 

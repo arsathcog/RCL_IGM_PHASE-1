@@ -470,7 +470,9 @@ public class ImportGeneralManifestMod {
 	
 	private String port_of_destination;
 	
+	private String tshipmentFlag;
 	
+	private String terminal_op_cod;
 	//end bl section 
 	
     public String getUno_code() {
@@ -496,6 +498,22 @@ public class ImportGeneralManifestMod {
 
 	public void setPort_of_destination(String port_of_destination) {
 		this.port_of_destination = port_of_destination;
+	}
+
+	public String getTshipmentFlag() {
+		return tshipmentFlag;
+	}
+
+	public void setTshipmentFlag(String tshipmentFlag) {
+		this.tshipmentFlag = tshipmentFlag;
+	}
+
+	public String getTerminal_op_cod() {
+		return terminal_op_cod;
+	}
+
+	public void setTerminal_op_cod(String terminal_op_cod) {
+		this.terminal_op_cod = terminal_op_cod;
 	}
 
 	/**

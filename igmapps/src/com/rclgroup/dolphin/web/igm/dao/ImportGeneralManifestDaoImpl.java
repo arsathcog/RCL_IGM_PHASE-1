@@ -346,12 +346,12 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 		             }catch (Exception e) {
 		            	 marksnumber.setMarksNumbers(rs.getString("MARKS_NO"));
 					}
-//		             if(null != rs.getString("DESCRIPTION") && !("").equals(rs.getString("DESCRIPTION")) ) {
-//		            		if(!rs.getString("DESCRIPTION").contains("\r\n")) {
-//								String Description = rs.getString("DESCRIPTION").replace("\\s+", "");
-//								
-//							} 
-//		             }
+		             if(null != rs.getString("DESCRIPTION") && !("").equals(rs.getString("DESCRIPTION")) ) {
+		            		if(!rs.getString("DESCRIPTION").contains("\r\n")) {
+								String Description = rs.getString("DESCRIPTION").replace("\\s+", "");
+								
+							} 
+		             }
 				
 					marksnumber.setDescription(rs.getString("DESCRIPTION"));
 					if(marksNumbersMap.get(marksnumber.getBlNO())==null || "updated".equals(rs.getString("type")) )

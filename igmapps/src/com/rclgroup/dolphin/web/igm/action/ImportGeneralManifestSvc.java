@@ -2325,7 +2325,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				// Need some values if not found keep hard coding
 				bw.write(String.join(Character.toString(fieldSepOp), msgTypeCon,
 						isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getImoCode(), 10)),
-						reqlength(vessel, 10), reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
+						 reqlength(objForm.getCallSign(), 10), reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
 						removeSlash(isNull(objForm.getIgmDate())),
 						// "Line_No",
 						isNull(reqlength(objForm.getCustomCode(), 6)),

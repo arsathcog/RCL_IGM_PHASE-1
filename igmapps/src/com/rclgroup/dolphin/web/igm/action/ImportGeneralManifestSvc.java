@@ -10,11 +10,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -37,11 +40,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.dao.DataAccessException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.niit.control.common.exception.BusinessException;
 import com.niit.control.web.action.BaseAction;
 import com.rclgroup.dolphin.web.igm.actionform.ImportGeneralManifestUim;
@@ -81,7 +84,6 @@ import com.rclgroup.dolphin.web.igm.vo.VesselDtls;
 import com.rclgroup.dolphin.web.igm.vo.VesselDtlsSEI;
 import com.rclgroup.dolphin.web.igm.vo.VoyageDtls;
 import com.rclgroup.dolphin.web.igm.vo.VoyageTransportEquipment;
-import com.sun.syndication.io.SyndFeedOutput;
 
 /**
  * The Class ImportGeneralManifestSvc.
@@ -1839,6 +1841,27 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			return a;
 		
 	}
+	
+    public static String reverseString(String input) {
+        return new StringBuilder(input).reverse().toString();
+    }
+	   public static String formatDate(String reversedDate) throws ParseException {
+	        // Extract day, month, and year substrings from the reversed date
+		   SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd");
+           Date date = inputFormat.parse(reversedDate);
+
+           // Format the date to the desired dd/mm/yyyy format
+           SimpleDateFormat outputFormat = new SimpleDateFormat("ddMMyyyy");
+           String formattedDate = outputFormat.format(date);
+           return formattedDate;
+	    }
+	   
+	    public static String formatTime(String inputTime) {
+	        StringBuilder sb = new StringBuilder(inputTime);
+	        sb.insert(2, '.'); // Insert dot at the 3rd position (between hour and minutes)
+	        return sb.toString();
+	    }
+	    
 	public static String settingLengthForDouble(String aField, int aintDigits,int aintDecimals){
         String val = aField+"";
         int dotIndex=val.indexOf('.');
@@ -1895,7 +1918,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 	public static File writeFileGenerateEdiFile(String path, ImportGeneralManifestUim objForm, JSONArray blList,
 			JSONObject serviceObj, ImportGeneralManifestDao objDao, JSONArray notifyPartyDetailes,
-			JSONArray marksNumberDtlstls, JSONArray containeerDtls,JSONArray consigneeDtls) throws DataAccessException, BusinessException {
+			JSONArray marksNumberDtlstls, JSONArray containeerDtls,JSONArray consigneeDtls) throws DataAccessException, BusinessException, ParseException {
 		String mesType = "F";
 
 		// String sId = "RCLAIPL123";
@@ -1961,8 +1984,11 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				terminalOpCod =isNull((String) blObj.get("Terminal op cod"));
 				
 			}
+			
+		        String formattedDate = formatDate(objForm.getaDate());
+		        String formattedTime = formatTime(objForm.getaTime());		        
 				// Need some values if not found keep hard coding for each line.
-				bw.write(String.join(Character.toString(fieldSepOp), msgType,
+		        bw.write(String.join(Character.toString(fieldSepOp), msgType,
 				isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getIgmNo(), 7)),
 				removeSlash(isNull(objForm.getIgmDate())), isNull(reqlength(objForm.getImoCode(), 10)),
 				isNull(reqlength(objForm.getCallSign(), 10)), isNull(reqlength(voyage, 10)),
@@ -1971,7 +1997,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						 portOfArrival, isNull(reqlength(objForm.getPrt1(), 6)),
 						isNull(reqlength(objForm.getPrt2(), 6)), isNull(reqlength(objForm.getPrt3(), 6)),
 						isNull(reqlength(objForm.getVesselTypes(), 1)), isNull((String) objForm.getTotalItem()),
-						"CONTAINERS", removeSlash(isNull(objForm.getAtaAd())) + " " + isNull(objForm.getaTime()),
+						"CONTAINERS", isNull(formattedDate) + " " + isNull(objForm.getaTime()),
 						isNull(reqlength(objForm.getLighthouseDue(), 9)),
 						isNull(reqlength(objForm.getSameBottomCargo(), 1)),
 						isNull(reqlength(objForm.getShipStoreDeclaration(), 1)), "N",

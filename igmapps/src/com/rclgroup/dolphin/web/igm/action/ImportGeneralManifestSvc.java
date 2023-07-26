@@ -1912,8 +1912,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		String sequence = "";
 		String portOfArrival = "";
 		String terminalOpCod = "";
-		String currTime = new StringBuffer().append(LocalTime.now().getHour()).append(LocalTime.now().getMinute())
-				.toString();
+		String currTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmm"));
+	        System.out.println(currTime);
 		System.out.println(currTime);
 		String currDate = LocalDate.now().toString().replaceAll("-", "");
 		System.out.println(currDate);
@@ -2167,7 +2167,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				}
 				// Need some values if not found keep hard coding for each line
 				bw.write(String.join(Character.toString(fieldSepOp), msgType,
-						isNull(reqlength(objForm.getCustomCode(), 6)), reqlength(objForm.getCallSign(), 10),
+						isNull(reqlength(objForm.getCustomCode(), 6)),
+						isNull(reqlength((String) imoCd, 10)),reqlength(objForm.getCallSign(), 10),
 						reqlength(voyage, 10),isNull(reqlength(objForm.getIgmNo(), 7)),
 						removeSlash(isNull(objForm.getIgmDate())), isNull((String) blObj.get("Item Number")),
 //						Item_Number = isNull((String) blObj.get("Item Number")), putting above line for line num 
@@ -2177,6 +2178,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull((String) blObj.get("HBL_NO")), isNull((String) blObj.get("HBL_Date")),
 						isNull(consigneeName), isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3),
 						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3),
+						isNull(blank),	
 						isNull(reqlength((String) blObj.get("Cargo Nature"), 2)),
 						isNull(reqlength((String) blObj.get("Item Type"), 2)),
 						isNull(reqlength((String) cargoMovmnt, 2)),
@@ -2190,7 +2192,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(reqlength(description, 250)),
 						// "MARKS_NUMBER",
 						/* isNullUno(reqlength((String)blObj.get("UNO Code"),5)) */ isNull(reqlength((String) unoCd, 5)), // "UNO_CODE",
-						/* isNull(reqlength(objForm.getImoCode(), 10)) */isNull(reqlength((String) imoCd, 10)),
+						/* isNull(reqlength(objForm.getImoCode(), 10)) */isNull(reqlength((String) "ZZZ", 10)),
 						reqlength(tpBond, 10), reqlength(rc_Code, 10),
 						
 						isNull(reqlength((String) transPrtMode, 1)),
@@ -2326,7 +2328,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				bw.write(String.join(Character.toString(fieldSepOp), msgTypeCon,
 						isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getImoCode(), 10)),
 						 reqlength(objForm.getCallSign(), 10), reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
-						removeSlash(isNull(objForm.getIgmDate())),
+						removeSlash(isNull(objForm.getIgmDate())), isNull(blank),
 						// "Line_No",
 						isNull(reqlength(objForm.getCustomCode(), 6)),
 						isNull((String) blObj.get("Item Number")),  

@@ -6390,7 +6390,7 @@ function manifestFileGeneratorEdiFile() {
 						for(j=0;j<popupjson.popup[blnoforpopupdata].containerDetailes.length;j++)
 						{
 							var listofcontainerdetails={};
-							var valueOfWeight=popupjson.popup[blnoforpopupdata].containerDetailes[j].containerWeight;
+							var valueOfWeight=((popupjson.popup[blnoforpopupdata].containerDetailes[j].containerWeight) * 0.001) + "";
 							var valueOfPackage=popupjson.popup[blnoforpopupdata].containerDetailes[j].totalNumberOfPackagesInContainer;
 							listofcontainerdetails["ISO Code"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].ISOCode;
 							listofcontainerdetails["blNO"]=popupjson.popup[blnoforpopupdata].containerDetailes[j].blNO;

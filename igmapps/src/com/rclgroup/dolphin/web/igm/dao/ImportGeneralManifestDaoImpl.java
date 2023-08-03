@@ -906,6 +906,7 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 //			objMod.setIgmDestinationPort(rs.getString("IGMDEL"));
 //			objMod.setIgmport(rs.getString("IGMPORT"));
 
+			if(null != objMod.getActualPod() ) {
 			if(objMod.getActualPod().equals(objMod.getPort_of_destination())) {
 //				//IGMPORT  implement 
 				if(null !=rs.getString("IGMPORT")|| ("").equals(rs.getString("IGMPORT")) ) {
@@ -916,6 +917,7 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 			}else {
 				//IGMDEL implement  
 				objMod.setIgmDestinationPort(rs.getString("IGMDEL"));
+			}
 			}
 
 			objMod.setDestinationPortFinal(rs.getString("IGMPORT_DEST"));

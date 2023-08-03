@@ -473,6 +473,16 @@ public class ImportGeneralManifestMod {
 	private String tshipmentFlag;
 	
 	private String terminal_op_cod;
+	
+	private String actualPod;
+	
+	private String igmDestinationPort;
+	
+	private String igmport;
+	
+	private String DestinationPortFinal;
+	
+	
 	//end bl section 
 	
     public String getUno_code() {
@@ -514,6 +524,40 @@ public class ImportGeneralManifestMod {
 
 	public void setTerminal_op_cod(String terminal_op_cod) {
 		this.terminal_op_cod = terminal_op_cod;
+	}
+
+	public String getActualPod() {
+		return actualPod;
+	}
+
+	public void setActualPod(String actualPod) {
+		this.actualPod = actualPod;
+	}
+
+	
+	public String getIgmDestinationPort() {
+		return igmDestinationPort;
+	}
+
+	public void setIgmDestinationPort(String igmDestinationPort) {
+		this.igmDestinationPort = igmDestinationPort;
+	}
+
+	public String getIgmport() {
+		return igmport;
+	}
+
+	public void setIgmport(String igmport) {
+		this.igmport = igmport;
+	}
+
+	
+	public String getDestinationPortFinal() {
+		return DestinationPortFinal;
+	}
+
+	public void setDestinationPortFinal(String destinationPortFinal) {
+		DestinationPortFinal = destinationPortFinal;
 	}
 
 	/**

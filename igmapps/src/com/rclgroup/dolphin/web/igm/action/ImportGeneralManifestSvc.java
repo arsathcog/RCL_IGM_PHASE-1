@@ -339,14 +339,17 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 		for (Object blObj : blList) {
 			JSONObject blJSONObj = (JSONObject) blObj;
+			if(blJSONObj.get("flag").equals("TRUE")) {
 			Map<String, String> mapParam = createHeaderParamsForSave(objForm, blJSONObj, serviceVesselVoyageObj,
 					consigneeDtlsList, consignerDtlsList, MarksNumberDtlstlsList, NotifyPartyDltsList);
 			if ("TRUE".equalsIgnoreCase(mapParam.get(ImportGeneralManifestDao.KEY_IGM_IS_SELECTED))
 					|| ("FALSE".equalsIgnoreCase(mapParam.get(ImportGeneralManifestDao.KEY_IGM_IS_SELECTED)) && "TRUE"
 							.equalsIgnoreCase(mapParam.get(ImportGeneralManifestDao.KEY_IGM_IS_PRESENT_IN_DB)))) {
+				
 				objDao.saveIGMData(mapParam);
 				System.out.println("#IGMLogger onSave() inserted record for #BL : " + blJSONObj.get("BL#"));
 			}
+		}
 		}
 		System.out.println(objForm.getContainerDetailsDtls());
 		if (!objForm.getContainerDetailsDtls().equals("") && objForm.getContainerDetailsDtls() != null) {
@@ -509,6 +512,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		ImportGeneralManifestUim objForm = (ImportGeneralManifestUim) form;
 		System.out.println("#IGMLogger Form Data : " + objForm.toString());
 		Map<String, String> mapParam = createHeaderParams(objForm);
+		
 		System.out.println("#IGMLogger Map mapParam : " + mapParam);
 		ImportGeneralManifestDao objDao = (ImportGeneralManifestDao) getDao(DAO_BEAN_ID);
 		System.out.println("#IGMLogger Dao bean created successfully...");
@@ -820,6 +824,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_MC_LOCATION_CUSTOMS, (String) blObj.get("MC Location Customsl"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_PORT_OF_DESTINATION, (String) blObj.get("Port Of Destination"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_TERMINAL_OP_COD, (String) blObj.get("Terminal op cod"));
+		mapParam.put(ImportGeneralManifestDao.KEY_IGM_ACTUAL_POD, (String) blObj.get("Actual pod"));
+		mapParam.put(ImportGeneralManifestDao.KEY_IGM_IGMPORT, (String) blObj.get("Igm port destination"));
+		
 		if (!consigneeArray.isEmpty()) {
 			for (Object consobj : consigneeArray) {
 				JSONObject consigneeObj = (JSONObject) consobj;
@@ -1935,6 +1942,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		String sequence = "";
 		String portOfArrival = "";
 		String terminalOpCod = "";
+		String customeCode = "";
 		String currTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmm"));
 	        System.out.println(currTime);
 		System.out.println(currTime);
@@ -1945,9 +1953,10 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		// Required to add new line char after each line.
 		String newLine = System.getProperty("line.separator");
 		// Make use of new vessel and new voyage
-		String voyage = isNull((String) serviceObj.get("Voyage"));
+		String voyage = isNull((String) serviceObj.get("Voyage"));  
 		String newVoyage = isNull((String) serviceObj.get("New Voyage"));
 		String pol = isNull((String) serviceObj.get("Pol"));
+		String CustomTerminalCd = isNull((String) serviceObj.get("Custom Terminal Code")); 
 		if (newVoyage != null && !newVoyage.trim().equals("")) {
 			voyage = newVoyage;
 		}
@@ -1982,6 +1991,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				JSONObject blObj = (JSONObject) blObjjson;
 				portOfArrival = isNull((String) blObj.get("Port arrival"));
 				terminalOpCod =isNull((String) blObj.get("Terminal op cod"));
+				customeCode = isNull((String) blObj.get("Cust Code"));
+				
 				
 			}
 			
@@ -1989,7 +2000,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		        String formattedTime = formatTime(objForm.getaTime());		        
 				// Need some values if not found keep hard coding for each line.
 		        bw.write(String.join(Character.toString(fieldSepOp), msgType,
-				isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getIgmNo(), 7)),
+				isNull(reqlength(customeCode, 6)), isNull(reqlength(objForm.getIgmNo(), 7)),
 				removeSlash(isNull(objForm.getIgmDate())), isNull(reqlength(objForm.getImoCode(), 10)),
 				isNull(reqlength(objForm.getCallSign(), 10)), isNull(reqlength(voyage, 10)),
 				isNull(reqlength("RCA1", 10)) // "RCA1" hard code value for line no
@@ -2003,7 +2014,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(reqlength(objForm.getShipStoreDeclaration(), 1)), "N",
 						isNull(reqlength(objForm.getPassengerList(), 1)), isNull(reqlength(objForm.getCrewEffect(), 1)),
 						isNull(reqlength(objForm.getMaritimeDeclaration(), 1)),
-						terminalOpCod
+						CustomTerminalCd
 				
 					// newly added-------------------------------------------
 					/*isNull(objForm.getDepartureManifestNumber()),
@@ -2044,19 +2055,19 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				String rc_Code = "";
 				String tpBond = "";
 				containerStatus = (String) blObj.get("Cargo Movement Type");
-				
+
 				String unoCd = "";
 				String imoCd = "";
-				if(!("").equals(blObj.get("UNO Code"))  ) {
+				if (!("").equals(blObj.get("UNO Code"))) {
 					unoCd = (String) blObj.get("UNO Code");
-				}else {
+				} else {
 					unoCd = "ZZZZZ";
 				}
-				if(null != objForm.getImoCode() || !("").equals( objForm.getImoCode())) {
+				if (null != objForm.getImoCode() || !("").equals(objForm.getImoCode())) {
 					imoCd = objForm.getImoCode();
-				}else {
+				} else {
 					imoCd = "ZZZ";
-				}	
+				}
 
 				if ("TI".equalsIgnoreCase((String) blObj.get("Cargo Movement"))) {
 					rc_Code = isNull((String) serviceObj.get("Road Carr code"));
@@ -2078,8 +2089,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				String marksNo = "";
 				String description = "";
 				String transPrtMode = "";
- 				String portOfDsetination = (String)blObj.get("Port Of Destination");
-				String cargoMovmnt = (String)blObj.get("Cargo Movement");
+				String portOfDestination = "";
+				String portOfDsetination = (String) blObj.get("Port Of Destination");
+				String cargoMovmnt = (String) blObj.get("Cargo Movement");
 				int l = add.length();
 				System.out.println("length of address " + l);
 				if (l > 35) {
@@ -2099,13 +2111,13 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				} else
 					add1 = add;
 				// System.out.println("length = " + add.length());
-				
+
 				for (Object notifyObj : notifyPartyDetailes) {
 					JSONObject notyObj = (JSONObject) notifyObj;
 					if (((String) blObj.get("BL#")).equals(notyObj.get("blNO"))) {
-						
+
 						nodifyName = isNull(((String) notyObj.get("customerName")));
-						
+
 						String NodifyAdd = isNull(((String) notyObj.get("addressLine1"))
 								+ ((String) notyObj.get("addressLine2")) + ((String) notyObj.get("addressLine3"))
 								+ ((String) notyObj.get("addressLine4")));
@@ -2126,7 +2138,6 @@ public class ImportGeneralManifestSvc extends BaseAction {
 								nodifyAdd2 = NodifyAdd;
 							// System.out.println("length = " + add.length());
 
-							
 						} else
 							nodifyAdd1 = NodifyAdd;
 						// System.out.println("length = " + add.length());
@@ -2134,15 +2145,14 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						break;
 					}
 				}
-				
+
 				for (Object consigneeObj : consigneeDtls) {
 					JSONObject cnsgneeObj = (JSONObject) consigneeObj;
 					if (((String) blObj.get("BL#")).equals(cnsgneeObj.get("blNO"))) {
 						String consigneeAdd = isNull(((String) cnsgneeObj.get("addressLine1"))
 								+ ((String) cnsgneeObj.get("addressLine2")) + ((String) cnsgneeObj.get("addressLine3"))
 								+ ((String) cnsgneeObj.get("addressLine4")));
-						 consigneeName = isNull(((String) cnsgneeObj.get("customerName")));
-						
+						consigneeName = isNull(((String) cnsgneeObj.get("customerName")));
 
 						int len = consigneeAdd.length();
 						System.out.println("length of Notify address " + len);
@@ -2167,44 +2177,50 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						break;
 					}
 				}
-				
+
 				for (Object marksNumObj : marksNumberDtlstls) {
 					JSONObject marksObj = (JSONObject) marksNumObj;
 					/* marksNo = (String) marksObj.get("marksNumbers"); */
-					marksNo ="No Marks";
-					description  = (String) marksObj.get("description");
-					if(description.contains("\r\n")) {
+					marksNo = "No Marks";
+					description = (String) marksObj.get("description");
+					if (description.contains("\r\n")) {
 						description = description.replace("\r\n", " ");
-					}else if(description.contains("\n")) {
+					} else if (description.contains("\n")) {
 						description = description.replace("\n", " ");
 					}
-					
+
 				}
-				if( blObj.get("Port Of Destination").equals(objForm.getPod()) && !"INBOM".equals(objForm.getPod())) {
+				if (blObj.get("Port Of Destination").equals(objForm.getPod()) && !"INBOM".equals(objForm.getPod())) {
 					transPrtMode = "T";
-				}else if("INBOM".equals( blObj.get("Port Of Destination")) || "".equals( blObj.get("Port Of Destination")) ) {
+				} else if ("INBOM".equals(blObj.get("Port Of Destination"))
+						|| "".equals(blObj.get("Port Of Destination"))) {
 					transPrtMode = "R";
-				}else if("1".equals( blObj.get("Transhipment flag")) ) {
+				} else if ("1".equals(blObj.get("Transhipment flag"))) {
 					transPrtMode = "S";
 				}
-				
-				if("1".equals( blObj.get("Transhipment flag")) && !portOfDsetination.substring(0, 2).equals("IN")) {
+
+				if ("1".equals(blObj.get("Transhipment flag")) && !portOfDsetination.substring(0, 2).equals("IN")) {
 					cargoMovmnt = "TC";
+				}
+
+				if (blObj.get("Port Of Destination").equals(objForm.getPod())) {
+					portOfDestination = "IGMPORT ";
+				} else {
+					portOfDestination = "IGMDEL";
 				}
 				// Need some values if not found keep hard coding for each line
 				bw.write(String.join(Character.toString(fieldSepOp), msgType,
-						isNull(reqlength(objForm.getCustomCode(), 6)),
-						isNull(reqlength((String) imoCd, 10)),reqlength(objForm.getCallSign(), 10),
-						reqlength(voyage, 10),isNull(reqlength(objForm.getIgmNo(), 7)),
-						removeSlash(isNull(objForm.getIgmDate())), isNull((String) blObj.get("Item Number")),
+						isNull(reqlength((String) blObj.get("Cust Code"), 6)), isNull(reqlength((String) imoCd, 10)),
+						reqlength(objForm.getCallSign(), 10), reqlength(voyage, 10),
+						isNull(reqlength(objForm.getIgmNo(), 7)), removeSlash(isNull(objForm.getIgmDate())),
+						isNull((String) blObj.get("Item Number")),
 //						Item_Number = isNull((String) blObj.get("Item Number")), putting above line for line num 
 						reqlength(SUB_LINE_NO, 4), isNull(reqlength((String) blObj.get("BL#"), 20)),
 						isNull(removeSlash((String) blObj.get("BL_Date"))), isNull(reqlength(pol, 6)),
-						isNull(reqlength((String) blObj.get("Port Of Destination"), 6)),
+						isNull(reqlength((String) blObj.get("Destination port final"), 6)),
 						isNull((String) blObj.get("HBL_NO")), isNull((String) blObj.get("HBL_Date")),
 						isNull(consigneeName), isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3),
-						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3),
-						isNull(blank),	
+						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3), isNull(blank),
 						isNull(reqlength((String) blObj.get("Cargo Nature"), 2)),
 						isNull(reqlength((String) blObj.get("Item Type"), 2)),
 						isNull(reqlength((String) cargoMovmnt, 2)),
@@ -2217,96 +2233,96 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(reqlength((String) blObj.get("Unit of Volume"), 3)), isNull(reqlength(marksNo, 300)),
 						isNull(reqlength(description, 250)),
 						// "MARKS_NUMBER",
-						/* isNullUno(reqlength((String)blObj.get("UNO Code"),5)) */ isNull(reqlength((String) unoCd, 5)), // "UNO_CODE",
+						/* isNullUno(reqlength((String)blObj.get("UNO Code"),5)) */ isNull(
+								reqlength((String) unoCd, 5)), // "UNO_CODE",
 						/* isNull(reqlength(objForm.getImoCode(), 10)) */isNull(reqlength((String) "ZZZ", 10)),
 						reqlength(tpBond, 10), reqlength(rc_Code, 10),
-						
-						isNull(reqlength((String) transPrtMode, 1)),
-						isNull(reqlength(objForm.getAgentCode(), 16))
-						
-						/*
-						 * // ----------------newly added
-						 * 
-						 * isNull((String) blObj.get("Previous Declaration")),
-						 * 
-						 * isNull((String) blObj.get("Consolidator PAN")),
-						 * 
-						 * isNull((String) blObj.get("CIN TYPE")),
-						 * 
-						 * isNull((String) blObj.get("MCIN")),
-						 * 
-						 * isNull((String) blObj.get("CSN Submitted Type")),
-						 * 
-						 * isNull((String) blObj.get("CSN Submitted by")),
-						 * 
-						 * isNull((String) blObj.get("CSN Reporting Type")),
-						 * 
-						 * isNull((String) blObj.get("CSN Site ID")),
-						 * 
-						 * isNull((String) blObj.get("CSN Number")),
-						 * 
-						 * isNull((String) blObj.get("CSN Date")),
-						 * 
-						 * isNull((String) blObj.get("Previous MCIN")),
-						 * 
-						 * isNull((String) blObj.get("Split Indicator")),
-						 * 
-						 * isNull((String) blObj.get("Number of Packages")),
-						 * 
-						 * isNull((String) blObj.get("Type of Package")),
-						 * 
-						 * isNull((String) blObj.get("First Port of Entry/Last Port of Departure")),
-						 * 
-						 * isNull((String) blObj.get("Type Of Cargo")),
-						 * 
-						 * isNull((String) blObj.get("Split Indicator List")),
-						 * 
-						 * isNull((String) blObj.get("Port of Acceptance")),
-						 * 
-						 * isNull((String) blObj.get("Port of Receipt")),
-						 * 
-						 * isNull((String) blObj.get("UCR Typel")),
-						 * 
-						 * isNull((String) blObj.get("UCR Code")),
-						 * 
-						 * isNull((String) blObj.get("Port of Acceptance Name")),
-						 * 
-						 * isNull((String) blObj.get("Port of Receipt Name")),
-						 * 
-						 * isNull((String) blObj.get("PAN of notified party")),
-						 * 
-						 * isNull((String) blObj.get("Unit of weight")),
-						 * 
-						 * isNull((String) blObj.get("Gross Volume")),
-						 * 
-						 * isNull((String) blObj.get("Unit of Volume")),
-						 * 
-						 * isNull((String) blObj.get("Cargo Item Sequence No")),
-						 * 
-						 * isNull((String) blObj.get("Cargo Item Description")),
-						 * 
-						 * isNull((String) blObj.get("UNO Code")),
-						 * 
-						 * isNull((String) blObj.get("IMDG Code")),
-						 * 
-						 * isNull((String) blObj.get("Number of Packages Hidden")),
-						 * 
-						 * isNull((String) blObj.get("Type of Packages Hidden")),
-						 * 
-						 * isNull((String) blObj.get("Container Weight")),
-						 * 
-						 * isNull((String) blObj.get("Port of call sequence numbe")),
-						 * 
-						 * isNull((String) blObj.get("Port of Call Coded")),
-						 * 
-						 * isNull((String) blObj.get("Next port of call coded")),
-						 * 
-						 * isNull((String) blObj.get("MC Location Customsl"))
-						 */
-						+newLine));
+
+						isNull(reqlength((String) transPrtMode, 1)), isNull(reqlength(objForm.getAgentCode(), 16))
+
+								/*
+								 * // ----------------newly added
+								 * 
+								 * isNull((String) blObj.get("Previous Declaration")),
+								 * 
+								 * isNull((String) blObj.get("Consolidator PAN")),
+								 * 
+								 * isNull((String) blObj.get("CIN TYPE")),
+								 * 
+								 * isNull((String) blObj.get("MCIN")),
+								 * 
+								 * isNull((String) blObj.get("CSN Submitted Type")),
+								 * 
+								 * isNull((String) blObj.get("CSN Submitted by")),
+								 * 
+								 * isNull((String) blObj.get("CSN Reporting Type")),
+								 * 
+								 * isNull((String) blObj.get("CSN Site ID")),
+								 * 
+								 * isNull((String) blObj.get("CSN Number")),
+								 * 
+								 * isNull((String) blObj.get("CSN Date")),
+								 * 
+								 * isNull((String) blObj.get("Previous MCIN")),
+								 * 
+								 * isNull((String) blObj.get("Split Indicator")),
+								 * 
+								 * isNull((String) blObj.get("Number of Packages")),
+								 * 
+								 * isNull((String) blObj.get("Type of Package")),
+								 * 
+								 * isNull((String) blObj.get("First Port of Entry/Last Port of Departure")),
+								 * 
+								 * isNull((String) blObj.get("Type Of Cargo")),
+								 * 
+								 * isNull((String) blObj.get("Split Indicator List")),
+								 * 
+								 * isNull((String) blObj.get("Port of Acceptance")),
+								 * 
+								 * isNull((String) blObj.get("Port of Receipt")),
+								 * 
+								 * isNull((String) blObj.get("UCR Typel")),
+								 * 
+								 * isNull((String) blObj.get("UCR Code")),
+								 * 
+								 * isNull((String) blObj.get("Port of Acceptance Name")),
+								 * 
+								 * isNull((String) blObj.get("Port of Receipt Name")),
+								 * 
+								 * isNull((String) blObj.get("PAN of notified party")),
+								 * 
+								 * isNull((String) blObj.get("Unit of weight")),
+								 * 
+								 * isNull((String) blObj.get("Gross Volume")),
+								 * 
+								 * isNull((String) blObj.get("Unit of Volume")),
+								 * 
+								 * isNull((String) blObj.get("Cargo Item Sequence No")),
+								 * 
+								 * isNull((String) blObj.get("Cargo Item Description")),
+								 * 
+								 * isNull((String) blObj.get("UNO Code")),
+								 * 
+								 * isNull((String) blObj.get("IMDG Code")),
+								 * 
+								 * isNull((String) blObj.get("Number of Packages Hidden")),
+								 * 
+								 * isNull((String) blObj.get("Type of Packages Hidden")),
+								 * 
+								 * isNull((String) blObj.get("Container Weight")),
+								 * 
+								 * isNull((String) blObj.get("Port of call sequence numbe")),
+								 * 
+								 * isNull((String) blObj.get("Port of Call Coded")),
+								 * 
+								 * isNull((String) blObj.get("Next port of call coded")),
+								 * 
+								 * isNull((String) blObj.get("MC Location Customsl"))
+								 */
+								+ newLine));
 
 			}
-			
+
 			bw.write("<END-cargo>" + newLine);
 
 			// Need some values if not found keep hard coding
@@ -2319,59 +2335,58 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				ItemNumber =  isNull((String) blObj.get("Item Number"));
 		
 			
-			for (Object containDtls : containeerDtls) {
-				JSONObject coDtl = (JSONObject) containDtls;
-				if(coDtl.get("blNO").equals( blObj.get("BL#"))) {
-					
-			
-				if( null == coDtl.get("containerSize") || coDtl.get("containerSize").equals(" ") ) {
-					iso = " ";
-				}else if(coDtl.get("containerSize").equals("40")) {
-					if(coDtl.get("containerType").equals("HC")) {
-						iso = "4400";
-					}
-					
-				}else if(coDtl.get("containerSize").equals("20") ) {
-					
-					if(coDtl.get("containerType").equals("GP")) {
-						iso = "2200";
-					}
-				}else if (coDtl.get("containerSize").equals("40") ) {
-					if(coDtl.get("containerType").equals("GP")) {
-						iso = "4200";
-					}else {
-						iso="";
-					}
-				}
-				
-				if(msgType.equals("A")) {
-					msgTypeCon = "S";
-				}else {
-					msgTypeCon = "F";
-					
-				}
-				// Need some values if not found keep hard coding
-				bw.write(String.join(Character.toString(fieldSepOp), msgTypeCon,
-						isNull(reqlength(objForm.getCustomCode(), 6)), isNull(reqlength(objForm.getImoCode(), 10)),
-						 reqlength(objForm.getCallSign(), 10), reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
-						removeSlash(isNull(objForm.getIgmDate())), isNull(blank),
-						// "Line_No",
-						isNull(reqlength(objForm.getCustomCode(), 6)),
-						isNull((String) blObj.get("Item Number")),  
-						
-						// "SUB_LINE_NO",
-						reqlength(SUB_LINE_NO, 4), isNull(reqlength((String) coDtl.get("containerNumber"), 11)),
-						isNull(reqlength((String) coDtl.get("containerSealNumber"), 15)),
-						isNull(reqlength(objForm.getAgentCode(), 16)),
-						// ---->"CONTAINER_STATUS"
-						isNull(reqlength(containerStatus, 3)),
-						isNull(reqlength((String) coDtl.get("totalNumberOfPackagesInContainer"), 8)),
-						isNull(settingLengthForDouble((String) coDtl.get("containerWeight"), 14, 2)),
-						isNull(reqlength(iso, 4)), "N"// "SOC_FLAG"
+				for (Object containDtls : containeerDtls) {
+					JSONObject coDtl = (JSONObject) containDtls;
+					if (coDtl.get("blNO").equals(blObj.get("BL#"))) {
 
-								+ newLine));
-			}
-			}
+						if (null == coDtl.get("containerSize") || coDtl.get("containerSize").equals(" ")) {
+							iso = " ";
+						} else if (coDtl.get("containerSize").equals("40")) {
+							if (coDtl.get("containerType").equals("HC")) {
+								iso = "4400";
+							}
+
+						} else if (coDtl.get("containerSize").equals("20")) {
+
+							if (coDtl.get("containerType").equals("GP")) {
+								iso = "2200";
+							}
+						} else if (coDtl.get("containerSize").equals("40")) {
+							if (coDtl.get("containerType").equals("GP")) {
+								iso = "4200";
+							} else {
+								iso = "";
+							}
+						}
+
+						if (msgType.equals("A")) {
+							msgTypeCon = "S";
+						} else {
+							msgTypeCon = "F";
+
+						}
+						// Need some values if not found keep hard coding
+						bw.write(String.join(Character.toString(fieldSepOp), msgTypeCon,
+								isNull(reqlength((String) blObj.get("Cust Code"), 6)),
+								isNull(reqlength(objForm.getImoCode(), 10)), reqlength(objForm.getCallSign(), 10),
+								reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
+								removeSlash(isNull(objForm.getIgmDate())), isNull(blank),
+								// "Line_No",
+								isNull((String) blObj.get("Item Number")),
+
+								// "SUB_LINE_NO",
+								reqlength(SUB_LINE_NO, 4), isNull(reqlength((String) coDtl.get("containerNumber"), 11)),
+								isNull(reqlength((String) coDtl.get("containerSealNumber"), 15)),
+								isNull(reqlength(objForm.getAgentCode(), 16)),
+								// ---->"CONTAINER_STATUS"
+								isNull(reqlength(containerStatus, 3)),
+								isNull(reqlength((String) coDtl.get("totalNumberOfPackagesInContainer"), 8)),
+								isNull(settingLengthForDouble((String) coDtl.get("containerWeight"), 14, 2)),
+								isNull(reqlength(iso, 4)), "N"// "SOC_FLAG"
+
+										+ newLine));
+					}
+				}
 			}
 			
 			// hard code

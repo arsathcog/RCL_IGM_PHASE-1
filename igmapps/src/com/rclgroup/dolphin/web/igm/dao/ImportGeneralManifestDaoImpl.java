@@ -128,6 +128,8 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 	private static final String CFSCustomcodeQuery=" select PARTNER_VALUE , SEALINER_VALUE from EDI_TRANSLATION_DETAIL where ETH_UID in (" + 
 			"             select ETH_UID from EDI_TRANSLATION_HEADER where CODE_SET='IGM_CFS'" + 
 			"           ) and SEALINER_VALUE in ";
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -708,9 +710,9 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 				{	KEY_IGM_IMDG_CODE            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_IMDG_CODE	) },
 				{	KEY_IGM_PORT_OF_DESTINATION            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_PORT_OF_DESTINATION	) },
 				{	KEY_IGM_TERMINAL_OP_COD            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_TERMINAL_OP_COD	) },
+				{	KEY_IGM_ACTUAL_POD            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_ACTUAL_POD) },
+				{	KEY_IGM_IGMPORT            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_IGMPORT) },
 
-				//BL SECTION END
-				
 				{	KEY_IGM_ERROR				, BLANK + ORACLE_VARCHAR, PARAM_OUT, BLANK }
 
 		};
@@ -900,11 +902,33 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 			objMod.setTshipmentFlag(rs.getString("TSHIPMNT_FLAG"));
 			objMod.setTerminal_op_cod(rs.getString("TERMINAL_OP_COD"));
 			
+			objMod.setActualPod(rs.getString("ACTUAL_POD"));
+//			objMod.setIgmDestinationPort(rs.getString("IGMDEL"));
+//			objMod.setIgmport(rs.getString("IGMPORT"));
 
+			if(objMod.getActualPod().equals(objMod.getPort_of_destination())) {
+//				//IGMPORT  implement 
+				if(null !=rs.getString("IGMPORT")|| ("").equals(rs.getString("IGMPORT")) ) {
+					objMod.setIgmDestinationPort(rs.getString("IGMPORT"));
+				}else {
+				objMod.setIgmDestinationPort("");
+				}
+			}else {
+				//IGMDEL implement  
+				objMod.setIgmDestinationPort(rs.getString("IGMDEL"));
+			}
+
+			objMod.setDestinationPortFinal(rs.getString("IGMPORT_DEST"));
 			//END BL SECTION 
 
 			return objMod;
 		}
+	}
+	
+	public String destinationPortCall() {
+		
+		return null;
+		
 	}
 
 	@Override

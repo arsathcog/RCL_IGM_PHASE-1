@@ -1921,6 +1921,11 @@ function submitData() {
 				.getElementById(idJsonObjectForTextBox[i]["Terminal op cod"]).value;
 				listOfBlDetails["Port arrival"] = document
 				.getElementById(idJsonObjectForTextBox[i]["Port arrival"]).value;
+				listOfBlDetails["Actual pod"] = document
+				.getElementById(idJsonObjectForTextBox[i]["Actual pod"]).value;
+				listOfBlDetails["Igm port destination"] = document
+				.getElementById(idJsonObjectForTextBox[i]["Igm port destination"]).value;
+		
 
 				if(popupjson.popup[blnoforpopupdata].consignee[0].vaidation=="TRUE" && popupjson.popup[blnoforpopupdata].notifyParty[0].vaidation=="TRUE"
 					&& popupjson.popup[blnoforpopupdata].containerDetailes[0].vaidation=="TRUE" && popupjson.popup[blnoforpopupdata].marksNumber[0].vaidation=="TRUE"){
@@ -4174,7 +4179,7 @@ function onUpload()
 		consigneeZip = popupWindow.document.getElementById("consigneeZip");
 		consigneeBlNo = popupWindow.document.getElementById("consigneeBlNo");
 		//consinfot.innerHTML = '';
-		consigneeCode.innerHTML = '';
+	/*	consigneeCode.innerHTML = '';
 		consigneeName.innerHTML = '';
 		consigneeAdress1.innerHTML = '';
 		consigneeAdress2.innerHTML = '';
@@ -4184,7 +4189,7 @@ function onUpload()
 		consigneeState.innerHTML = '';
 		consigneeCountry.innerHTML = '';
 		consigneeZip.innerHTML = '';
-		consigneeBlNo.innerHTML = '';
+		consigneeBlNo.innerHTML = '';*/
 		
 		listOfconsigneeInformation = [];
 		//console.log(popupjson);
@@ -4494,7 +4499,7 @@ function onUpload()
 			ConsignerZip = popupWindow.document.getElementById("ConsignerZip");
 			ConsignerBlNo = popupWindow.document.getElementById("ConsignerBlNo");
 			//consinfot.innerHTML = '';
-			ConsignerCode.innerHTML = '';
+		/*	ConsignerCode.innerHTML = '';
 			ConsignerName.innerHTML = '';
 			ConsignerAdress1.innerHTML = '';
 			ConsignerAdress2.innerHTML = '';
@@ -4504,7 +4509,7 @@ function onUpload()
 			ConsignerState.innerHTML = '';
 			ConsignerCountry.innerHTML = '';
 			ConsignerZip.innerHTML = '';
-			ConsignerBlNo.innerHTML = '';
+			ConsignerBlNo.innerHTML = '';*/
 			
 			listOfConsignerInformation = [];
 			//console.log(popupjson);
@@ -4790,7 +4795,7 @@ function onUpload()
 		NotifyZip = popupWindow.document.getElementById("NotifyZip");
 		NotifyBlNo = popupWindow.document.getElementById("NotifyBlNo");
 		//notifyInfot.innerHTML = '';
-		NotifyCode.innerHTML = '';
+	/*	NotifyCode.innerHTML = '';
 		NotifyName.innerHTML = '';
 		NotifyAdress1.innerHTML = '';
 		NotifyAdress2.innerHTML = '';
@@ -4800,7 +4805,7 @@ function onUpload()
 		NotifyState.innerHTML = '';
 		NotifyCountry.innerHTML = '';
 		NotifyZip.innerHTML = '';
-		NotifyBlNo.innerHTML = '';
+		NotifyBlNo.innerHTML = '';*/
 		listOfnotifyInformation = [];
 		//console.log(popupjson);
 		var notifyInformationpath=popupjson.popup[document.getElementById(Y+"BL#").value].notifyParty;
@@ -5103,7 +5108,7 @@ function onUpload()
 		var X=document.getElementById(idr).getAttribute("servicepath");
 		var Y=document.getElementById(idr).getAttribute("blspath");
 		marksInfot = popupWindow.document.getElementById("marksNumberinfo");
-		marksInfot.innerHTML = '';
+		/*marksInfot.innerHTML = '';*/
 		listOfMarksNumberInformation = [];
 		//console.log(popupjson);
 		var marksInformationpath=popupjson.popup[document.getElementById(Y+"BL#").value].marksNumber;
@@ -6319,7 +6324,15 @@ function manifestFileGeneratorEdiFile() {
 						.getElementById(idJsonObjectForTextBox[i]["Terminal op cod"]).value;
 						listOfBlDetails["Port arrival"] = document
 						.getElementById(idJsonObjectForTextBox[i]["Port arrival"]).value;
-				
+						listOfBlDetails["Actual pod"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Actual pod"]).value;
+						listOfBlDetails["Igm port destination"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Igm port destination"]).value;
+						listOfBlDetails["Destination port final"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Destination port final"]).value;
+						listOfBlDetails["Cust Code"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Cust Code"]).value;
+					
 						blDetails.push(listOfBlDetails);
 						
 						console.log(blDetails);

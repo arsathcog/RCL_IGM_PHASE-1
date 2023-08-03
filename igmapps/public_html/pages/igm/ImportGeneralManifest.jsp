@@ -1403,8 +1403,27 @@ var bld = [{
 	},
 	{
 		'type'      : 'hidden',
+		'columnName': 'Actual pod',
+	    'mappedCol' : 'actualPod'
+	},
+	{
+		'type'      : 'hidden',
+		'columnName': 'Igm port destination',
+	    'mappedCol' : 'igmDestinationPort'
+	},
+	{
+		'type'      : 'hidden',
 		'columnName': 'Port arrival',
 	    'mappedCol' : 'portArrival'
+	},{
+		'type'      : 'hidden',
+		'columnName': 'Destination port final',
+	    'mappedCol' : 'destinationPortFinal'
+	},
+	{
+		'type'      : 'hidden',
+		'columnName': 'Cust Code',
+	    'mappedCol' : 'codeCode'
 	}]
 
 

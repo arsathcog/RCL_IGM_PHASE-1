@@ -529,6 +529,12 @@ public interface ImportGeneralManifestDao {
 	
 	public static final String KEY_IGM_TERMINAL_OP_COD  = "P_I_V_TERMINAL_OP_COD";
 	
+	public static final String KEY_IGM_ACTUAL_POD  = "P_I_V_ACTUAL_POD";
+	
+	public static final String KEY_IGM_IGMPORT  = "P_I_V_IGMPORT_DEST";
+	
+	public static final String KEY_IGM_IGMDEL = "P_I_V_IGMDEL";
+	
 	//BL SECTION END
 	
 	

@@ -1534,7 +1534,7 @@ var bld = [{
 		}
 		if (window.focus) {popupWindow.focus()}
 		
-		setTimeout(consigneeMethod, 500, popupWindow, selectObject);
+		setTimeout(consigneeMethod, 1000, popupWindow, selectObject);
 
 	}
 
@@ -1554,7 +1554,7 @@ var bld = [{
 		}
 		if (window.focus) {popupWindow.focus()}
 		
-		setTimeout(consignerMethod, 500, popupWindow, selectObject);
+		setTimeout(consignerMethod, 1000, popupWindow, selectObject);
 
 	}
 
@@ -1575,7 +1575,7 @@ var bld = [{
 
 		if (window.focus) {popupWindow.focus()}
 		
-		setTimeout(notifyPartyme, 500, popupWindow, selectObject);
+		setTimeout(notifyPartyme, 1000, popupWindow, selectObject);
 
 	}
 	function marksInfo(selectObject) {
@@ -1596,7 +1596,7 @@ var bld = [{
 
 		if (window.focus) {popupWindow.focus()}
 
-		setTimeout(markNumberme, 500, popupWindow, selectObject);
+		setTimeout(markNumberme, 1000, popupWindow, selectObject);
 	}
 
 	function containerDetailsInfo(selectObject) {
@@ -1617,7 +1617,7 @@ var bld = [{
 
 	if (window.focus) {popupWindow.focus()} 
 
-	setTimeout(containerme, 500, popupWindow, selectObject);
+	setTimeout(containerme, 1000, popupWindow, selectObject);
 
 	}
 	

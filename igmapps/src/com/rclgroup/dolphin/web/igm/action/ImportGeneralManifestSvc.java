@@ -2000,7 +2000,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		        String formattedTime = formatTime(objForm.getaTime());		        
 				// Need some values if not found keep hard coding for each line.
 		        bw.write(String.join(Character.toString(fieldSepOp), msgType,
-				isNull(reqlength(customeCode, 6)), isNull(reqlength(objForm.getIgmNo(), 7)),
+				isNull(customeCode), isNull(reqlength(objForm.getIgmNo(), 7)),
 				removeSlash(isNull(objForm.getIgmDate())), isNull(reqlength(objForm.getImoCode(), 10)),
 				isNull(reqlength(objForm.getCallSign(), 10)), isNull(reqlength(voyage, 10)),
 				isNull(reqlength("RCA1", 10)) // "RCA1" hard code value for line no
@@ -2210,14 +2210,14 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				}
 				// Need some values if not found keep hard coding for each line
 				bw.write(String.join(Character.toString(fieldSepOp), msgType,
-						isNull(reqlength((String) blObj.get("Cust Code"), 6)), isNull(reqlength((String) imoCd, 10)),
+						isNull((String) blObj.get("Cust Code")), isNull(reqlength((String) imoCd, 10)),
 						reqlength(objForm.getCallSign(), 10), reqlength(voyage, 10),
 						isNull(reqlength(objForm.getIgmNo(), 7)), removeSlash(isNull(objForm.getIgmDate())),
 						isNull((String) blObj.get("Item Number")),
 //						Item_Number = isNull((String) blObj.get("Item Number")), putting above line for line num 
 						reqlength(SUB_LINE_NO, 4), isNull(reqlength((String) blObj.get("BL#"), 20)),
 						isNull(removeSlash((String) blObj.get("BL_Date"))), isNull(reqlength(pol, 6)),
-						isNull(reqlength((String) blObj.get("Destination port final"), 6)),
+						isNull((String) blObj.get("Destination port final")),
 						isNull((String) blObj.get("HBL_NO")), isNull((String) blObj.get("HBL_Date")),
 						isNull(consigneeName), isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3),
 						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3), isNull(blank),
@@ -2228,7 +2228,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(reqlength((String) blObj.get("Number of Packages"), 8)),
 						isNull(reqlength((String) blObj.get("Type of Package"), 3)),
 						isNull(settingLengthForDouble(objForm.getGrossWeightVessel(), 12, 3)),
-						isNull(reqlength((String) blObj.get("Unit of weight"), 3)),
+						isNull(reqlength((String) "KGS", 3)),
 						isNull(settingLengthForDouble((String) blObj.get("Gross Volume"), 12, 3)),
 						isNull(reqlength((String) blObj.get("Unit of Volume"), 3)), isNull(reqlength(marksNo, 300)),
 						isNull(reqlength(description, 250)),
@@ -2367,7 +2367,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						}
 						// Need some values if not found keep hard coding
 						bw.write(String.join(Character.toString(fieldSepOp), msgTypeCon,
-								isNull(reqlength((String) blObj.get("Cust Code"), 6)),
+								isNull((String) blObj.get("Cust Code")),
 								isNull(reqlength(objForm.getImoCode(), 10)), reqlength(objForm.getCallSign(), 10),
 								reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
 								removeSlash(isNull(objForm.getIgmDate())), isNull(blank),

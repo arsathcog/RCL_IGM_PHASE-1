@@ -5229,7 +5229,7 @@ function onUpload()
 		var Y=document.getElementById(idr).getAttribute("blspath");
 		listOfcontainerDetailsInformation = [];
 		containerinfot = popupWindow.document.getElementById("containerDetailsinfo");
-		containerinfot.innerHTML = '';
+		/*containerinfot.innerHTML = '';*/
 		//console.log(popupjson.popup[document.getElementById(Y+"BL#").value].containerDetailes.length)
 		var containerDetailsInfonpath=popupjson.popup[document.getElementById(Y+"BL#").value].containerDetailes;
 		//console.log(popupjson);

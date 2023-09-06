@@ -1861,11 +1861,11 @@ public class ImportGeneralManifestSvc extends BaseAction {
            SimpleDateFormat outputFormat = new SimpleDateFormat("ddMMyyyy");
            String formattedDate = outputFormat.format(date);
            return formattedDate;
-	    }
+	    }	
 	   
 	    public static String formatTime(String inputTime) {
 	        StringBuilder sb = new StringBuilder(inputTime);
-	        sb.insert(2, '.'); // Insert dot at the 3rd position (between hour and minutes)
+	        sb.insert(2, ':'); // Insert dot at the 3rd position (between hour and minutes)
 	        return sb.toString();
 	    }
 	    
@@ -2008,7 +2008,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						 portOfArrival, isNull(reqlength(objForm.getPrt1(), 6)),
 						isNull(reqlength(objForm.getPrt2(), 6)), isNull(reqlength(objForm.getPrt3(), 6)),
 						isNull(reqlength(objForm.getVesselTypes(), 1)), isNull((String) objForm.getTotalItem()),
-						"CONTAINERS", isNull(formattedDate) + " " + isNull(objForm.getaTime()),
+						"CONTAINERS", isNull(formattedDate) + " " + isNull(formattedTime),
 						isNull(reqlength(objForm.getLighthouseDue(), 9)),
 						isNull(reqlength(objForm.getSameBottomCargo(), 1)),
 						isNull(reqlength(objForm.getShipStoreDeclaration(), 1)), "N",
@@ -2220,7 +2220,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull((String) blObj.get("Destination port final")),
 						isNull((String) blObj.get("HBL_NO")), isNull((String) blObj.get("HBL_Date")),
 						isNull(consigneeName), isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3),
-						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3), isNull(blank),
+						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3),
 						isNull(reqlength((String) blObj.get("Cargo Nature"), 2)),
 						isNull(reqlength((String) blObj.get("Item Type"), 2)),
 						isNull(reqlength((String) cargoMovmnt, 2)),
@@ -2370,7 +2370,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 								isNull((String) blObj.get("Cust Code")),
 								isNull(reqlength(objForm.getImoCode(), 10)), reqlength(objForm.getCallSign(), 10),
 								reqlength(voyage, 10), isNull(reqlength(objForm.getIgmNo(), 7)),
-								removeSlash(isNull(objForm.getIgmDate())), isNull(blank),
+								removeSlash(isNull(objForm.getIgmDate())),
 								// "Line_No",
 								isNull((String) blObj.get("Item Number")),
 

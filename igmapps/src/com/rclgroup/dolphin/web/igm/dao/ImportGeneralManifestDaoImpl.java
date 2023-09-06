@@ -909,18 +909,18 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 			if(null != objMod.getActualPod() ) {
 			if(objMod.getActualPod().equals(objMod.getPort_of_destination())) {
 //				//IGMPORT  implement 
-				if(null !=rs.getString("IGMPORT")|| ("").equals(rs.getString("IGMPORT")) ) {
+//				if(null !=rs.getString("IGMPORT")|| ("").equals(rs.getString("IGMPORT")) ) {
 					objMod.setIgmDestinationPort(rs.getString("IGMPORT"));
-				}else {
-				objMod.setIgmDestinationPort("");
-				}
+//				}else {
+//				objMod.setIgmDestinationPort("");
+//				}
 			}else {
 				//IGMDEL implement  
 				objMod.setIgmDestinationPort(rs.getString("IGMDEL"));
 			}
 			}
 
-			objMod.setDestinationPortFinal(rs.getString("IGMPORT_DEST"));
+			objMod.setDestinationPortFinal(rs.getString("SZXCB23020545"));
 			//END BL SECTION 
 
 			return objMod;

@@ -920,7 +920,7 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 			}
 			}
 
-			objMod.setDestinationPortFinal(rs.getString("SZXCB23020545"));
+			objMod.setDestinationPortFinal(rs.getString("IGMPORT_DEST"));
 			//END BL SECTION 
 
 			return objMod;

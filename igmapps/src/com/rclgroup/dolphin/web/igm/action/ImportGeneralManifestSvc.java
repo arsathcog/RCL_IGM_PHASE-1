@@ -1870,6 +1870,25 @@ public class ImportGeneralManifestSvc extends BaseAction {
 	        return sb.toString();
 	    }
 	    
+	    public static String formatTimeTo12Hour(String inputTime) {
+	    	 if (inputTime.length() != 4) {
+	    	        // Input time should be in HHMM format (4 characters)
+	    	        return "Invalid time format";
+	    	    }
+	    	    
+	    	    int hours = Integer.parseInt(inputTime.substring(0, 2));
+	    	    int minutes = Integer.parseInt(inputTime.substring(2, 4));
+	    	    
+	    	    if (hours == 0) {
+	    	        hours = 12; // Midnight
+	    	    } else if (hours > 12) {
+	    	        hours -= 12;
+	    	    }
+	    	    
+	    	    return String.format("%02d:%02d", hours, minutes);
+	    }
+
+	    
 	public static String settingLengthForDouble(String aField, int aintDigits,int aintDecimals){
         String val = aField+"";
         int dotIndex=val.indexOf('.');
@@ -1997,7 +2016,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			}
 			
 		        String formattedDate = formatDate(objForm.getaDate());
-		        String formattedTime = formatTime(objForm.getaTime());		        
+		        String formattedTime = formatTimeTo12Hour(objForm.getaTime());		        
 				// Need some values if not found keep hard coding for each line.
 		        bw.write(String.join(Character.toString(fieldSepOp), msgType,
 				isNull(customeCode), isNull(reqlength(objForm.getIgmNo(), 7)),

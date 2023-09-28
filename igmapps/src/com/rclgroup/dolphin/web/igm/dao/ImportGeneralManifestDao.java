@@ -443,6 +443,9 @@ public interface ImportGeneralManifestDao {
 	/** The  Constant KEY_IGM_NUMBER_OF_PACKAGES.*/
 	public static final String KEY_IGM_NUMBER_OF_PACKAGES = "P_I_V_NUMBER_OF_PACKAGES";
 	
+	/** The  Constant KEY_IGM_GROS_WEIGHT - PER BL.*/
+	public static final String KEY_IGM_GROS_WEIGHT  = "P_I_V_GROS_WEIGHT";
+	
 	/** The  Constant KEY_IGM_TYPE_OF_PACKAGE.*/
 	public static final String KEY_IGM_TYPE_OF_PACKAGE = "P_I_V_TYPE_OF_PACKAGE";
 	

@@ -1424,6 +1424,10 @@ var bld = [{
 		'type'      : 'hidden',
 		'columnName': 'Cust Code',
 	    'mappedCol' : 'codeCode'
+	},{
+		'type'      : 'hidden',
+		'columnName': 'Gross Weight',
+	    'mappedCol' : 'gros_weight'
 	}]
 
 

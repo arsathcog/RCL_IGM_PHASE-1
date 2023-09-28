@@ -648,7 +648,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 	private Map<String, String> createHeaderParamsForSave(ImportGeneralManifestUim objForm, JSONObject blObj,
 			JSONObject serviceObj, JSONArray consigneeArray, JSONArray consignerarray, JSONArray MarksNumberArray,
 			JSONArray NotifyPartyArray) {
-		// System.out.println("#IGMLogger createHeaderParamsForSave() started..");
+		// System.out.println("#IGMLogger () started..");
 		Map<String, String> mapParam = new HashMap<>();
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_SERVICE, (String) (String) serviceObj.get("Service"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_VESSEL, (String) serviceObj.get("Vessel"));
@@ -699,7 +699,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_ARRIVAL_TIME_ATA, objForm.getAtaAt());
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_TOTAL_BLS, objForm.getTotalItem());
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_LIGHT_DUE, objForm.getLighthouseDue());
-		mapParam.put(ImportGeneralManifestDao.KEY_IGM_GROSS_WEIGHT, objForm.getGrossWeightVessel());
+		mapParam.put(ImportGeneralManifestDao.KEY_IGM_GROSS_WEIGHT, (String) blObj.get("Gross Weight"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_NET_WEIGHT, objForm.getNetWeightVessel());
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_SM_BT_CARGO, objForm.getSameBottomCargo());
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_SHIP_STR_DECL, objForm.getShipStoreDeclaration());
@@ -788,6 +788,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_PREVIOUS_MCIN, (String) blObj.get("Previous MCIN"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_SPLIT_INDICATOR, (String) blObj.get("Split Indicator"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_NUMBER_OF_PACKAGES, (String) blObj.get("Number of Packages"));
+		mapParam.put(ImportGeneralManifestDao.KEY_IGM_GROS_WEIGHT, (String) blObj.get("Gross Weight"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_TYPE_OF_PACKAGE, (String) blObj.get("Type of Package"));
 		mapParam.put(ImportGeneralManifestDao.KEY_IGM_FIRST_PORT_OF_ENTRY_LAST_PORT_OF_DEPARTURE,
 				(String) blObj.get("First Port of Entry/Last Port of Departure"));
@@ -1992,8 +1993,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				portOfArrival = isNull((String) blObj.get("Port arrival"));
 				terminalOpCod =isNull((String) blObj.get("Terminal op cod"));
 				customeCode = isNull((String) blObj.get("Cust Code"));
-				
-				
+
 			}
 			
 		        String formattedDate = formatDate(objForm.getaDate());
@@ -2190,15 +2190,23 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					}
 
 				}
-				if (blObj.get("Port Of Destination").equals(objForm.getPod()) && !"INBOM".equals(objForm.getPod())) {
-					transPrtMode = "T";
-				} else if ("INBOM".equals(blObj.get("Port Of Destination"))
-						|| "".equals(blObj.get("Port Of Destination"))) {
-					transPrtMode = "R";
-				} else if ("1".equals(blObj.get("Transhipment flag"))) {
+//				if (blObj.get("Port Of Destination").equals(objForm.getPod()) && !"INBOM".equals(objForm.getPod())) {
+//					transPrtMode = "T";
+//				} else if ("INBOM".equals(blObj.get("Port Of Destination"))
+//						|| "".equals(blObj.get("Port Of Destination"))) {
+//					transPrtMode = "R";
+//				} else if ("1".equals(blObj.get("Transhipment flag"))) {
+//					transPrtMode = "S";
+//				}
+				
+//-----------------------------	transport mode Logic -------------------------------------
+				if(blObj.get("Port Of Destination").equals(objForm.getPod())) {
 					transPrtMode = "S";
+				}else if( !blObj.get("Port Of Destination").equals(objForm.getPod())) {
+					transPrtMode = "R";
 				}
-
+//-----------------------------------------------------------------------------------------
+				
 				if ("1".equals(blObj.get("Transhipment flag")) && !portOfDsetination.substring(0, 2).equals("IN")) {
 					cargoMovmnt = "TC";
 				}
@@ -2220,14 +2228,14 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull((String) blObj.get("Destination port final")),
 						isNull((String) blObj.get("HBL_NO")), isNull((String) blObj.get("HBL_Date")),
 						isNull(consigneeName), isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3),
-						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2), isNull(nodifyAdd3),
+						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2),
 						isNull(reqlength((String) blObj.get("Cargo Nature"), 2)),
 						isNull(reqlength((String) blObj.get("Item Type"), 2)),
 						isNull(reqlength((String) cargoMovmnt, 2)),
 						isNull(reqlength((String) blObj.get("CFS-Custom Code"), 10)), // "NUMBER_PACKAGES",
 						isNull(reqlength((String) blObj.get("Number of Packages"), 8)),
 						isNull(reqlength((String) blObj.get("Type of Package"), 3)),
-						isNull(settingLengthForDouble(objForm.getGrossWeightVessel(), 12, 3)),
+						isNull((String) blObj.get("Gross Weight")),
 						isNull(reqlength((String) "KGS", 3)),
 						isNull(settingLengthForDouble((String) blObj.get("Gross Volume"), 12, 3)),
 						isNull(reqlength((String) blObj.get("Unit of Volume"), 3)), isNull(reqlength(marksNo, 300)),
@@ -2399,5 +2407,12 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			e.printStackTrace();
 		}
 		return manifestFile;
+	}
+
+	private static CharSequence isNull(String string, String null1, String null2, String null3, String null4,
+			String null5, String null6, String null7, String reqlength, String reqlength2, String null8,
+			String string2) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

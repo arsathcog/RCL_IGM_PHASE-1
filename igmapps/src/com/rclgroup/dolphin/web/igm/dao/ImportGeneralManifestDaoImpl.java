@@ -550,7 +550,7 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 				{	KEY_IGM_ARRIVAL_TIME_ATA	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_ARRIVAL_TIME_ATA	) },
 				{	KEY_IGM_TOTAL_BLS			, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_TOTAL_BLS	) },
 				{	KEY_IGM_LIGHT_DUE			, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_LIGHT_DUE	) },
-				{	KEY_IGM_GROSS_WEIGHT		, BLANK + ORACLE_VARCHAR, PARAM_IN,  (String) amapParam.get(	KEY_IGM_GROSS_WEIGHT	) },
+				{	KEY_IGM_GROSS_WEIGHT		, BLANK + ORACLE_VARCHAR, PARAM_IN,  (String) amapParam.get(	KEY_IGM_GROSS_WEIGHT) },
 				{	KEY_IGM_NET_WEIGHT			, BLANK + ORACLE_VARCHAR, PARAM_IN,  (String) amapParam.get(	KEY_IGM_NET_WEIGHT	) },
 				{	KEY_IGM_SM_BT_CARGO			, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_SM_BT_CARGO	) },
 				{	KEY_IGM_SHIP_STR_DECL		, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_SHIP_STR_DECL	) },
@@ -683,6 +683,7 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 				{	KEY_IGM_PREVIOUS_MCIN            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_PREVIOUS_MCIN	) },
 				{	KEY_IGM_SPLIT_INDICATOR            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_SPLIT_INDICATOR	) },
 				{	KEY_IGM_NUMBER_OF_PACKAGES            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_NUMBER_OF_PACKAGES	) },
+				{	KEY_IGM_GROS_WEIGHT            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_GROS_WEIGHT	) },
 				{	KEY_IGM_TYPE_OF_PACKAGE            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_TYPE_OF_PACKAGE	) },
 				{	KEY_IGM_FIRST_PORT_OF_ENTRY_LAST_PORT_OF_DEPARTURE            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_FIRST_PORT_OF_ENTRY_LAST_PORT_OF_DEPARTURE	) },
 				{	KEY_IGM_TYPE_OF_CARGO            	, BLANK + ORACLE_VARCHAR, PARAM_IN, (String) amapParam.get(	KEY_IGM_TYPE_OF_CARGO	) },
@@ -873,6 +874,7 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 			objMod.setSplit_indicator(rs.getString("PREVIOUS_MCIN"));
 			objMod.setSplit_indicator(rs.getString("SPLIT_INDICATOR"));
 			objMod.setNumber_of_packages(rs.getString("NUMBER_OF_PACKAGES"));
+			objMod.setGros_weight(rs.getString("GROS_WEIGHT"));
 			objMod.setType_of_package(rs.getString("TYPE_OF_PACKAGE"));
 			objMod.setFirst_port_of_entry_last_port_of_departure(rs.getString("FIRST_PORT_OF_ENTRY_LAST_PORT_OF_DEPARTURE"));
 			objMod.setType_of_cargo(rs.getString("TYPE_OF_CARGO"));

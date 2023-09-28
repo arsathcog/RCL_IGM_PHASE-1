@@ -141,7 +141,10 @@ public class ImportGeneralManifestUim extends PaginationForm {
 
 	/** The Gross weight vessel. */
 	private String GrossWeightVessel;
-
+	
+	/** The Gross weight BL. */
+	private String GrossWeight;
+	
 	/** The Net weight vessel. */
 	private String NetWeightVessel;
 	
@@ -782,6 +785,14 @@ public class ImportGeneralManifestUim extends PaginationForm {
 	 */
 	public void setGrossWeightVessel(String grossWeightVessel) {
 		GrossWeightVessel = grossWeightVessel;
+	}
+
+	public String getGrossWeight() {
+		return GrossWeight;
+	}
+
+	public void setGrossWeight(String grossWeight) {
+		GrossWeight = grossWeight;
 	}
 
 	/**

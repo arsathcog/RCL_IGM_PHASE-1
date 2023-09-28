@@ -408,6 +408,8 @@ public class ImportGeneralManifestMod {
 	
 	private String number_of_packages;   // need to discussion  ??? 
 	
+	private String gros_weight;
+	
 	private String type_of_package;
 	
 	private String first_port_of_entry_last_port_of_departure;
@@ -2380,6 +2382,14 @@ public class ImportGeneralManifestMod {
 
 	public void setNumber_of_packages(String number_of_packages) {
 		this.number_of_packages = number_of_packages;
+	}
+	
+	public String getGros_weight() {
+		return gros_weight;
+	}
+
+	public void setGros_weight(String gros_weight) {
+		this.gros_weight = gros_weight;
 	}
 
 	public String getType_of_package() {

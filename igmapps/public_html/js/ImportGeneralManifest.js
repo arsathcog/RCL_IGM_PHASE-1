@@ -1594,6 +1594,7 @@ function bllevelcheck(){
 
 function submitData() {
 	/**disable all button search section*/
+	debugger;
 	disableButton();
 	var mgsnull=document.getElementById("msg");
 	mgsnull.innerHTML = '';
@@ -1925,6 +1926,9 @@ function submitData() {
 				.getElementById(idJsonObjectForTextBox[i]["Actual pod"]).value;
 				listOfBlDetails["Igm port destination"] = document
 				.getElementById(idJsonObjectForTextBox[i]["Igm port destination"]).value;
+				listOfBlDetails["Gross Weight"] = document
+				.getElementById(idJsonObjectForTextBox[i]["Gross Weight"]).value;
+				
 		
 
 				if(popupjson.popup[blnoforpopupdata].consignee[0].vaidation=="TRUE" && popupjson.popup[blnoforpopupdata].notifyParty[0].vaidation=="TRUE"
@@ -2204,7 +2208,7 @@ function submitData() {
 				blDetails.push(listOfBlDetails);
 
 
-				for(j=0;j<popupjson.popup[blnoforpopupdata].consignee.length;j++)
+				for (j = 0; j < popupjson.popup[blnoforpopupdata].consignee.length;j++)
 				{
 					var listofconsignee={};
 					listofconsignee["zip"]=popupjson.popup[blnoforpopupdata].consignee[j].zip;
@@ -6332,6 +6336,9 @@ function manifestFileGeneratorEdiFile() {
 						.getElementById(idJsonObjectForTextBox[i]["Destination port final"]).value;
 						listOfBlDetails["Cust Code"] = document
 						.getElementById(idJsonObjectForTextBox[i]["Cust Code"]).value;
+						listOfBlDetails["Gross Weight"] = document
+						.getElementById(idJsonObjectForTextBox[i]["Gross Weight"]).value;
+					
 					
 						blDetails.push(listOfBlDetails);
 						

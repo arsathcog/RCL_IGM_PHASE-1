@@ -339,7 +339,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 		for (Object blObj : blList) {
 			JSONObject blJSONObj = (JSONObject) blObj;
-			if(blJSONObj.get("flag").equals("TRUE")) {
+			if(blJSONObj.get("flag").equals("TRUE") && blJSONObj.get("Is Present").equals("FALSE") ) {
 			Map<String, String> mapParam = createHeaderParamsForSave(objForm, blJSONObj, serviceVesselVoyageObj,
 					consigneeDtlsList, consignerDtlsList, MarksNumberDtlstlsList, NotifyPartyDltsList);
 			if ("TRUE".equalsIgnoreCase(mapParam.get(ImportGeneralManifestDao.KEY_IGM_IS_SELECTED))
@@ -1871,13 +1871,18 @@ public class ImportGeneralManifestSvc extends BaseAction {
 	    }
 	    
 	    public static String formatTimeTo12Hour(String inputTime) {
-	    	 if (inputTime.length() != 4) {
-	    	        // Input time should be in HHMM format (4 characters)
-	    	        return "Invalid time format";
+	    	int hours = 0;
+	    	 int minutes = 0;
+	   
+	    	    if(inputTime.length() == 4) {
+	    	    	hours = Integer.parseInt(inputTime.substring(0, 2));
+	    	    	minutes = Integer.parseInt(inputTime.substring(2, 4));
+	    	    }else if(inputTime.length() != 4){
+	    	    	
+	    	    	hours = Integer.parseInt(inputTime.substring(0, 1));
+	    	    	minutes = Integer.parseInt(inputTime.substring(1, 3));
 	    	    }
-	    	    
-	    	    int hours = Integer.parseInt(inputTime.substring(0, 2));
-	    	    int minutes = Integer.parseInt(inputTime.substring(2, 4));
+	    	  
 	    	    
 	    	    if (hours == 0) {
 	    	        hours = 12; // Midnight

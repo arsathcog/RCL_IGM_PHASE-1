@@ -1952,6 +1952,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			JSONObject serviceObj, ImportGeneralManifestDao objDao, JSONArray notifyPartyDetailes,
 			JSONArray marksNumberDtlstls, JSONArray containeerDtls,JSONArray consigneeDtls) throws DataAccessException, BusinessException, ParseException {
 		String mesType = "F";
+		System.out.println("Method started version 1.3");
 
 		// String sId = "RCLAIPL123";
 		Map data = objDao.getSerialNumber(objForm.getSerialNumber());
@@ -2190,12 +2191,22 @@ public class ImportGeneralManifestSvc extends BaseAction {
 									consigneeAdd3 = consigneeAdd.substring(0, 35);
 								} else
 									consigneeAdd3 = consigneeAdd;
-							} else
-								nodifyAdd2 = consigneeAdd;
+							} else {
+								if(nodifyAdd2.equals("")) {
+									
+									nodifyAdd2 = consigneeAdd;
+								}
+								
+							}
+								
 							// System.out.println("length = " + add.length());
 
-						} else
-							nodifyAdd1 = consigneeAdd;
+						} else {
+							if(nodifyAdd1.equals("")) {
+								nodifyAdd1 = consigneeAdd;	
+							}
+							
+						}
 						// System.out.println("length = " + add.length());
 
 						break;
@@ -2225,9 +2236,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				
 //-----------------------------	transport mode Logic -------------------------------------
 				if(blObj.get("Port Of Destination").equals(objForm.getPod())) {
-					transPrtMode = "S";
+					transPrtMode = "";
 				}else if( !blObj.get("Port Of Destination").equals(objForm.getPod())) {
-					transPrtMode = "R";
+					transPrtMode =(String) blObj.get("Transport Mode");
 				}
 //-----------------------------------------------------------------------------------------
 				
@@ -2252,7 +2263,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull((String) blObj.get("Destination port final")),
 						isNull((String) blObj.get("HBL_NO")), isNull((String) blObj.get("HBL_Date")),
 						isNull(consigneeName), isNull(consigneeAdd1), isNull(consigneeAdd2), isNull(consigneeAdd3),
-						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2),
+						isNull(nodifyName), isNull(nodifyAdd1), isNull(nodifyAdd2),isNull(nodifyAdd3),
 						isNull(reqlength((String) blObj.get("Cargo Nature"), 2)),
 						isNull(reqlength((String) blObj.get("Item Type"), 2)),
 						isNull(reqlength((String) cargoMovmnt, 2)),
@@ -2430,6 +2441,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println("#IGMFile Text File generation Completed (v1.3)............");
 		return manifestFile;
 	}
 

@@ -2013,6 +2013,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 			// hard code
 			bw.write("<vesinfo>" + newLine);
+			
+			System.out.println("vesinfo section started");
 			for (Object blObjjson : blList) {
 				JSONObject blObj = (JSONObject) blObjjson;
 				portOfArrival = isNull((String) blObj.get("Port arrival"));
@@ -2021,6 +2023,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 
 			}
 			
+			
+			System.out.println(customeCode + "printing custcode here" );
 		        String formattedDate = formatDate(objForm.getaDate());
 		        String formattedTime = formatTimeTo12Hour(objForm.getaTime());		        
 				// Need some values if not found keep hard coding for each line.
@@ -2074,6 +2078,8 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		
 			bw.write("<END-vesinfo>" + newLine);
 			bw.write("<cargo>" + newLine);
+			
+			System.out.println("cargo section starting here !");
 			String containerStatus = "";
 			for (Object blObjjson : blList) {
 				JSONObject blObj = (JSONObject) blObjjson;
@@ -2251,6 +2257,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				} else {
 					portOfDestination = "IGMDEL";
 				}
+				System.out.println(blObj.get("Cust Code") + "cust code is printing here");
 				// Need some values if not found keep hard coding for each line
 				bw.write(String.join(Character.toString(fieldSepOp), msgType,
 						isNull((String) blObj.get("Cust Code")), isNull(reqlength((String) imoCd, 10)),

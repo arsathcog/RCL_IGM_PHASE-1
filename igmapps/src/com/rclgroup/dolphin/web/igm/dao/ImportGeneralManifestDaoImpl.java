@@ -757,6 +757,7 @@ public class ImportGeneralManifestDaoImpl extends AncestorJdbcDao implements Imp
 			PodTerminal.add(objMod.getPodTerminal());
 			objMod.setVessel(rs.getString("VESSEL"));
 			objMod.setVoyage(rs.getString("VOYAGE"));
+			System.out.println(rs.getString("CUST_CODE") + "cust_code printing here");
 			objMod.setCodeCode(rs.getString("CUST_CODE"));
 			objMod.setCallSing(rs.getString("CALL_SIGN"));
 			objMod.setLineCode(rs.getString("LINE_CODE"));

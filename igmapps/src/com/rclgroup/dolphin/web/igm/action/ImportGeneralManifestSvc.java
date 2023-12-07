@@ -516,7 +516,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		System.out.println("#IGMLogger Map mapParam : " + mapParam);
 		ImportGeneralManifestDao objDao = (ImportGeneralManifestDao) getDao(DAO_BEAN_ID);
 		System.out.println("#IGMLogger Dao bean created successfully...");
-		Map<Object, Object> mapReturn = objDao.getIGMData(mapParam);
+		Map<Object, Object> mapReturn	 = objDao.getIGMData(mapParam);
 		System.out.println("#IGMLogger Proc executed successfully...");
 		List<ImportGeneralManifestMod> result = (List<ImportGeneralManifestMod>) mapReturn
 				.get(ImportGeneralManifestDao.KEY_REF_IGM_DATA);
@@ -1992,22 +1992,19 @@ public class ImportGeneralManifestSvc extends BaseAction {
 		if (newVessel != null && !newVessel.trim().equals("")) {
 			vessel = newVessel;
 		}
-		
 		if(null == objForm.getIgmNo() || ("").equals(objForm.getIgmNo())) {
 			msgType = "F";
 		}else {
 			msgType = "A";
 		}
-		
 		sequence = sId.substring(2,8);
 		File manifestFile = new File(path);
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(manifestFile));) {
-
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(manifestFile),1000);) {
 			// Need some values if not found keep hard coding
 			bw.write(String.join(Character.toString(fieldSepOp), "HREC", "ZZ", "RCLAIPL123", // isNull(sId),
 					"ZZ", isNull(reqlength(objForm.getPod(),6)+"1"), "ICES1_5", "P", isNull(blank), "SACHI01", isNull(sequence), // isNull(objForm.getSerialNumber()),
 					currDate, currTime + newLine));
-
+			
 			// hard code
 			bw.write("<manifest>" + newLine);
 
@@ -2024,7 +2021,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 			}
 			
 			
-			System.out.println(customeCode + "printing custcode here" );
+//			System.out.println(customeCode + "printing custcode here" );
 		        String formattedDate = formatDate(objForm.getaDate());
 		        String formattedTime = formatTimeTo12Hour(objForm.getaTime());		        
 				// Need some values if not found keep hard coding for each line.
@@ -2043,7 +2040,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						isNull(reqlength(objForm.getShipStoreDeclaration(), 1)), "N",
 						isNull(reqlength(objForm.getPassengerList(), 1)), isNull(reqlength(objForm.getCrewEffect(), 1)),
 						isNull(reqlength(objForm.getMaritimeDeclaration(), 1)),
-						CustomTerminalCd
+						terminalOpCod
 				
 					// newly added-------------------------------------------
 					/*isNull(objForm.getDepartureManifestNumber()),
@@ -2093,11 +2090,13 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					unoCd = (String) blObj.get("UNO Code");
 				} else {
 					unoCd = "ZZZZZ";
+					unoCd = unoCd.replaceAll("\\s", "");
 				}
-				if (null != objForm.getImoCode() || !("").equals(objForm.getImoCode())) {
-					imoCd = objForm.getImoCode();
-				} else {
+				if (null == blObj.get("IMDG Code") || ("").equals(blObj.get("IMDG Code"))) {
 					imoCd = "ZZZ";
+				} else {
+					imoCd = (String) blObj.get("IMDG Code");
+					imoCd = imoCd.replaceAll("\\s", "");
 				}
 
 				if ("TI".equalsIgnoreCase((String) blObj.get("Cargo Movement"))) {
@@ -2106,6 +2105,11 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				}
 				String add = isNull(((String) blObj.get("Custom ADD1")) + ((String) blObj.get("Custom ADD2"))
 						+ ((String) blObj.get("Custom ADD3")) + ((String) blObj.get("Custom ADD4")));
+				if(add.contains("\n")) {
+					add = add.replaceAll("\n", "");
+//					System.out.println(add + "to check \n");
+				}
+			
 				String add1 = "";
 				String add2 = "";
 				String add3 = "";
@@ -2146,18 +2150,22 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				for (Object notifyObj : notifyPartyDetailes) {
 					JSONObject notyObj = (JSONObject) notifyObj;
 					if (((String) blObj.get("BL#")).equals(notyObj.get("blNO"))) {
-
+						System.out.println(notyObj.get("blNO"));
 						nodifyName = isNull(((String) notyObj.get("customerName")));
 
 						String NodifyAdd = isNull(((String) notyObj.get("addressLine1"))
 								+ ((String) notyObj.get("addressLine2")) + ((String) notyObj.get("addressLine3"))
 								+ ((String) notyObj.get("addressLine4")));
 
+						if(NodifyAdd.contains("\n")) {
+							NodifyAdd = NodifyAdd.replaceAll("\n", "");
+						}
 						int len = NodifyAdd.length();
 						System.out.println("length of Notify address " + len);
 						if (len > 35) {
 							nodifyAdd1 = NodifyAdd.substring(0, 35);
 							NodifyAdd = NodifyAdd.substring(35, len);
+//							System.out.println("to check \n"+  NodifyAdd);
 							if (NodifyAdd.length() > 35) {
 								nodifyAdd2 = NodifyAdd.substring(0, 35);
 								NodifyAdd = NodifyAdd.substring(35, NodifyAdd.length());
@@ -2183,6 +2191,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						String consigneeAdd = isNull(((String) cnsgneeObj.get("addressLine1"))
 								+ ((String) cnsgneeObj.get("addressLine2")) + ((String) cnsgneeObj.get("addressLine3"))
 								+ ((String) cnsgneeObj.get("addressLine4")));
+						if(consigneeAdd.contains("\n")) {
+							consigneeAdd = consigneeAdd.replaceAll("\n", "");
+						}
 						consigneeName = isNull(((String) cnsgneeObj.get("customerName")));
 
 						int len = consigneeAdd.length();
@@ -2204,7 +2215,6 @@ public class ImportGeneralManifestSvc extends BaseAction {
 								}
 								
 							}
-								
 							// System.out.println("length = " + add.length());
 
 						} else {
@@ -2225,9 +2235,9 @@ public class ImportGeneralManifestSvc extends BaseAction {
 					marksNo = "No Marks";
 					description = (String) marksObj.get("description");
 					if (description.contains("\r\n")) {
-						description = description.replace("\r\n", " ");
+						description = description.replace("\r\n", "");
 					} else if (description.contains("\n")) {
-						description = description.replace("\n", " ");
+						description = description.replace("\n", "");
 					}
 
 				}
@@ -2260,7 +2270,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 				System.out.println(blObj.get("Cust Code") + "cust code is printing here");
 				// Need some values if not found keep hard coding for each line
 				bw.write(String.join(Character.toString(fieldSepOp), msgType,
-						isNull((String) blObj.get("Cust Code")), isNull(reqlength((String) imoCd, 10)),
+						isNull((String) blObj.get("Cust Code")), isNull(reqlength((String) objForm.getImoCode(), 10)),
 						reqlength(objForm.getCallSign(), 10), reqlength(voyage, 10),
 						isNull(reqlength(objForm.getIgmNo(), 7)), removeSlash(isNull(objForm.getIgmDate())),
 						isNull((String) blObj.get("Item Number")),
@@ -2285,7 +2295,7 @@ public class ImportGeneralManifestSvc extends BaseAction {
 						// "MARKS_NUMBER",
 						/* isNullUno(reqlength((String)blObj.get("UNO Code"),5)) */ isNull(
 								reqlength((String) unoCd, 5)), // "UNO_CODE",
-						/* isNull(reqlength(objForm.getImoCode(), 10)) */isNull(reqlength((String) "ZZZ", 10)),
+						/* isNull(reqlength(objForm.getImoCode(), 10)) */isNull((String) imoCd),
 						reqlength(tpBond, 10), reqlength(rc_Code, 10),
 
 						isNull(reqlength((String) transPrtMode, 1)), isNull(reqlength(objForm.getAgentCode(), 16))

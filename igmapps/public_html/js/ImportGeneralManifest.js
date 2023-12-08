@@ -4164,25 +4164,25 @@ function onUpload()
 	}
 	if (window.focus) {popupWindow.focus()}*/
 
-	 function consigneeMethod(popupWindow,selectObject){
-		//debugger;
-		
-		var idr=selectObject.id;
-		var X=document.getElementById(idr).getAttribute("servicepath");
-		var Y=document.getElementById(idr).getAttribute("blspath");
-		//consinfot = popupWindow.document.getElementById("consigneeInformation");
-		consigneeCode = popupWindow.document.getElementById("consigneeCode");
-		consigneeName = popupWindow.document.getElementById("consigneeName");
-		consigneeAdress1 = popupWindow.document.getElementById("consigneeAdress1");
-		consigneeAdress2 = popupWindow.document.getElementById("consigneeAdress2");
-		consigneeAdress3 = popupWindow.document.getElementById("consigneeAdress3");
-		consigneeAdress4 = popupWindow.document.getElementById("consigneeAdress4");
-		consigneeCity = popupWindow.document.getElementById("consigneeCity");
-		consigneeState = popupWindow.document.getElementById("consigneeState");
-		consigneeCountry = popupWindow.document.getElementById("consigneeCountry");
-		consigneeZip = popupWindow.document.getElementById("consigneeZip");
-		consigneeBlNo = popupWindow.document.getElementById("consigneeBlNo");
-		//consinfot.innerHTML = '';
+function consigneeMethod(popupWindow, selectObject) {
+	debugger;
+
+	var idr = selectObject.id;
+	var X = document.getElementById(idr).getAttribute("servicepath");
+	var Y = document.getElementById(idr).getAttribute("blspath");
+	//consinfot = popupWindow.document.getElementById("consigneeInformation");
+	consigneeCode = popupWindow.document.getElementById("consigneeCode");
+	consigneeName = popupWindow.document.getElementById("consigneeName");
+	consigneeAdress1 = popupWindow.document.getElementById("consigneeAdress1");
+	consigneeAdress2 = popupWindow.document.getElementById("consigneeAdress2");
+	consigneeAdress3 = popupWindow.document.getElementById("consigneeAdress3");
+	consigneeAdress4 = popupWindow.document.getElementById("consigneeAdress4");
+	consigneeCity = popupWindow.document.getElementById("consigneeCity");
+	consigneeState = popupWindow.document.getElementById("consigneeState");
+	consigneeCountry = popupWindow.document.getElementById("consigneeCountry");
+	consigneeZip = popupWindow.document.getElementById("consigneeZip");
+	consigneeBlNo = popupWindow.document.getElementById("consigneeBlNo");
+	//consinfot.innerHTML = '';
 	/*	consigneeCode.innerHTML = '';
 		consigneeName.innerHTML = '';
 		consigneeAdress1.innerHTML = '';
@@ -4194,264 +4194,483 @@ function onUpload()
 		consigneeCountry.innerHTML = '';
 		consigneeZip.innerHTML = '';
 		consigneeBlNo.innerHTML = '';*/
-		
-		listOfconsigneeInformation = [];
-		//console.log(popupjson);
-		var consigneeInformationpath=popupjson.popup[document.getElementById(Y+"BL#").value].consignee;
-		var CNINF=popupWindow.CNINF;
-		consigneeInformationpath[0].vaidation="TRUE";
+
+	listOfconsigneeInformation = [];
+	//console.log(popupjson);
+	var consigneeInformationpath = popupjson.popup[document.getElementById(Y + "BL#").value].consignee;
+	var notifyInformationpath = popupjson.popup[document.getElementById(Y + "BL#").value].notifyParty;
+
+	if (consigneeInformationpath[0].customerName.includes("Bank") && 
+	(notifyInformationpath[0].customerName.includes("Bank") || 
+	!notifyInformationpath[0].customerName.include("TO ORDER") || 
+	!notifyInformationpath[0].customerName.include("TO THE ORDER OF "))) {
+		var CNINF = popupWindow.CNINF;
+		consigneeInformationpath[0].vaidation = "TRUE";
 		for (j = 0; j < consigneeInformationpath.length; j++) {
-			var eachconsigneeInformationRow = {};	
-			for(i=0;i<CNINF.length;i++)
-			{
-				if(CNINF[i].columnName=="Code") 
-				{	
+			var eachconsigneeInformationRow = {};
+			for (i = 0; i < CNINF.length; i++) {
+				if (CNINF[i].columnName == "Code") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
-					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							notifyInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeCode.appendChild(element);
 				}
-				else if(CNINF[i].columnName=="Name") 
-				{
+				else if (CNINF[i].columnName == "Name") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapname");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
-					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							notifyInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeName.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					consinfot.appendChild(node);*/
 				}
-				else if(CNINF[i].columnName=="Address1") 
-				{
+				else if (CNINF[i].columnName == "Address1") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapadress");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
-					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							notifyInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeAdress1.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					consinfot.appendChild(node);*/
 				}
-				else if(CNINF[i].columnName=="Address2") 
-				{
+				else if (CNINF[i].columnName == "Address2") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapadress");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
-					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							notifyInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeAdress2.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					consinfot.appendChild(node);*/
 				}
-				else if(CNINF[i].columnName=="Address3") 
-				{
+				else if (CNINF[i].columnName == "Address3") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapadress");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
-					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							notifyInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeAdress3.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					consinfot.appendChild(node);*/
 				}
-				else if(CNINF[i].columnName=="Address4") 
-				{
+				else if (CNINF[i].columnName == "Address4") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapadress");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
-					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							notifyInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeAdress4.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					consinfot.appendChild(node);*/
 				}
-				else if(CNINF[i].columnName =="City") 
-				{
+				else if (CNINF[i].columnName == "City") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
-					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							notifyInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeCity.appendChild(element);
 				}
-				else if(CNINF[i].columnName=="State") 
-				{
+				else if (CNINF[i].columnName == "State") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
-					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							notifyInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeState.appendChild(element);
 				}
-				else if(CNINF[i].columnName=="Country") 
-				{
+				else if (CNINF[i].columnName == "Country") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeCountry.appendChild(element);
+				}
+				else if (CNINF[i].columnName == "BLNO") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log("blNO");
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeBlNo.appendChild(element);
+				}
+				else if (CNINF[i].columnName == "Zip") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!notifyInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeZip.appendChild(element);
+				}
+			}
+			listOfconsigneeInformation
+				.push(eachconsigneeInformationRow);
+			/*var node = popupWindow.document.createElement("p");
+			consinfot.appendChild(node);*/
+			//console.log(listOfconsigneeInformation);
+		}
+	} else {
+
+		var CNINF = popupWindow.CNINF;
+		consigneeInformationpath[0].vaidation = "TRUE";
+		for (j = 0; j < consigneeInformationpath.length; j++) {
+			var eachconsigneeInformationRow = {};
+			for (i = 0; i < CNINF.length; i++) {
+				if (CNINF[i].columnName == "Code") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
 					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
 					}
-					consigneeCountry.appendChild(element);
+					consigneeCode.appendChild(element);
 				}
-				else if(CNINF[i].columnName=="BLNO") 
-				{
+				else if (CNINF[i].columnName == "Name") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapname");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeName.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					consinfot.appendChild(node);*/
+				}
+				else if (CNINF[i].columnName == "Address1") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapadress");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeAdress1.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					consinfot.appendChild(node);*/
+				}
+				else if (CNINF[i].columnName == "Address2") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapadress");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeAdress2.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					consinfot.appendChild(node);*/
+				}
+				else if (CNINF[i].columnName == "Address3") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapadress");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeAdress3.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					consinfot.appendChild(node);*/
+				}
+				else if (CNINF[i].columnName == "Address4") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapadress");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeAdress4.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					consinfot.appendChild(node);*/
+				}
+				else if (CNINF[i].columnName == "City") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeCity.appendChild(element);
+				}
+				else if (CNINF[i].columnName == "State") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeState.appendChild(element);
+				}
+				else if (CNINF[i].columnName == "Country") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
+					//console.log(CNINF[i].mappedCol);
+					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
+					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
+					}
+					consigneeCountry.appendChild(element);
+				}
+				else if (CNINF[i].columnName == "BLNO") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", CNINF[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", CNINF[i].columnName);
+					element.setAttribute("id", j
+						+ CNINF[i].columnName);
+					eachconsigneeInformationRow[CNINF[i].columnName] = j
+						+ CNINF[i].columnName;
 					//console.log("blNO");
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
 					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
 					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeBlNo.appendChild(element);
 				}
-				else if(CNINF[i].columnName=="Zip") 
-				{
+				else if (CNINF[i].columnName == "Zip") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", CNINF[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", CNINF[i].columnName);
 					element.setAttribute("id", j
-							+ CNINF[i].columnName);
+						+ CNINF[i].columnName);
 					eachconsigneeInformationRow[CNINF[i].columnName] = j
-					+ CNINF[i].columnName;
+						+ CNINF[i].columnName;
 					//console.log(CNINF[i].mappedCol);
 					//console.log(consigneeInformationpath[j][CNINF[i].mappedCol]);
 					if (!consigneeInformationpath[j][CNINF[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								consigneeInformationpath[j][CNINF[i].mappedCol]);
+							consigneeInformationpath[j][CNINF[i].mappedCol]);
 					}
 					consigneeZip.appendChild(element);
 				}
 			}
 			listOfconsigneeInformation
-			.push(eachconsigneeInformationRow);
+				.push(eachconsigneeInformationRow);
 			/*var node = popupWindow.document.createElement("p");
 			consinfot.appendChild(node);*/
 			//console.log(listOfconsigneeInformation);
 		}
 	}
+} 
+
 	// this.consigneeme();
 	/*if (popupWindow.addEventListener) {
 		//popupWindow.addEventListener("load", this.consigneeme, false);
@@ -4772,33 +4991,31 @@ function onUpload()
 				//console.log(listOfConsignerInformation);
 			}
 		}
-	 
-	 function notifyPartyme(popupWindow,selectObject){
-		//debugger;
-		 for(var i=0;i<1000;i++)
-			{
-			if(i==999)
-				{
-				console.log(popupWindow);
-				console.log(selectObject);
-				}
-			}
-		var idr=selectObject.id;
-		var X=document.getElementById(idr).getAttribute("servicepath");
-		var Y=document.getElementById(idr).getAttribute("blspath");
-		//notifyInfot = popupWindow.document.getElementById("notifyPartyinfodtl");
-		NotifyCode = popupWindow.document.getElementById("NotifyCode");
-		NotifyName = popupWindow.document.getElementById("NotifyName");
-		NotifyAdress1 = popupWindow.document.getElementById("NotifyAdress1");
-		NotifyAdress2 = popupWindow.document.getElementById("NotifyAdress2");
-		NotifyAdress3 = popupWindow.document.getElementById("NotifyAdress3");
-		NotifyAdress4 = popupWindow.document.getElementById("NotifyAdress4");
-		NotifyCity = popupWindow.document.getElementById("NotifyCity");
-		NotifyState = popupWindow.document.getElementById("NotifyState");
-		NotifyCountry = popupWindow.document.getElementById("NotifyCountry");
-		NotifyZip = popupWindow.document.getElementById("NotifyZip");
-		NotifyBlNo = popupWindow.document.getElementById("NotifyBlNo");
-		//notifyInfot.innerHTML = '';
+
+function notifyPartyme(popupWindow, selectObject) {
+	debugger;
+	for (var i = 0; i < 1000; i++) {
+		if (i == 999) {
+			console.log(popupWindow);
+			console.log(selectObject);
+		}
+	}
+	var idr = selectObject.id;
+	var X = document.getElementById(idr).getAttribute("servicepath");
+	var Y = document.getElementById(idr).getAttribute("blspath");
+	//notifyInfot = popupWindow.document.getElementById("notifyPartyinfodtl");
+	NotifyCode = popupWindow.document.getElementById("NotifyCode");
+	NotifyName = popupWindow.document.getElementById("NotifyName");
+	NotifyAdress1 = popupWindow.document.getElementById("NotifyAdress1");
+	NotifyAdress2 = popupWindow.document.getElementById("NotifyAdress2");
+	NotifyAdress3 = popupWindow.document.getElementById("NotifyAdress3");
+	NotifyAdress4 = popupWindow.document.getElementById("NotifyAdress4");
+	NotifyCity = popupWindow.document.getElementById("NotifyCity");
+	NotifyState = popupWindow.document.getElementById("NotifyState");
+	NotifyCountry = popupWindow.document.getElementById("NotifyCountry");
+	NotifyZip = popupWindow.document.getElementById("NotifyZip");
+	NotifyBlNo = popupWindow.document.getElementById("NotifyBlNo");
+	//notifyInfot.innerHTML = '';
 	/*	NotifyCode.innerHTML = '';
 		NotifyName.innerHTML = '';
 		NotifyAdress1.innerHTML = '';
@@ -4810,268 +5027,490 @@ function onUpload()
 		NotifyCountry.innerHTML = '';
 		NotifyZip.innerHTML = '';
 		NotifyBlNo.innerHTML = '';*/
-		listOfnotifyInformation = [];
-		//console.log(popupjson);
-		var notifyInformationpath=popupjson.popup[document.getElementById(Y+"BL#").value].notifyParty;
-		notifyInformationpath[0].vaidation="TRUE";
-		var NTP=popupWindow.NTP;
-		for (j = 0; j < notifyInformationpath.length; j++) {
-			var eachnotifyInformationRow = {};	
-			for(i=0;i<NTP.length;i++)
-			{
+	listOfnotifyInformation = [];
+	//console.log(popupjson);
+	var notifyInformationpath = popupjson.popup[document.getElementById(Y + "BL#").value].notifyParty;
+	var consigneeInformationpath = popupjson.popup[document.getElementById(Y + "BL#").value].consignee;
 
-				if(NTP[i].columnName=="Notify Code") 
-				{						
+	notifyInformationpath[0].vaidation = "TRUE";
+	var NTP = popupWindow.NTP;
+
+	if (notifyInformationpath[0].customerName.includes("SAME AS CONSIGNEE") && (!consigneeInformationpath[0].customerName.includes("Bank") ||
+		!consigneeInformationpath[0].customerName.include("TO ORDER") ||
+		!consigneeInformationpath[0].customerName.include("TO THE ORDER OF"))) {
+
+		for (j = 0; j < notifyInformationpath.length; j++) {
+			var eachnotifyInformationRow = {};
+			for (i = 0; i < NTP.length; i++) {
+
+				if (NTP[i].columnName == "Notify Code") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("id", i
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = i
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 
 					NotifyCode.appendChild(element);
 				}
-				else if(NTP[i].columnName=="Notify Name") 
-				{
+				else if (NTP[i].columnName == "Notify Name") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapname");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 
 					NotifyName.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					notifyInfot.appendChild(node);*/
 				}
-				else if(NTP[i].columnName=="Notify Address1") 
-				{
+				else if (NTP[i].columnName == "Notify Address1") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapadress");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 					NotifyAdress1.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					notifyInfot.appendChild(node);*/
 				}
-				else if(NTP[i].columnName=="Notify Address2") 
-				{
+				else if (NTP[i].columnName == "Notify Address2") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapadress");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 					NotifyAdress2.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					notifyInfot.appendChild(node);*/
 				}
-				else if(NTP[i].columnName=="Notify Address3") 
-				{
+				else if (NTP[i].columnName == "Notify Address3") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapadress");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 					NotifyAdress3.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					notifyInfot.appendChild(node);*/
 				}
-				else if(NTP[i].columnName=="Notify Address4") 
-				{
+				else if (NTP[i].columnName == "Notify Address4") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapadress");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 					NotifyAdress4.appendChild(element);
 					/*var node = popupWindow.document.createElement("p");
 					notifyInfot.appendChild(node);*/
 				}
-				else if(NTP[i].columnName =="City") 
-				{
+				else if (NTP[i].columnName == "City") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 					NotifyCity.appendChild(element);
 				}
-				else if(NTP[i].columnName=="State") 
-				{
+				else if (NTP[i].columnName == "State") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 
 					NotifyState.appendChild(element);
 				}
-				else if(NTP[i].columnName=="Country") 
-				{
+				else if (NTP[i].columnName == "Country") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 
 					NotifyCountry.appendChild(element);
 				}
-				else if(NTP[i].columnName=="Zip") 
-				{
+				else if (NTP[i].columnName == "Zip") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", j
-							+ NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = j
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 					NotifyZip.appendChild(element);
 				}
-				else if(NTP[i].columnName=="BLNO") 
-				{
+				else if (NTP[i].columnName == "BLNO") {
 					var element = popupWindow.document.createElement("input");
 					element.setAttribute("type", NTP[i].type);
 					element.setAttribute("class", "roundshapnormal");
 					element.setAttribute("name", NTP[i].columnName);
 					element.setAttribute("id", i
-							+NTP[i].columnName);
+						+ NTP[i].columnName);
 					eachnotifyInformationRow[NTP[i].columnName] = i
-					+ NTP[i].columnName;
+						+ NTP[i].columnName;
 					//console.log(NTP[i].mappedCol);
 					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
-					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+					if (!consigneeInformationpath[j][NTP[i].mappedCol]) {
 						element.setAttribute("value", "");
-					} else 
-					{
+					} else {
 						element.setAttribute("value",
-								notifyInformationpath[j][NTP[i].mappedCol]);
+							consigneeInformationpath[j][NTP[i].mappedCol]);
 					}
 					NotifyBlNo.appendChild(element);
 				}
 			}
 			listOfnotifyInformation
-			.push(eachnotifyInformationRow);
+				.push(eachnotifyInformationRow);
+			/*var node = popupWindow.document.createElement("p");
+			notifyInfot.appendChild(node);*/
+		}
+
+	} else {
+
+
+		for (j = 0; j < notifyInformationpath.length; j++) {
+			var eachnotifyInformationRow = {};
+			for (i = 0; i < NTP.length; i++) {
+
+				if (NTP[i].columnName == "Notify Code") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("id", i
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = i
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+
+					NotifyCode.appendChild(element);
+				}
+				else if (NTP[i].columnName == "Notify Name") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapname");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+
+					NotifyName.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					notifyInfot.appendChild(node);*/
+				}
+				else if (NTP[i].columnName == "Notify Address1") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapadress");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+					NotifyAdress1.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					notifyInfot.appendChild(node);*/
+				}
+				else if (NTP[i].columnName == "Notify Address2") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapadress");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+					NotifyAdress2.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					notifyInfot.appendChild(node);*/
+				}
+				else if (NTP[i].columnName == "Notify Address3") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapadress");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+					NotifyAdress3.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					notifyInfot.appendChild(node);*/
+				}
+				else if (NTP[i].columnName == "Notify Address4") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapadress");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+					NotifyAdress4.appendChild(element);
+					/*var node = popupWindow.document.createElement("p");
+					notifyInfot.appendChild(node);*/
+				}
+				else if (NTP[i].columnName == "City") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+					NotifyCity.appendChild(element);
+				}
+				else if (NTP[i].columnName == "State") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+
+					NotifyState.appendChild(element);
+				}
+				else if (NTP[i].columnName == "Country") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+
+					NotifyCountry.appendChild(element);
+				}
+				else if (NTP[i].columnName == "Zip") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", j
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = j
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+					NotifyZip.appendChild(element);
+				}
+				else if (NTP[i].columnName == "BLNO") {
+					var element = popupWindow.document.createElement("input");
+					element.setAttribute("type", NTP[i].type);
+					element.setAttribute("class", "roundshapnormal");
+					element.setAttribute("name", NTP[i].columnName);
+					element.setAttribute("id", i
+						+ NTP[i].columnName);
+					eachnotifyInformationRow[NTP[i].columnName] = i
+						+ NTP[i].columnName;
+					//console.log(NTP[i].mappedCol);
+					//console.log(notifyInformationpath[j][NTP[i].mappedCol]);
+					if (!notifyInformationpath[j][NTP[i].mappedCol]) {
+						element.setAttribute("value", "");
+					} else {
+						element.setAttribute("value",
+							notifyInformationpath[j][NTP[i].mappedCol]);
+					}
+					NotifyBlNo.appendChild(element);
+				}
+			}
+			listOfnotifyInformation
+				.push(eachnotifyInformationRow);
 			/*var node = popupWindow.document.createElement("p");
 			notifyInfot.appendChild(node);*/
 		}
 	}
+}
 	/*//this.notifyPartyme();
 	if (popupWindow.addEventListener) {
 		//popupWindow.addEventListener("load", this.notifyPartyme, false);
